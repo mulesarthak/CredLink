@@ -397,6 +397,169 @@ p, .body-text {
   padding: var(--spacing-2xl) 0;
 }
 
+/* Pricing page component global styles (migrated from local module) */
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.subHeader {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.toggleWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(127,216,190,0.06);
+  padding: 0.35rem;
+  border-radius: 9999px;
+}
+
+.switch {
+  width: 40px;
+  height: 22px;
+  background: #e6f6ef;
+  border-radius: 9999px;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.knob {
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 200ms ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.knob.checked {
+  transform: translateX(18px);
+}
+
+.pricingGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .pricingGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1100px) {
+  .pricingGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.planCard {
+  background: var(--background-white);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(127,216,190,0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 320px;
+}
+
+.featured {
+  background: var(--gradient-primary);
+  color: var(--text-white);
+  border: none;
+}
+
+.planHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.planTitle {
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.planSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0.75rem 0;
+}
+
+.priceSmall {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.features {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.featureIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.planFooter {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.ctaPrimary {
+  flex: 1 1 auto;
+}
+
+.ctaSecondary {
+  flex: 0 0 auto;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  background: rgba(127,216,190,0.12);
+  color: var(--primary-green);
+}
+
+.contactLink {
+  color: var(--primary-green);
+  text-decoration: underline;
+}
+
 /* ========================================
    Responsive Typography
    ======================================== */
