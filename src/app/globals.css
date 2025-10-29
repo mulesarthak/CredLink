@@ -72,15 +72,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0F1419;
-    --background-white: #1A1F26;
-    --foreground: #E8F8F3;
-    --text-primary: #E8F8F3;
-    --text-secondary: #9CA3AF;
-  }
-}
+/* Dark theme disabled: site will always use the light theme variables above */
 
 /* ========================================
    Base Styles
@@ -452,20 +444,25 @@ p, .body-text {
 
 .pricingGrid {
   display: grid;
-  gap: 1rem;
+  gap: 1.5rem;
   grid-template-columns: 1fr;
+  align-items: stretch; /* ensure grid children stretch to same height */
+  justify-content: center; /* center the grid within container */
+  justify-items: stretch;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .pricingGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+    gap: 1.5rem;
   }
 }
 
 @media (min-width: 1100px) {
+  /* three equal columns centered and equidistant */
   .pricingGrid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    gap: 2rem;
   }
 }
 
@@ -479,6 +476,7 @@ p, .body-text {
   flex-direction: column;
   justify-content: space-between;
   min-height: 320px;
+  height: 100%; /* allow card to fill grid cell height */
 }
 
 .featured {
@@ -487,12 +485,70 @@ p, .body-text {
   border: none;
 }
 
+/* Improve contrast for featured (gradient) cards */
+.featured .planSubtitle,
+.featured .priceSmall,
+.featured .featureItem,
+.featured .planHeader .badge {
+  color: rgba(255,255,255,0.85);
+}
+
+.featured .planTitle,
+.featured .price {
+  color: var(--text-white);
+}
+
+/* Make SVG icons inherit color inside featured cards */
+.featured .featureIcon {
+  color: rgba(255,255,255,0.9);
+}
+
+/* Hover effects: elevate and slightly shift color */
+.planCard {
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, background 220ms ease;
+}
+
+.planCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 30px rgba(16,24,40,0.08);
+  border-color: rgba(99,102,241,0.12);
+}
+
+.planCard:hover .badge {
+  transform: translateY(-1px);
+}
+
+/* Featured hover: make gradient a bit stronger */
+.featured:hover {
+  background: var(--gradient-secondary);
+  box-shadow: 0 24px 40px rgba(99,102,241,0.12);
+}
+
+/* Ensure feature text in featured cards is readable on hover too */
+.featured:hover .planSubtitle,
+.featured:hover .featureItem,
+.featured:hover .priceSmall {
+  color: rgba(255,255,255,0.95);
+}
+
 .planHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
+}
+
+/* Ensure the main content area inside the card grows so all cards match height
+   and footers align at the bottom */
+.planCard > div:first-child {
+  flex: 1 1 auto;
+}
+
+/* Also make grid children (articles) stretch and be flex containers for consistency */
+.pricingGrid > article {
+  display: flex;
+  flex-direction: column;
 }
 
 .planTitle {

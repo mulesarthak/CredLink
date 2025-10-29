@@ -1,5 +1,5 @@
 import React from "react";
-import PricingPage from "../../components/Pricing/page";
+import PricingPage from "../../components/Pricing/Component";
 
 export const metadata = {
   title: "Pricing — CredLink",
