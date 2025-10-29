@@ -6,12 +6,10 @@ export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // Public paths that don't require authentication
-  // Add any routes here that should be accessible without logging in (e.g. /pricing)
-  const isPublicPath =
-    path === '/auth/login' ||
-    path === '/auth/signup' ||
-    path === '/pricing' ||
-    path.startsWith('/pricing/')
+  const isAuthPath = path.startsWith('/auth')
+  const isAdminPath = path.startsWith('/admin')
+  const isPricingPath = path === '/pricing' || path.startsWith('/pricing/')
+  const isPublicPath = isAuthPath || isAdminPath || isPricingPath || path === '/'
 
   // Check if user is authenticated (NextAuth uses next-auth.session-token)
   const isAuthenticated = request.cookies.has('next-auth.session-token') || 
@@ -22,7 +20,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
-  // Redirect unauthenticated users to login page
+  // Redirect unauthenticated users to login page (except for public paths)
   if (!isAuthenticated && !isPublicPath) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }

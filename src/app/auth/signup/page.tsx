@@ -31,12 +31,33 @@ export default function SignupPage() {
 
   const onSubmit = async (data: SignupForm) => {
     try {
-      // Add your signup logic here
-      toast.loading('Creating your account...')
-      await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate API call
+      const loadingToast = toast.loading('Creating your account...')
+      
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          fullName: data.fullName,
+          phone: data.phone,
+        }),
+      })
+
+      const result = await response.json()
+      toast.dismiss(loadingToast)
+
+      if (!response.ok) {
+        toast.error(result.error || 'Failed to create account')
+        return
+      }
+
       toast.success('Account created successfully!')
       router.push('/auth/login')
     } catch (error) {
+      console.error('Signup error:', error)
       toast.error('Failed to create account. Please try again.')
     }
   }

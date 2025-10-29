@@ -37,11 +37,30 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    // Simulate login
-    setTimeout(() => {
+    
+    try {
+      if (loginMethod === 'email') {
+        const result = await signIn('credentials', {
+          email: formData.email,
+          password: formData.password,
+          redirect: false,
+        })
+
+        if (result?.error) {
+          alert(result.error)
+        } else {
+          window.location.href = '/'
+        }
+      } else {
+        // OTP login logic (to be implemented)
+        alert('OTP login not yet implemented')
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+      alert('An error occurred during login')
+    } finally {
       setLoading(false)
-      // Redirect to dashboard
-    }, 1000)
+    }
   }
 
   return (
