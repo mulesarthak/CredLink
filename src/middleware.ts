@@ -6,9 +6,12 @@ export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // Public paths that don't require authentication
-  const isAuthPath = path.startsWith('/auth')
-  const isAdminPath = path.startsWith('/admin')
-  const isPublicPath = isAuthPath || isAdminPath
+  // Add any routes here that should be accessible without logging in (e.g. /pricing)
+  const isPublicPath =
+    path === '/auth/login' ||
+    path === '/auth/signup' ||
+    path === '/pricing' ||
+    path.startsWith('/pricing/')
 
   // Check if user is authenticated (NextAuth uses next-auth.session-token)
   const isAuthenticated = request.cookies.has('next-auth.session-token') || 
