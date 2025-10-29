@@ -13,11 +13,12 @@ export function middleware(request: NextRequest) {
     path === '/pricing' ||
     path.startsWith('/pricing/')
 
-  // Check if user is authenticated
-  const isAuthenticated = request.cookies.has('authToken') // Replace with your auth token name
+  // Check if user is authenticated (NextAuth uses next-auth.session-token)
+  const isAuthenticated = request.cookies.has('next-auth.session-token') || 
+                          request.cookies.has('__Secure-next-auth.session-token')
 
   // Redirect authenticated users away from auth pages
-  if (isAuthenticated && isPublicPath) {
+  if (isAuthenticated && isAuthPath) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 

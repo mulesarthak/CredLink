@@ -11,6 +11,18 @@ const handler = NextAuth({
   pages: {
     signIn: '/auth/login',
   },
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Allow redirects to admin routes without authentication
+      if (url.startsWith('/admin')) {
+        return url
+      }
+      // Default redirect behavior
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
+    },
+  },
 })
 
 export { handler as GET, handler as POST }
