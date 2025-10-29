@@ -6,13 +6,16 @@ export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // Public paths that don't require authentication
-  const isPublicPath = path === '/auth/login' || path === '/auth/signup'
+  const isAuthPath = path.startsWith('/auth')
+  const isAdminPath = path.startsWith('/admin')
+  const isPublicPath = isAuthPath || isAdminPath
 
-  // Check if user is authenticated
-  const isAuthenticated = request.cookies.has('authToken') // Replace with your auth token name
+  // Check if user is authenticated (NextAuth uses next-auth.session-token)
+  const isAuthenticated = request.cookies.has('next-auth.session-token') || 
+                          request.cookies.has('__Secure-next-auth.session-token')
 
   // Redirect authenticated users away from auth pages
-  if (isAuthenticated && isPublicPath) {
+  if (isAuthenticated && isAuthPath) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
