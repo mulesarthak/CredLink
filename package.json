@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@auth/nextjs": "^0.0.0-380f8d56",
+    "@prisma/client": "^5.7.1",
     "@hookform/resolvers": "^5.2.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
