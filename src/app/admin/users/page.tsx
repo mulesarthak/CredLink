@@ -53,12 +53,13 @@ export default function UsersPage() {
   })
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="w-full flex justify-center">
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 md:space-y-12">
+        {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-          <p className="text-gray-600">Manage all registered users</p>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Users</h1>
+          <p className="mt-1 text-sm md:text-base text-gray-600">Manage all registered users</p>
         </div>
         <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
           Export Users
@@ -66,8 +67,8 @@ export default function UsersPage() {
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex flex-col sm:flex-row gap-4">
+      <div className="bg-white rounded-lg shadow p-8 md:p-10">
+        <div className="flex flex-col sm:flex-row gap-6 md:gap-8">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
@@ -75,20 +76,20 @@ export default function UsersPage() {
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-5 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Users</option>
               <option value="verified">Verified</option>
               <option value="unverified">Unverified</option>
             </select>
-            <button className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <button className="flex items-center px-5 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
               <Filter className="h-4 w-4 mr-2" />
               More Filters
             </button>
@@ -102,25 +103,25 @@ export default function UsersPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-8 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-8 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-8 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-8 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Profile
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-8 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Activity
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-8 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Views
                 </th>
-                <th className="relative px-6 py-3">
+                <th className="relative px-8 py-4">
                   <span className="sr-only">Actions</span>
                 </th>
               </tr>
@@ -128,7 +129,7 @@ export default function UsersPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-8 py-5 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-10 w-10 bg-gray-300 rounded-full flex items-center justify-center">
                         <span className="text-sm font-medium text-gray-700">
@@ -141,11 +142,11 @@ export default function UsersPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-8 py-5 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{user.email}</div>
                     <div className="text-sm text-gray-500">{user.phone}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-8 py-5 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         user.isVerified 
@@ -156,7 +157,7 @@ export default function UsersPage() {
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-8 py-5 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       user.profileStatus === 'published'
                         ? 'bg-blue-100 text-blue-800'
@@ -165,14 +166,14 @@ export default function UsersPage() {
                       {user.profileStatus}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-8 py-5 whitespace-nowrap text-sm text-gray-500">
                     <div>Joined: {user.joinDate}</div>
                     <div>Last: {user.lastActive}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-8 py-5 whitespace-nowrap text-sm text-gray-900">
                     {user.profileViews.toLocaleString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <button className="text-blue-600 hover:text-blue-900 p-1">
                         <Shield className="h-4 w-4" />
@@ -196,26 +197,27 @@ export default function UsersPage() {
       </div>
 
       {/* Pagination */}
-      <div className="bg-white rounded-lg shadow px-6 py-4">
+      <div className="bg-white rounded-lg shadow px-8 py-6 md:px-10">
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-700">
+          <div className="text-sm md:text-base text-gray-700">
             Showing 1 to {filteredUsers.length} of {users.length} users
           </div>
-          <div className="flex items-center space-x-2">
-            <button className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+          <div className="flex items-center space-x-3">
+            <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors">
               Previous
             </button>
-            <button className="px-3 py-1 bg-blue-600 text-white rounded">
+            <button className="px-4 py-2 bg-blue-600 text-white rounded">
               1
             </button>
-            <button className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+            <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors">
               2
             </button>
-            <button className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+            <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors">
               Next
             </button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )
