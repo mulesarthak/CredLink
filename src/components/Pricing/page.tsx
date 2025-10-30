@@ -1,3 +1,8 @@
+
+
+
+
+
 "use client";
 
 import React, { useState } from "react";
@@ -13,9 +18,9 @@ type Plan = {
 
 const PLANS: Plan[] = [
   {
-    id: "personal",
-    title: "Personal",
-    subtitle: "Get started with a free contact card",
+    id: "free-professional",
+    title: "Free ",
+    subtitle: "Get started with a free professional card",
     monthly: 0,
     features: [
       "Create a contact card",
@@ -24,42 +29,31 @@ const PLANS: Plan[] = [
       "Email signature generator",
     ],
   },
-  {
-    id: "professional",
-    title: "Professional",
-    subtitle: "Customize, brand, and analyze your digital business cards",
-    monthly: 6,
-    featured: true,
-    features: [
-      "Additional card designs and styles",
-      "Add videos, badges, and PDFs",
-      "Access your card analytics",
-      "Sync with Outlook and Google Contacts",
-    ],
-  },
-  {
-    id: "business",
-    title: "Business",
-    subtitle: "Scale across your team and integrate with business tools",
-    monthly: 25,
-    features: [
-      "Digital business cards for entire team",
-      "CRM integrations",
-      "Admin-customized virtual backgrounds",
-      "Team analytics and scanner",
-    ],
-  },
-  {
-    id: "enterprise",
-    title: "Enterprise",
-    subtitle: "Advanced security, integration, and authentication",
-    monthly: null,
-    features: [
-      "Advanced SAML/SCIM integrations",
-      "Priority enterprise onboarding",
-      "Phone & Zoom technical support",
-    ],
-  },
+//   {
+//     id: "professional",
+//     title: "Professional",
+//     subtitle: "Customize, brand, and analyze your digital business cards",
+//     monthly: 6,
+//     featured: true,
+//     features: [
+//       "Additional card designs and styles",
+//       "Add videos, badges, and PDFs",
+//       "Access your card analytics",
+//       "Sync with Outlook and Google Contacts",
+//     ],
+//   },
+//   {
+//     id: "premium",
+//     title: "Premium",
+//     subtitle: "Scale across your team and integrate with business tools",
+//     monthly: 25,
+//     features: [
+//       "Digital business cards for entire team",
+//       "CRM integrations",
+//       "Admin-customized virtual backgrounds",
+//       "Team analytics and scanner",
+//     ],
+//   },
 ];
 
 export default function PricingPage() {
@@ -123,6 +117,14 @@ export default function PricingPage() {
         </div>
 
         <div className="pricingGrid">
+              style={{
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "50vh", // optional: gives some vertical breathing space
+  }}
+            
+            
           {PLANS.map((plan) => (
             <article
               key={plan.id}
@@ -134,7 +136,7 @@ export default function PricingPage() {
                     <div className="planTitle">{plan.title}</div>
                     <div className="planSubtitle">{plan.subtitle}</div>
                   </div>
-                  {plan.id === "business" && <span className="badge">Includes 5 users</span>}
+                  {plan.id === "premium" && <span className="badge">Includes 5 users</span>}
                 </header>
 
                 <div>
@@ -146,7 +148,8 @@ export default function PricingPage() {
                   {plan.features.map((f, i) => (
                     <div key={i} className="featureItem">
                       <svg className="featureIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                        <circle cx="12" cy="12" r="11" stroke="rgba(127,216,190,0.45)" strokeWidth="1.2" />
+                        {/* Use currentColor so CSS can control stroke color (important for featured gradient cards) */}
+                        <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="1.2" />
                         <path d="M7 12.5l2.5 2.5L17 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                       <div>{f}</div>
@@ -163,7 +166,7 @@ export default function PricingPage() {
                 ) : (
                   <>
                     <button className="btn btn-primary btn-large ctaPrimary" onClick={() => handlePrimaryAction(plan.id)}>
-                      {plan.monthly === 0 ? "Create a free card" : "Sign Up"}
+                      {plan.id === 'free-pro' ? 'Get Free Pro' : plan.monthly === 0 ? "Create a free card" : "Sign Up"}
                     </button>
                     <button className="btn btn-secondary btn-small ctaSecondary" onClick={() => alert("Learn more clicked")}>Learn more</button>
                   </>
@@ -175,4 +178,4 @@ export default function PricingPage() {
       </div>
     </section>
   );
-}
+} 
