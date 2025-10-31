@@ -1,3 +1,5 @@
+// This route is deprecated. Use /api/auth/login instead.
+// Keeping for backward compatibility - redirects to centralized auth route
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'

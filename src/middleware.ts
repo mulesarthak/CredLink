@@ -2,26 +2,47 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  // Get the pathname of the request (e.g. /, /protected, /login)
   const path = request.nextUrl.pathname
 
   // Public paths that don't require authentication
+  const publicPaths = [
+    '/',
+    '/auth/login',
+    '/auth/signup',
+    '/features',
+    '/how-it-works',
+    '/pricing',
+    '/contact',
+    '/search',
+    '/faq',
+    '/terms',
+    '/privacy',
+    '/create-card'
+  ]
+  
   const isAuthPath = path.startsWith('/auth')
   const isAdminPath = path.startsWith('/admin')
   const isPricingPath = path === '/pricing' || path.startsWith('/pricing/')
-  const isPublicPath = isAuthPath || isAdminPath || isPricingPath || path === '/'
+  const isContactPath = path === '/contact' || path.startsWith('/contact/')
+  const isDashboardContactPath = path === '/dashboardcontact' || path.startsWith('/dashboardcontact/')
+  
+  // Check if the current path is in the public paths array or matches public path patterns
+  const isInPublicPaths = publicPaths.includes(path)
+  const isCombinedPublicPath = isInPublicPaths || isAuthPath || isAdminPath || isPricingPath || isContactPath || isDashboardContactPath
 
-  // Check if user is authenticated (NextAuth uses next-auth.session-token)
-  const isAuthenticated = request.cookies.has('next-auth.session-token') || 
+  // Check if user is authenticated (check for custom user_token or admin_token)
+  const isAuthenticated = request.cookies.has('user_token') || 
+                          request.cookies.has('admin_token') ||
+                          request.cookies.has('next-auth.session-token') || 
                           request.cookies.has('__Secure-next-auth.session-token')
 
-  // Redirect authenticated users away from auth pages
+  // Redirect authenticated users away from auth pages to dashboard
   if (isAuthenticated && isAuthPath) {
-    return NextResponse.redirect(new URL('/', request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // Redirect unauthenticated users to login page (except for public paths)
-  if (!isAuthenticated && !isPublicPath) {
+  if (!isAuthenticated && !isCombinedPublicPath) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
@@ -30,5 +51,5 @@ export function middleware(request: NextRequest) {
 
 // Configure the paths that should be protected
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*?)'],
 }
