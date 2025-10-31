@@ -36,10 +36,10 @@ export function middleware(request: NextRequest) {
                           request.cookies.has('next-auth.session-token') || 
                           request.cookies.has('__Secure-next-auth.session-token')
 
-  // Redirect authenticated users away from auth pages to dashboard
-  if (isAuthenticated && isAuthPath) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
+  // Allow authenticated users to access auth pages (for logout/account switching)
+  // if (isAuthenticated && isAuthPath) {
+  //   return NextResponse.redirect(new URL('/dashboard', request.url))
+  // }
 
   // Redirect unauthenticated users to login page (except for public paths)
   if (!isAuthenticated && !isCombinedPublicPath) {
