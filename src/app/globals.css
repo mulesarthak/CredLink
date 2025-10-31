@@ -41,8 +41,8 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-card: 0 8px 16px rgba(127, 216, 190, 0.1);
-  --shadow-colored: 0 10px 40px rgba(127, 216, 190, 0.2);
+  --shadow-card: 0 8px 16px rgba(0, 102, 255, 0.1);
+  --shadow-colored: 0 10px 40px rgba(0, 102, 255, 0.2);
   
   /* Border Radius */
   --radius-sm: 0.5rem;
@@ -350,7 +350,7 @@ p, .body-text {
 .card-header {
   margin-bottom: var(--spacing-md);
   padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid rgba(127, 216, 190, 0.2);
+  border-bottom: 1px solid rgba(0, 102, 255, 0.2);
 }
 
 .card-title {
@@ -370,7 +370,7 @@ p, .body-text {
 .card-footer {
   margin-top: var(--spacing-md);
   padding-top: var(--spacing-md);
-  border-top: 1px solid rgba(127, 216, 190, 0.2);
+  border-top: 1px solid rgba(0, 102, 255, 0.2);
 }
 
 
@@ -463,15 +463,15 @@ p, .body-text {
 }
 
 .alert-success {
-  background: var(--background-light-green);
-  color: var(--success-green);
-  border-left: 4px solid var(--success-green);
+  background: var(--background-light-blue);
+  color: var(--success-blue);
+  border-left: 4px solid var(--success-blue);
 }
 
 .alert-warning {
   background: #FEF3C7;
-  color: var(--warning-yellow);
-  border-left: 4px solid var(--warning-yellow);
+  color: var(--warning-orange);
+  border-left: 4px solid var(--warning-orange);
 }
 
 /* ========================================
@@ -506,11 +506,11 @@ p, .body-text {
 }
 
 .text-primary-green {
-  color: var(--primary-green);
+  color: var(--primary-blue);
 }
 
 .hover\:text-primary-green-dark:hover {
-  color: var(--primary-green-dark);
+  color: var(--primary-blue);
 }
 
 .container {
@@ -539,7 +539,7 @@ p, .body-text {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  background: rgba(127,216,190,0.06);
+  background: rgba(0, 102, 255, 0.06);
   padding: 0.35rem;
   border-radius: 9999px;
 }
@@ -547,7 +547,7 @@ p, .body-text {
 .switch {
   width: 40px;
   height: 22px;
-  background: #e6f6ef;
+  background: #E6F0FF;
   border-radius: 9999px;
   position: relative;
   cursor: pointer;
@@ -599,7 +599,7 @@ p, .body-text {
   border-radius: var(--radius-lg);
   padding: 1.25rem;
   box-shadow: var(--shadow-card);
-  border: 1px solid rgba(127,216,190,0.08);
+  border: 1px solid rgba(0, 102, 255, 0.08);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -639,7 +639,7 @@ p, .body-text {
 .planCard:hover {
   transform: translateY(-6px);
   box-shadow: 0 18px 30px rgba(16,24,40,0.08);
-  border-color: rgba(99,102,241,0.12);
+  border-color: rgba(0, 102, 255, 0.12);
 }
 
 .planCard:hover .badge {
@@ -649,7 +649,7 @@ p, .body-text {
 /* Featured hover: make gradient a bit stronger */
 .featured:hover {
   background: var(--gradient-secondary);
-  box-shadow: 0 24px 40px rgba(99,102,241,0.12);
+  box-shadow: 0 24px 40px rgba(0, 102, 255, 0.12);
 }
 
 /* Ensure feature text in featured cards is readable on hover too */
@@ -742,12 +742,12 @@ p, .body-text {
   padding: 0.2rem 0.5rem;
   border-radius: 9999px;
   font-size: 0.75rem;
-  background: rgba(127,216,190,0.12);
-  color: var(--primary-green);
+  background: rgba(0, 102, 255, 0.12);
+  color: var(--primary-blue);
 }
 
 .contactLink {
-  color: var(--primary-green);
+  color: var(--primary-blue);
   text-decoration: underline;
 }
 
@@ -771,7 +771,7 @@ p, .body-text {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: var(--background-light-green);
+  background: var(--background-light-blue);
   padding: var(--spacing-lg);
 }
 
@@ -782,7 +782,7 @@ p, .body-text {
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(127, 216, 190, 0.1);
+  border: 1px solid rgba(0, 102, 255, 0.1);
 }
 
 .auth-header {
@@ -823,15 +823,15 @@ p, .body-text {
 .auth-input {
   width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
-  border: 2px solid var(--background-light-green);
+  border: 2px solid var(--background-light-blue);
   border-radius: var(--radius-md);
   font-size: 1rem;
   transition: all 0.3s ease;
 }
 
 .auth-input:focus {
-  border-color: var(--primary-green);
-  box-shadow: 0 0 0 2px rgba(127, 216, 190, 0.2);
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.2);
   outline: none;
 }
 
@@ -867,7 +867,7 @@ p, .body-text {
 .auth-divider::after {
   content: '';
   flex: 1;
-  border-bottom: 1px solid var(--background-light-green);
+  border-bottom: 1px solid var(--background-light-blue);
 }
 
 .auth-divider-text {
@@ -882,7 +882,7 @@ p, .body-text {
   align-items: center;
   justify-content: center;
   padding: var(--spacing-md);
-  border: 2px solid var(--background-light-green);
+  border: 2px solid var(--background-light-blue);
   border-radius: var(--radius-md);
   background: var(--background-white);
   color: var(--text-primary);
@@ -891,7 +891,7 @@ p, .body-text {
 }
 
 .social-login-button:hover {
-  background: var(--background-light-green);
+  background: var(--background-light-blue);
 }
 
 /* ========================================
@@ -970,10 +970,10 @@ p, .body-text {
 /* Glow Effect */
 .glow {
   position: relative;
-  animation: glow 2s ease-in-out infinite;
+  /* animation: glow 2s ease-in-out infinite; */
 }
 
-@keyframes glow {
+/* @keyframes glow {
   0%,
   100% {
     box-shadow: 0 0 20px rgba(37, 99, 235, 0.3),
@@ -983,12 +983,25 @@ p, .body-text {
     box-shadow: 0 0 30px rgba(37, 99, 235, 0.5),
                 0 0 60px rgba(139, 92, 246, 0.3);
   }
+} */
+
+.neon-glow {
+  animation: neon-glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes neon-glow {
+  0% {
+    box-shadow: 0 0 5px var(--primary-blue), 0 0 10px var(--primary-purple), 0 0 15px var(--accent-blue);
+  }
+  100% {
+    box-shadow: 0 0 10px var(--primary-blue), 0 0 20px var(--primary-purple), 0 0 30px var(--accent-blue);
+  }
 }
 
 /* Text Glow */
 .text-glow {
-  text-shadow: 0 0 20px rgba(37, 99, 235, 0.5),
-               0 0 40px rgba(139, 92, 246, 0.3);
+  text-shadow: 0 0 20px rgba(0, 102, 255, 0.5),
+               0 0 40px rgba(108, 92, 231, 0.3);
 }
 
 /* Floating Animation */
@@ -1017,7 +1030,7 @@ p, .body-text {
     opacity: 1;
   }
   50% {
-    opacity: 0.7;
+    opacity: 0.5;
   }
 }
 
@@ -1122,7 +1135,7 @@ p, .body-text {
 }
 
 .filter-select {
-  border: 1px solid var(--background-light-green);
+  border: 1px solid var(--background-light-blue);
   border-radius: var(--radius-md);
   padding: var(--spacing-sm);
   background: var(--background-white);
@@ -1155,7 +1168,7 @@ p, .body-text {
 }
 
 .inbox-table th {
-  background: var(--background-light-green);
+  background: var(--background-light-blue);
   color: var(--text-secondary);
   font-size: 0.75rem;
   font-weight: 600;
@@ -1166,15 +1179,15 @@ p, .body-text {
 
 .inbox-table td {
   padding: var(--spacing-md) var(--spacing-lg);
-  border-bottom: 1px solid var(--background-light-green);
+  border-bottom: 1px solid var(--background-light-blue);
 }
 
 .inbox-table tr:hover {
-  background: var(--background-light-green);
+  background: var(--background-light-blue);
 }
 
 .card-name {
-  color: var(--primary-green);
+  color: var(--primary-blue);
   font-weight: 500;
 }
 
@@ -1216,8 +1229,8 @@ p, .body-text {
 }
 
 .status-contacted {
-  background: var(--background-light-green);
-  color: var(--success-green);
+  background: var(--background-light-blue);
+  color: var(--success-blue);
 }
 
 .actions-cell {
@@ -1226,14 +1239,14 @@ p, .body-text {
 }
 
 .action-button {
-  color: var(--primary-green);
+  color: var(--primary-blue);
   font-weight: 500;
   margin-left: var(--spacing-sm);
   cursor: pointer;
 }
 
 .action-button:hover {
-  color: var(--primary-green-dark);
+  color: var(--primary-blue);
 }
 
 .message-modal {
@@ -1257,7 +1270,7 @@ p, .body-text {
 }
 
 .modal-header {
-  border-bottom: 1px solid var(--background-light-green);
+  border-bottom: 1px solid var(--background-light-blue);
   padding-bottom: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }
