@@ -1,16 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
-import { Header } from "@/components/layout/header"; // ensure Header is a named export
+import { Header } from "@/components/layout/header";
 import { motion } from "framer-motion";
+import { useAuth } from "@/lib/hooks/use-auth";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const { isAuthenticated, checkAuth, isLoading } = useAuth();
   const [expanded, setExpanded] = useState(true);
+
+  useEffect(() => {
+    // Check auth when dashboard layout mounts
+    checkAuth();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">

@@ -416,6 +416,7 @@ export default function Footer() {
                   e.currentTarget.style.borderColor = 'rgba(0, 102, 255, 0.3)';
                   e.currentTarget.style.boxShadow = 'none';
                 }}
+                suppressHydrationWarning
               />
               <button
                 style={{
@@ -437,6 +438,7 @@ export default function Footer() {
                   e.currentTarget.style.transform = 'scale(1)';
                   e.currentTarget.style.boxShadow = 'none';
                 }}
+                suppressHydrationWarning
               >
                 Subscribe
               </button>

@@ -12,7 +12,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, password } = body
 
+    console.log('🔐 Admin login attempt for:', email)
+
     if (!email || !password) {
+      console.log('❌ Missing email or password')
       return NextResponse.json(
         { error: "Email and password are required" },
         { status: 400 }
@@ -25,11 +28,14 @@ export async function POST(request: NextRequest) {
     })
 
     if (!admin) {
+      console.log('❌ Admin not found:', email)
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 }
       )
     }
+
+    console.log('✅ Admin found:', admin.email, 'Role:', admin.role)
 
     // Check if admin is active
     if (!admin.isActive) {
@@ -40,14 +46,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password
+    console.log('🔑 Verifying password...')
     const isPasswordValid = await bcrypt.compare(password, admin.password)
 
     if (!isPasswordValid) {
+      console.log('❌ Invalid password for admin:', email)
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 }
       )
     }
+
+    console.log('✅ Password verified successfully')
 
     // Update last login
     await prisma.admin.update({
