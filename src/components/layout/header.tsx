@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Search, Menu, X, User, LogOut } from "lucide-react"
 import { useAuth } from "@/lib/hooks/use-auth"
@@ -9,13 +9,8 @@ import { toast } from "react-hot-toast"
 
 export function Header() {
   const router = useRouter()
-  const { user, isAuthenticated, logout, checkAuth } = useAuth()
+  const { user, isAuthenticated, logout } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  
-  useEffect(() => {
-    checkAuth()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return (
     <header className="bg-white shadow-sm border-b">

@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { FiEdit, FiBarChart2, FiZap, FiUser, FiPlus } from "react-icons/fi";
+import { FiEdit, FiBarChart2, FiZap, FiUser, FiPlus, FiLogOut } from "react-icons/fi";
+import { useAuth } from "@/lib/hooks/use-auth";
+import { toast } from "react-hot-toast";
 
 // ----------------- Card Type Definition -----------------
 interface Card {
@@ -165,6 +167,17 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
 // ----------------- Main Dashboard -----------------
 const Dashboard = () => {
   const router = useRouter();
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+      router.push('/auth/login');
+    } catch (error) {
+      toast.error('Logout failed');
+    }
+  };
 
   const cards: Card[] = [
     {
@@ -195,6 +208,29 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[var(--background)] px-8 sm:px-14 py-14 lg:ml-64 transition-all duration-300">
+      {/* Top Bar with User Info and Logout */}
+      {isAuthenticated && user && (
+        <div className="flex justify-between items-center mb-8 px-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-green to-primary-green-dark flex items-center justify-center text-white font-bold">
+              {user.fullName?.charAt(0) || user.email.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p className="font-semibold text-text-primary">{user.fullName || 'User'}</p>
+              <p className="text-sm text-text-secondary">{user.email}</p>
+            </div>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-md"
+          >
+            <FiLogOut /> Logout
+          </motion.button>
+        </div>
+      )}
+      
       {/* Top Create Button with generous space */}
       <div className="flex justify-center my-20">
         <motion.button
