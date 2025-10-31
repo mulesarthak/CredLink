@@ -1,12 +1,40 @@
 "use client"
 
+import { useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useSession, signOut } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { LogOut, User } from "lucide-react"
+import { useAuth } from "@/lib/hooks/use-auth"
+import { toast } from "react-hot-toast"
 
 export default function Home() {
-  const { data: session, status } = useSession()
+  const router = useRouter()
+  const { user, isAuthenticated, logout, checkAuth, isLoading } = useAuth()
+
+  useEffect(() => {
+    checkAuth()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    // Redirect to dashboard if user is authenticated
+    if (isAuthenticated && user) {
+      router.push('/dashboard')
+    }
+  }, [isAuthenticated, user, router])
+
+  // Show loading state while checking auth or redirecting
+  if (isLoading || (isAuthenticated && user)) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+          <p className="mt-4 text-sm text-zinc-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -22,16 +50,19 @@ export default function Home() {
             priority
           />
           <div className="flex items-center gap-4">
-            {status === "loading" ? (
+            {isLoading ? (
               <p className="text-sm text-zinc-600">Loading...</p>
-            ) : session ? (
+            ) : isAuthenticated && user ? (
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 text-sm">
                   <User className="h-4 w-4" />
-                  <span className="text-zinc-900 dark:text-zinc-50">{session.user?.name || session.user?.email}</span>
+                  <span className="text-zinc-900 dark:text-zinc-50">{user.fullName || user.email}</span>
                 </div>
                 <button
-                  onClick={() => signOut()}
+                  onClick={async () => {
+                    await logout()
+                    toast.success('Logged out successfully')
+                  }}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors text-sm font-medium"
                 >
                   <LogOut className="h-4 w-4" />

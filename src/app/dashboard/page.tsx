@@ -124,6 +124,7 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
             whileHover={{ scale: 1.05 }}
             className="flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl bg-background-light-green text-primary-green-dark font-medium hover:bg-[var(--primary-green-light)] transition-all"
             onClick={() => router.push(`/dashboard/edit/${card.id}`)}
+            suppressHydrationWarning
           >
             <FiEdit size={16} /> Edit
           </motion.button>
@@ -131,6 +132,7 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             className="flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl bg-[var(--primary-green-dark)] text-white font-medium hover:bg-[var(--primary-green)] transition-all"
+            suppressHydrationWarning
           >
             <FiBarChart2 size={16} /> Analytics
           </motion.button>
@@ -142,6 +144,7 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
                 ? "bg-background-light-green text-primary-green-dark border border-primary-green-light hover:bg-background-mint"
                 : "bg-background-mint text-primary-green-dark hover:bg-[var(--primary-green-light)]"
             }`}
+            suppressHydrationWarning
           >
             <FiZap size={16} /> {card.boost === "Active" ? "Manage" : "Boost"}
           </motion.button>
@@ -149,6 +152,7 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             className="flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl bg-background-mint text-primary-green-dark font-medium hover:bg-[var(--primary-green-light)] transition-all"
+            suppressHydrationWarning
           >
             <FiUser size={16} /> View Profile
           </motion.button>
@@ -198,6 +202,7 @@ const Dashboard = () => {
           whileTap={{ scale: 0.97 }}
           onClick={() => router.push("/dashboard/create")}
           className="relative flex items-center justify-center gap-3 btn btn-large btn-primary shadow-xl hover:shadow-colored transition-all text-xl font-bold px-14 py-6"
+          suppressHydrationWarning
         >
           <FiPlus className="text-2xl" /> Create New Card
         </motion.button>

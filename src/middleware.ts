@@ -11,13 +11,15 @@ export function middleware(request: NextRequest) {
   const isPricingPath = path === '/pricing' || path.startsWith('/pricing/')
   const isPublicPath = isAuthPath || isAdminPath || isPricingPath || path === '/'
 
-  // Check if user is authenticated (NextAuth uses next-auth.session-token)
-  const isAuthenticated = request.cookies.has('next-auth.session-token') || 
+  // Check if user is authenticated (check for custom user_token or admin_token)
+  const isAuthenticated = request.cookies.has('user_token') || 
+                          request.cookies.has('admin_token') ||
+                          request.cookies.has('next-auth.session-token') || 
                           request.cookies.has('__Secure-next-auth.session-token')
 
-  // Redirect authenticated users away from auth pages
+  // Redirect authenticated users away from auth pages to dashboard
   if (isAuthenticated && isAuthPath) {
-    return NextResponse.redirect(new URL('/', request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // Redirect unauthenticated users to login page (except for public paths)

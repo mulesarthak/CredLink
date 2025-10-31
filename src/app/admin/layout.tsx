@@ -18,7 +18,6 @@ import {
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: Home },
   { name: "Users", href: "/admin/users", icon: Users },
-  { name: "Profiles", href: "/admin/profiles", icon: Shield },
   { name: "Promotions", href: "/admin/promotions", icon: DollarSign },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "Settings", href: "/admin/settings", icon: Settings },
