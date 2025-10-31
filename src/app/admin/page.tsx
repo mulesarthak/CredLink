@@ -8,8 +8,20 @@ export default function AdminPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Redirect to admin login
-    router.push("/admin/login")
+    // Check if admin is authenticated, otherwise redirect to login
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/admin/auth/me')
+        if (response.ok) {
+          router.push("/admin/dashboard")
+        } else {
+          router.push("/admin/login")
+        }
+      } catch (error) {
+        router.push("/admin/login")
+      }
+    }
+    checkAuth()
   }, [router])
 
   return (
