@@ -82,6 +82,9 @@ export default function Home() {
           </a>
         </div>
       </main>
+      <Header />
+      <Homepage />
+      <Footer />
     </div>
   )
 }
