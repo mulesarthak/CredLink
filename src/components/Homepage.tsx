@@ -94,7 +94,7 @@ export default function Homepage() {
               </p>
               
               <div className="flex flex-wrap gap-4">
-                <Link href="/create-card" className="text-white rounded-full transition-all" style={{ 
+                <Link href="/auth/signup" className="text-white rounded-full transition-all" style={{ 
                   paddingLeft: '2.5rem',
                   paddingRight: '2.5rem',
                   paddingTop: '1rem',
@@ -312,7 +312,7 @@ export default function Homepage() {
               }}>
                 Say goodbye to paper cards — connect smartly and sustainably.
               </p>
-              <Link href="/create-card" className="text-white rounded-full transition-all" style={{ 
+              <Link href="/auth/signup" className="text-white rounded-full transition-all" style={{ 
                 paddingLeft: '2.5rem',
                 paddingRight: '2.5rem',
                 paddingTop: '1rem',
@@ -632,7 +632,7 @@ export default function Homepage() {
                 desc: 'QR code, WhatsApp, email, or link — share it anywhere instantly.'
               },
               {
-                icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />,
+                icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />,
                 title: 'Integrate Your Card With Popular Apps',
                 desc: 'Connect seamlessly with your CRM or contact manager.'
               },
@@ -804,7 +804,7 @@ export default function Homepage() {
                 color: '#ffffff',
                 filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))'
               }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1" />
               </svg>
               
               {/* Scanning animation line */}
@@ -821,7 +821,7 @@ export default function Homepage() {
           </div>
           
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/create-card" className="text-white rounded-full transition-all" style={{ 
+            <Link href="/auth/signup" className="text-white rounded-full transition-all" style={{ 
               paddingLeft: '2.5rem',
               paddingRight: '2.5rem',
               paddingTop: '1rem',
@@ -1109,7 +1109,7 @@ export default function Homepage() {
           <p className="body-large mb-8 max-w-2xl mx-auto">
             Join millions of professionals who have already made the switch to digital business cards.
           </p>
-          <Link href="/create-card" className="btn btn-large px-12 py-4 text-lg font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all" style={{ background: 'var(--background-white)', color: 'var(--primary-blue)' }}>
+          <Link href="/auth/signup" className="btn btn-large px-12 py-4 text-lg font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all" style={{ background: 'var(--background-white)', color: 'var(--primary-blue)' }}>
             Create Your Free Card Now
           </Link>
         </div>

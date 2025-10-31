@@ -25,14 +25,19 @@ export function middleware(request: NextRequest) {
   const isPricingPath = path === '/pricing' || path.startsWith('/pricing/')
   const isContactPath = path === '/contact' || path.startsWith('/contact/')
   const isDashboardContactPath = path === '/dashboardcontact' || path.startsWith('/dashboardcontact/')
-  const isPublicPath = isAuthPath || isAdminPath || isPricingPath || isContactPath || isDashboardContactPath || path === '/'
+  
+  // Check if the current path is in the public paths array or matches public path patterns
+  const isInPublicPaths = publicPaths.includes(path)
+  const isCombinedPublicPath = isInPublicPaths || isAuthPath || isAdminPath || isPricingPath || isContactPath || isDashboardContactPath
 
-  // Check if user is authenticated (NextAuth uses next-auth.session-token)
-  const isAuthenticated = request.cookies.has('next-auth.session-token') || 
+  // Check if user is authenticated (check for custom user_token or admin_token)
+  const isAuthenticated = request.cookies.has('user_token') || 
+                          request.cookies.has('admin_token') ||
+                          request.cookies.has('next-auth.session-token') || 
                           request.cookies.has('__Secure-next-auth.session-token')
 
-  // Redirect authenticated users away from auth pages
-  if (isAuthenticated && (isAuthPath)) {
+  // Redirect authenticated users away from auth pages to dashboard
+  if (isAuthenticated && isAuthPath) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
