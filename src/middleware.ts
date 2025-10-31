@@ -23,7 +23,9 @@ export function middleware(request: NextRequest) {
   const isAuthPath = path.startsWith('/auth')
   const isAdminPath = path.startsWith('/admin')
   const isPricingPath = path === '/pricing' || path.startsWith('/pricing/')
-  const isCombinedPublicPath = publicPaths.includes(path) || isAuthPath || isAdminPath || isPricingPath
+  const isContactPath = path === '/contact' || path.startsWith('/contact/')
+  const isDashboardContactPath = path === '/dashboardcontact' || path.startsWith('/dashboardcontact/')
+  const isPublicPath = isAuthPath || isAdminPath || isPricingPath || isContactPath || isDashboardContactPath || path === '/'
 
   // Check if user is authenticated (NextAuth uses next-auth.session-token)
   const isAuthenticated = request.cookies.has('next-auth.session-token') || 
