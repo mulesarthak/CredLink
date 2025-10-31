@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Mail, Eye, EyeOff, Loader2, Check } from "lucide-react"
@@ -17,109 +17,136 @@ export default function SignupPage() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [identifier, setIdentifier] = useState('')
+  const [identifierType, setIdentifierType] = useState<'email' | 'phone' | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const { register, handleSubmit, formState: { errors, isSubmitting }, watch } = useForm<SignupForm>({
+  const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setValue } = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       fullName: '',
-      email: '',
-      phone: '',
       password: '',
       confirmPassword: ''
     }
   })
 
+  // Detect input type
+  const detectInputType = (value: string) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const phonePattern = /^\d{10}$/
+    if (emailPattern.test(value)) return 'email'
+    if (phonePattern.test(value)) return 'phone'
+    return null
+  }
+
+  const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.trim()
+    setIdentifier(value)
+    setError('')
+    const type = detectInputType(value)
+    setIdentifierType(type)
+  }
+
   const onSubmit = async (data: SignupForm) => {
+    if (identifierType === 'phone') {
+      // Simulate sending OTP and redirect to OTP page
+      toast.loading('Sending OTP...')
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      toast.success('OTP sent!')
+      router.push(`/auth/verify-otp?phone=${encodeURIComponent(identifier)}`)
+      return
+    }
+    // For email signup, continue as before
     try {
-      // Add your signup logic here
-      toast.loading('Creating your account...')
-      await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate API call
+      const loadingToast = toast.loading('Creating your account...')
+      
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: identifier,
+          password: data.password,
+          fullName: data.fullName,
+        }),
+      })
+
+      const result = await response.json()
+      toast.dismiss(loadingToast)
+
+      if (!response.ok) {
+        toast.error(result.error || 'Failed to create account')
+        return
+      }
+
       toast.success('Account created successfully!')
       router.push('/auth/login')
     } catch (error) {
+      console.error('Signup error:', error)
       toast.error('Failed to create account. Please try again.')
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl">
-        <div className="text-center">
-          <div className="mx-auto h-12 w-12 relative mb-4">
-            <div className="absolute inset-0 bg-green-500 rounded-xl transform rotate-6"></div>
-            <div className="absolute inset-0 bg-green-600 rounded-xl transform -rotate-6"></div>
-            <div className="absolute inset-0 bg-white rounded-xl flex items-center justify-center">
-              <span className="text-2xl font-bold text-green-600">C</span>
-            </div>
-          </div>
-          
-          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <Link href="/" className="block">
+            <h1 className="auth-logo">CredLink</h1>
+          </Link>
+          <h2 className="auth-title">
             Create your account
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="auth-subtitle">
             Already have an account?{' '}
-            <Link href="/auth/login" className="font-medium text-green-600 hover:text-green-500 transition-colors">
-              login 
+            <Link href="/auth/login" className="text-primary-green hover:text-primary-green-dark">
+              Sign in
             </Link>
           </p>
         </div>
 
         <form
-          className="mt-8 space-y-6"
+          className="auth-form"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <div className="rounded-2xl shadow-sm space-y-4">
-            <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="space-y-4">
+            <div className="auth-input-group">
+              <label htmlFor="fullName" className="label">
                 Full Name
               </label>
               <input
                 id="fullName"
                 type="text"
                 {...register('fullName')}
-                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
+                className="auth-input"
                 placeholder="Enter your full name"
               />
               {errors.fullName && (
-                <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>
+                <p className="form-error">{errors.fullName.message}</p>
               )}
             </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
+            <div className="auth-input-group">
+              <label htmlFor="identifier" className="label">
+                Email or Phone Number
               </label>
               <input
-                id="email"
-                type="email"
-                {...register('email')}
-                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
-                placeholder="Enter your email"
+                id="identifier"
+                type="text"
+                value={identifier}
+                onChange={handleIdentifierChange}
+                className="auth-input"
+                placeholder="Enter email or phone number"
+                maxLength={50}
+                autoComplete="email tel"
               />
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
-              )}
+              {error && <p className="form-error mt-2">{error}</p>}
             </div>
 
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
-              <input
-                id="phone"
-                type="tel"
-                maxLength={10}
-                {...register('phone')}
-                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
-                placeholder="Enter your phone number"
-              />
-              {errors.phone && (
-                <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="auth-input-group">
+              <label htmlFor="password" className="label">
                 Password
               </label>
               <div className="relative">
@@ -127,28 +154,32 @@ export default function SignupPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   {...register('password')}
-                  className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
+                  className="auth-input"
                   placeholder="Create a strong password"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
+                  tabIndex={-1}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowPassword(!showPassword);
+                  }}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  {!showPassword ? (
+                    <EyeOff className="h-5 w-5" aria-label="Show password" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <Eye className="h-5 w-5" aria-label="Hide password" />
                   )}
                 </button>
               </div>
               {errors.password && (
-                <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+                <p className="form-error">{errors.password.message}</p>
               )}
             </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="auth-input-group">
+              <label htmlFor="confirmPassword" className="label">
                 Confirm Password
               </label>
               <div className="relative">
@@ -156,39 +187,43 @@ export default function SignupPage() {
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   {...register('confirmPassword')}
-                  className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
+                  className="auth-input"
                   placeholder="Confirm your password"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  tabIndex={-1}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowConfirmPassword(!showConfirmPassword);
+                  }}
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  {!showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" aria-label="Show password" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <Eye className="h-5 w-5" aria-label="Hide password" />
                   )}
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>
+                <p className="form-error">{errors.confirmPassword.message}</p>
               )}
             </div>
           </div>
 
           <div>
-            <Button
+            <button
               type="submit"
-              disabled={isSubmitting}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting || loading || !identifier || !watch('fullName') || !watch('password') || !watch('confirmPassword')}
+              className={`auth-submit-button ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
-              {isSubmitting ? (
+              {(isSubmitting || loading) ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 'Create Account'
               )}
-            </Button>
+            </button>
           </div>
         </form>
       </div>

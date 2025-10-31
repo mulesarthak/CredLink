@@ -32,6 +32,11 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
 
+  // Don't show sidebar on login page
+  if (pathname === '/admin/login') {
+    return <>{children}</>
+  }
+
   return (
     <div className="h-screen flex bg-gray-100">
       {/* Sidebar */}
