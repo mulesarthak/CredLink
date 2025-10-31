@@ -55,6 +55,8 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
     try {
+      console.log('identifier', identifier)
+      console.log('password', password)
       // Send login payload to backend JSON API (email + password)
       const res = await fetch('/api/login', {
         method: 'POST',
@@ -64,17 +66,29 @@ export default function LoginPage() {
           password,
         }),
       })
+
+      
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         setError(data?.error || 'Login failed. Please try again.')
         return
       }
+      alert("it's done")
       // On success, go to dashboard
       window.location.href = '/dashboard'
     } catch {
       setError('Login failed. Please try again.')
     } finally {
       setLoading(false)
+    }
+  }
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/logout', { method: 'POST' })
+      toast.success('Logged out successfully')
+      router.push('/')
+    } catch {
+      toast.error('Failed to log out')
     }
   }
 
