@@ -22,3 +22,35 @@ model User {
 
   @@map("users")
 }
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  SUB_ADMIN
+}
+
+model Admin {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  fullName    String
+  role        AdminRole @default(SUB_ADMIN)
+  permissions String   @db.Text // Store as JSON string
+  isActive    Boolean  @default(true)
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastLogin   DateTime?
+
+  @@map("admins")
+}
+
+model AdminSession {
+  id        String   @id @default(uuid())
+  adminId   String
+  token     String   @unique @db.VarChar(1000)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("admin_sessions")
+}
