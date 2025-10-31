@@ -22,10 +22,12 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setValue } = useForm<SignupForm>({
+  const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setValue, setError: setFormError } = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       fullName: '',
+      email: '',
+      phone: '',
       password: '',
       confirmPassword: ''
     }
@@ -46,17 +48,42 @@ export default function SignupPage() {
     setError('')
     const type = detectInputType(value)
     setIdentifierType(type)
+    
+    // Update form values based on detected type
+    if (type === 'email') {
+      setValue('email', value)
+      setValue('phone', '')
+    } else if (type === 'phone') {
+      setValue('phone', value)
+      setValue('email', '')
+    }
   }
 
   const onSubmit = async (data: SignupForm) => {
+    console.log('Form submitted with data:', data)
+    console.log('Identifier:', identifier, 'Type:', identifierType)
+    console.log('Form errors:', errors)
+    
+    // Validate identifier is provided
+    if (!identifier || !identifierType) {
+      setFormError('email', {
+        type: 'manual',
+        message: 'Please enter a valid email or 10-digit phone number'
+      })
+      toast.error('Please enter a valid email or phone number')
+      return
+    }
+
     if (identifierType === 'phone') {
       // Simulate sending OTP and redirect to OTP page
-      toast.loading('Sending OTP...')
+      const loadingToast = toast.loading('Sending OTP...')
       await new Promise(resolve => setTimeout(resolve, 1000))
-      toast.success('OTP sent!')
+      toast.dismiss(loadingToast)
+      toast.success('OTP sent to your phone!')
       router.push(`/auth/verify-otp?phone=${encodeURIComponent(identifier)}`)
       return
     }
+    
     // For email signup, continue as before
     try {
       const loadingToast = toast.loading('Creating your account...')
@@ -78,14 +105,23 @@ export default function SignupPage() {
 
       if (!response.ok) {
         toast.error(result.error || 'Failed to create account')
+        setError(result.error || 'Failed to create account')
         return
       }
 
-      toast.success('Account created successfully!')
-      router.push('/auth/login')
+      // Show success message and redirect
+      toast.success('🎉 Account created successfully! Redirecting to login...', {
+        duration: 3000,
+      })
+      
+      // Wait a moment before redirecting so user sees the message
+      setTimeout(() => {
+        router.push('/auth/login')
+      }, 1500)
     } catch (error) {
       console.error('Signup error:', error)
       toast.error('Failed to create account. Please try again.')
+      setError('Failed to create account. Please try again.')
     }
   }
 
@@ -141,8 +177,15 @@ export default function SignupPage() {
                 placeholder="Enter email or phone number"
                 maxLength={50}
                 autoComplete="email tel"
+                required
               />
+              {identifierType && (
+                <p className="text-xs text-gray-500 mt-1">
+                  {identifierType === 'email' ? '✓ Valid email' : '✓ Valid phone number'}
+                </p>
+              )}
               {error && <p className="form-error mt-2">{error}</p>}
+              {errors.email && <p className="form-error mt-2">{errors.email.message}</p>}
             </div>
 
             <div className="auth-input-group">
@@ -215,8 +258,8 @@ export default function SignupPage() {
           <div>
             <button
               type="submit"
-              disabled={isSubmitting || loading || !identifier || !watch('fullName') || !watch('password') || !watch('confirmPassword')}
-              className={`auth-submit-button ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
+              disabled={isSubmitting || loading}
+              className={`auth-submit-button ${(isSubmitting || loading) ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
               {(isSubmitting || loading) ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

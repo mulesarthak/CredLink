@@ -13,18 +13,12 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { checkAuth, isLoading } = useAuth();
+  const { isAuthenticated, checkAuth, isLoading } = useAuth();
   const [expanded, setExpanded] = useState(true);
 
   useEffect(() => {
-    // Check auth when dashboard loads
-    let mounted = true;
-    if (mounted) {
-      checkAuth();
-    }
-    return () => {
-      mounted = false;
-    };
+    // Check auth when dashboard layout mounts
+    checkAuth();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

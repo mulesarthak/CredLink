@@ -978,7 +978,7 @@ export default function Homepage() {
                 marginBottom: '1.5rem',
                 textAlign: 'center'
               }}>Get Your Free Digital Card</h3>
-              <form className="space-y-4">
+              <form className="space-y-4" suppressHydrationWarning>
                 <input 
                   type="text" 
                   placeholder="Name" 
@@ -992,6 +992,7 @@ export default function Homepage() {
                     outline: 'none',
                     transition: 'all 0.3s'
                   }}
+                  suppressHydrationWarning
                 />
                 <input 
                   type="text" 
@@ -1006,6 +1007,7 @@ export default function Homepage() {
                     outline: 'none',
                     transition: 'all 0.3s'
                   }}
+                  suppressHydrationWarning
                 />
                 <input 
                   type="email" 
@@ -1020,6 +1022,7 @@ export default function Homepage() {
                     outline: 'none',
                     transition: 'all 0.3s'
                   }}
+                  suppressHydrationWarning
                 />
                 <select 
                   className="w-full rounded-lg" 
@@ -1032,6 +1035,7 @@ export default function Homepage() {
                     outline: 'none',
                     cursor: 'pointer'
                   }}
+                  suppressHydrationWarning
                 >
                   <option style={{ background: '#2c3e50', color: '#ffffff' }}>Number of Employees</option>
                   <option style={{ background: '#2c3e50', color: '#ffffff' }}>1-10</option>
@@ -1054,6 +1058,7 @@ export default function Homepage() {
                     transition: 'all 0.3s',
                     textAlign: 'center'
                   }}
+                  suppressHydrationWarning
                 >
                   Submit Request
                 </button>

@@ -38,60 +38,68 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
       initial={{ width: expanded ? 270 : 90 }}
       animate={{ width: expanded ? 270 : 90 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="fixed left-0 top-0 h-screen flex flex-col justify-between bg-gradient-to-b from-white via-[var(--background-light-green)] to-white border-r shadow-lg z-40"
+      className="fixed left-0 top-0 h-screen flex flex-col justify-between bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200 shadow-xl z-40"
+      style={{
+        background: 'linear-gradient(180deg, #ffffff 0%, #f9fafb 50%, #ffffff 100%)'
+      }}
     >
       {/* ---------- Top Section ---------- */}
       <div>
         {/* Logo / Title */}
-        <div className="flex items-center justify-between h-16 px-5 border-b border-gray-200">
+        <div className="flex items-center justify-between h-20 px-6 border-b border-gray-200 bg-white">
           <AnimatePresence mode="wait">
             {expanded && (
-              <motion.span
+              <motion.div
                 key="logo"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.2 }}
-                className="font-extrabold text-3xl tracking-wide text-[var(--primary-green)]"
+                className="flex items-center gap-3"
               >
-                CredLink
-              </motion.span>
+                <div className="w-10 h-10 bg-gradient-to-br from-primary-green to-primary-green-dark rounded-lg flex items-center justify-center shadow-md">
+                  <span className="text-white font-bold text-xl">C</span>
+                </div>
+                <span className="font-extrabold text-2xl tracking-tight text-gray-800">
+                  CredLink
+                </span>
+              </motion.div>
             )}
           </AnimatePresence>
 
           <button
             onClick={() => setExpanded(!expanded)}
-            className="p-2 hover:bg-[var(--primary-green)] hover:text-white rounded-full transition-all duration-200"
+            className="p-2.5 hover:bg-primary-green hover:text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
           >
             <motion.div
               animate={{ rotate: expanded ? 0 : 180 }}
               transition={{ duration: 0.3 }}
-              className="text-3xl"
+              className="text-xl"
             >
               {expanded ? <FiChevronLeft /> : <FiChevronRight />}
             </motion.div>
           </button>
         </div>
 
-        {/* Top Partition Line (Black) */}
-        <div className="h-[1px] bg-black mx-4 mt-0.5"></div>
-
-        {/* 2-finger gap above Dashboard */}
-        <nav className="mt-10 flex flex-col gap-5 px-2">
+        {/* Navigation */}
+        <nav className="mt-8 flex flex-col gap-2 px-4">
           {menuItems.map((item) => {
             const isActive = pathname === item.path;
             return (
               <Link key={item.name} href={item.path}>
                 <motion.div
-                  whileHover={{ scale: 1.05, x: 6 }}
-                  whileTap={{ scale: 0.97 }}
-                  className={`flex items-center gap-5 px-5 py-3 rounded-lg cursor-pointer transition-all ${
+                  whileHover={{ scale: 1.02, x: 4 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`flex items-center gap-4 px-4 py-3.5 rounded-xl cursor-pointer transition-all ${
                     isActive
-                      ? "bg-gradient-to-r from-[var(--primary-green)] to-[var(--primary-green-dark)] text-white shadow-md"
-                      : "text-gray-700 hover:bg-white/70 hover:shadow-sm"
+                      ? "bg-gradient-to-r from-primary-green to-primary-green-dark text-white shadow-lg"
+                      : "text-gray-700 hover:bg-gray-100 hover:shadow-sm"
                   }`}
                 >
-                  <motion.div whileHover={{ rotate: 12 }} className="text-[1.7rem]">
+                  <motion.div 
+                    whileHover={{ rotate: 8 }} 
+                    className={`text-2xl ${isActive ? 'text-white' : 'text-primary-green'}`}
+                  >
                     {item.icon}
                   </motion.div>
 
@@ -103,7 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="text-lg font-semibold"
+                        className="text-base font-semibold"
                       >
                         {item.name}
                       </motion.span>
@@ -117,25 +125,28 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
       </div>
 
       {/* ---------- Bottom Section ---------- */}
-      <div className="mb-10"> {/* Added extra gap below Support */}
-        {/* Faint Divider Above Settings */}
-        <div className="border-t border-black/30 mx-6 mb-3"></div>
+      <div className="mb-8 px-4">
+        {/* Divider */}
+        <div className="border-t border-gray-200 mb-6"></div>
 
-        <div className="flex flex-col gap-5 px-2">
+        <div className="flex flex-col gap-2">
           {bottomItems.map((item) => {
             const isActive = pathname === item.path;
             return (
               <Link key={item.name} href={item.path}>
                 <motion.div
-                  whileHover={{ scale: 1.05, x: 6 }}
-                  whileTap={{ scale: 0.97 }}
-                  className={`flex items-center gap-5 px-5 py-3 rounded-lg cursor-pointer transition-all ${
+                  whileHover={{ scale: 1.02, x: 4 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`flex items-center gap-4 px-4 py-3.5 rounded-xl cursor-pointer transition-all ${
                     isActive
-                      ? "bg-gradient-to-r from-[var(--primary-green)] to-[var(--primary-green-dark)] text-white shadow-md"
-                      : "text-gray-700 hover:bg-white/70 hover:shadow-sm"
+                      ? "bg-gradient-to-r from-primary-green to-primary-green-dark text-white shadow-lg"
+                      : "text-gray-700 hover:bg-gray-100 hover:shadow-sm"
                   }`}
                 >
-                  <motion.div whileHover={{ rotate: 12 }} className="text-[1.7rem]">
+                  <motion.div 
+                    whileHover={{ rotate: 8 }} 
+                    className={`text-2xl ${isActive ? 'text-white' : 'text-primary-green'}`}
+                  >
                     {item.icon}
                   </motion.div>
 
@@ -147,7 +158,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="text-lg font-semibold"
+                        className="text-base font-semibold"
                       >
                         {item.name}
                       </motion.span>

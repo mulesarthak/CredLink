@@ -13,34 +13,12 @@ export default function Home() {
 
   useEffect(() => {
     // Only check auth once on mount
-    let mounted = true
-    if (mounted) {
-      checkAuth()
-    }
-    return () => {
-      mounted = false
-    }
+    checkAuth()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEffect(() => {
-    // Redirect to dashboard if user is authenticated
-    if (isAuthenticated && user) {
-      router.push('/dashboard')
-    }
-  }, [isAuthenticated, user, router])
-
-  // Show loading state while checking auth or redirecting
-  if (isLoading || (isAuthenticated && user)) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-          <p className="mt-4 text-sm text-zinc-600">Loading...</p>
-        </div>
-      </div>
-    )
-  }
+  // Don't auto-redirect - let users navigate manually
+  // The header will show "Dashboard" button if authenticated
 
   return (
     <div className="min-h-screen">
