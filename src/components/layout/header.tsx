@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { Search, Menu, X, User, LogOut } from "lucide-react"
+import { signOut } from "next-auth/react"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -53,7 +54,16 @@ export function Header() {
                     <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                       Settings
                     </Link>
-                    <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                    <button
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                      onClick={async () => {
+                        try {
+                          await fetch('/api/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+                        } finally {
+                          await signOut({ callbackUrl: '/' })
+                        }
+                      }}
+                    >
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out
                     </button>
@@ -66,7 +76,7 @@ export function Header() {
                   Sign In
                 </Link>
                 <Link
-                  href="/auth/register"
+                  href="/auth/signup"
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Get Started
@@ -116,7 +126,16 @@ export function Header() {
                   <Link href="/settings" className="text-gray-700 hover:text-blue-600">
                     Settings
                   </Link>
-                  <button className="text-left text-gray-700 hover:text-blue-600 flex items-center">
+                  <button
+                    className="text-left text-gray-700 hover:text-blue-600 flex items-center"
+                    onClick={async () => {
+                      try {
+                        await fetch('/api/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+                      } finally {
+                        await signOut({ callbackUrl: '/' })
+                      }
+                    }}
+                  >
                     <LogOut className="h-4 w-4 mr-2" />
                     Sign Out
                   </button>
@@ -127,7 +146,7 @@ export function Header() {
                     Sign In
                   </Link>
                   <Link
-                    href="/auth/register"
+                    href="/auth/signup"
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
                   >
                     Get Started
@@ -141,3 +160,4 @@ export function Header() {
     </header>
   )
 }
+

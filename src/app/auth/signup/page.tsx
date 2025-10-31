@@ -61,6 +61,17 @@ export default function SignupPage() {
     try {
       const loadingToast = toast.loading('Creating your account...')
       
+      // Send register payload to backend JSON API
+      await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: identifier,
+          password: data.password,
+          fullName: data.fullName,
+        }),
+      })
+
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {

@@ -51,6 +51,17 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
     try {
+      // Send login payload to backend JSON API
+      await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          identifier,
+          identifierType,
+          password,
+        }),
+      })
+
       const result = await signIn('credentials', {
         email: identifierType === 'email' ? identifier : '',
         phone: identifierType === 'phone' ? identifier : '',
