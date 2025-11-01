@@ -1,5 +1,3 @@
-// This route is deprecated. Use /api/auth/logout instead.
-// Keeping for backward compatibility - redirects to centralized auth route
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {

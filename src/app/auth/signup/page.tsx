@@ -10,6 +10,16 @@ import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { signupSchema } from "@/lib/validations/auth"
 import type { z } from "zod"
+//import { signInWithPhoneNumber } from "@/lib/firebase"
+//import { auth } from "@/lib/firebase"
+import { RecaptchaVerifier, type ConfirmationResult } from "firebase/auth"
+
+// Augment window for reCAPTCHA handle (must be top-level)
+declare global {
+  interface Window {
+    recaptchaVerifier?: RecaptchaVerifier
+  }
+}
 
 type SignupForm = z.infer<typeof signupSchema>
 
@@ -21,8 +31,8 @@ export default function SignupPage() {
   const [identifierType, setIdentifierType] = useState<'email' | 'phone' | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
-  const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setValue, setError: setFormError } = useForm<SignupForm>({
+  const [otp, setOtp] = useState('')
+  const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setValue } = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       fullName: '',
@@ -58,29 +68,39 @@ export default function SignupPage() {
       setValue('email', '')
     }
   }
-
-  const onSubmit = async (data: SignupForm) => {
-    console.log('Form submitted with data:', data)
-    console.log('Identifier:', identifier, 'Type:', identifierType)
-    console.log('Form errors:', errors)
-    
-    // Validate identifier is provided
-    if (!identifier || !identifierType) {
-      setFormError('email', {
-        type: 'manual',
-        message: 'Please enter a valid email or 10-digit phone number'
-      })
-      toast.error('Please enter a valid email or phone number')
-      return
-    }
-
-    if (identifierType === 'phone') {
-      // Simulate sending OTP and redirect to OTP page
-      const loadingToast = toast.loading('Sending OTP...')
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      toast.dismiss(loadingToast)
-      toast.success('OTP sent to your phone!')
+/*
+  const sendOtp = async () => {
+    try {
+      const verifier = setupRecaptcha()
+      const phoneNumber = "+91" + identifier
+      const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, verifier)
+      // Persist verificationId for the verify page
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('verificationId', confirmationResult.verificationId)
+        sessionStorage.setItem('otpPhone', phoneNumber)
+      }
+      toast.success('OTP sent!')
       router.push(`/auth/verify-otp?phone=${encodeURIComponent(identifier)}`)
+    } catch (error: any) {
+      console.error(error)
+      toast.error(error?.message || 'Failed to send OTP')
+    }
+  }
+
+  // OTP verification happens on /auth/verify-otp page using verificationId
+  
+  const setupRecaptcha = () => {
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+        size: "invisible",
+      })
+    }
+    return window.recaptchaVerifier
+  }
+*/
+  const onSubmit = async (data: SignupForm) => {
+    if (identifierType === 'phone') {
+      //await sendOtp()
       return
     }
     
@@ -88,18 +108,31 @@ export default function SignupPage() {
     try {
       const loadingToast = toast.loading('Creating your account...')
       
-      const response = await fetch('/api/auth/signup', {
+      // Send register payload to backend JSON API
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          fullName: data.fullName,
+          phone: data.phone
+        }),
+      })
+
+     /* const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: identifier,
+          email: data.email,
           password: data.password,
           fullName: data.fullName,
+          phone: data.phone
         }),
       })
-
+*/
       const result = await response.json()
       toast.dismiss(loadingToast)
 
@@ -143,6 +176,9 @@ export default function SignupPage() {
           </p>
         </div>
 
+        {/* Invisible reCAPTCHA container for Firebase phone auth */}
+        <div id="recaptcha-container" className="hidden" />
+
         <form
           className="auth-form"
           onSubmit={handleSubmit(onSubmit)}
@@ -166,15 +202,39 @@ export default function SignupPage() {
 
             <div className="auth-input-group">
               <label htmlFor="identifier" className="label">
-                Email or Phone Number
+                 Phone Number
               </label>
               <input
                 id="identifier"
-                type="text"
-                value={identifier}
-                onChange={handleIdentifierChange}
+                type="number"
+                {...register('phone')}
+                //onChange={handleIdentifierChange}
                 className="auth-input"
-                placeholder="Enter email or phone number"
+                placeholder="Enter phone number"
+                maxLength={50}
+                //autoComplete="email tel"
+                required
+              />
+              {identifierType && (
+                <p className="text-xs text-gray-500 mt-1">
+                  {identifierType === 'email' ? '✓ Valid email' : '✓ Valid phone number'}
+                </p>
+              )}
+              {error && <p className="form-error mt-2">{error}</p>}
+              {errors.email && <p className="form-error mt-2">{errors.email.message}</p>}
+            </div>
+
+            <div className="auth-input-group">
+              <label htmlFor="identifier" className="label">
+                Email 
+              </label>
+              <input
+                id="identifier"
+                type="email"
+                {...register('email')}
+                //onChange={handleIdentifierChange}
+                className="auth-input"
+                placeholder="Enter email"
                 maxLength={50}
                 autoComplete="email tel"
                 required

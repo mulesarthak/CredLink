@@ -8,6 +8,7 @@ export function middleware(request: NextRequest) {
   // Public paths that don't require authentication
   const publicPaths = [
     '/',
+    '/dashboard',
     '/auth/login',
     '/auth/signup',
     '/features',
