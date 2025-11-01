@@ -17,7 +17,10 @@ export function middleware(request: NextRequest) {
     '/faq',
     '/terms',
     '/privacy',
-    '/create-card'
+    '/create-card',
+    '/dashboard',
+    '/dashboardcontact',
+    '/search'
   ]
   
   const isAuthPath = path.startsWith('/auth')

@@ -26,6 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
     { name: "Dashboard", path: "/dashboard", icon: <FiHome /> },
     { name: "Messages / Leads", path: "/dashboard/messages", icon: <FiMessageSquare /> },
     { name: "Connections", path: "/dashboard/connections", icon: <FiUsers /> },
+    { name : "Search", path: "/search", icon: <FiUsers /> },
   ];
 
   const bottomItems = [

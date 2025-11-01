@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { FiEdit, FiBarChart2, FiZap, FiUser, FiPlus, FiLogOut } from "react-icons/fi";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "react-hot-toast";
+import { Filter } from "lucide-react";
 
 // ----------------- Card Type Definition -----------------
 interface Card {
@@ -14,6 +15,12 @@ interface Card {
   views: string;
   boost: "Active" | "Inactive";
   color: string;
+  location?: string;
+  category: string;
+  status: "review" | "completed";
+  verified: boolean;
+  reviews: number;
+
   geometry: "wave" | "slope" | "swoosh";
 }
 
@@ -93,7 +100,7 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
 
       {/* Content */}
       <div style={contentStyle} className="p-5 flex flex-col justify-between">
-        <div className="flex-grow">
+  <div className="grow">
           <h3 className="card-title text-center text-xl font-bold text-text-primary mb-1">
             {card.title}
           </h3>
@@ -124,7 +131,7 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
         <div className="grid grid-cols-2 gap-4 pb-6">
           <motion.button
             whileHover={{ scale: 1.05 }}
-            className="flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl bg-background-light-green text-primary-green-dark font-medium hover:bg-[var(--primary-green-light)] transition-all"
+            className="flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl bg-background-light-green text-primary-green-dark font-medium hover:bg-(--primary-green-light) transition-all"
             onClick={() => router.push(`/dashboard/edit/${card.id}`)}
             suppressHydrationWarning
           >
@@ -133,7 +140,7 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
 
           <motion.button
             whileHover={{ scale: 1.05 }}
-            className="flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl bg-[var(--primary-green-dark)] text-white font-medium hover:bg-[var(--primary-green)] transition-all"
+            className="flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl bg-(--primary-green-dark) text-white font-medium hover:bg-(--primary-green) transition-all"
             suppressHydrationWarning
           >
             <FiBarChart2 size={16} /> Analytics
@@ -144,7 +151,7 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
             className={`flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl font-medium transition-all ${
               card.boost === "Active"
                 ? "bg-background-light-green text-primary-green-dark border border-primary-green-light hover:bg-background-mint"
-                : "bg-background-mint text-primary-green-dark hover:bg-[var(--primary-green-light)]"
+                : "bg-background-mint text-primary-green-dark hover:bg-(--primary-green-light)"
             }`}
             suppressHydrationWarning
           >
@@ -153,7 +160,7 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
 
           <motion.button
             whileHover={{ scale: 1.05 }}
-            className="flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl bg-background-mint text-primary-green-dark font-medium hover:bg-[var(--primary-green-light)] transition-all"
+            className="flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl bg-background-mint text-primary-green-dark font-medium hover:bg-(--primary-green-light) transition-all"
             suppressHydrationWarning
           >
             <FiUser size={16} /> View Profile
@@ -168,9 +175,21 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
 const Dashboard = () => {
   const router = useRouter();
   const { user, isAuthenticated, logout, isLoading } = useAuth();
+  const [searchResults, setSearchResults] = useState<Card[]>([]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filterMode, setFilterMode] = useState<"none" | "review" | "verified">("none");
 
   // Auth is checked by the dashboard layout, no need to check here
-
+const SearchCard = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value.toLowerCase();
+    const filteredCards = cards.filter(card => {
+      const matchesTitle = card.title.toLowerCase().includes(query);
+      const matchesLocation = (card.location ?? '').toLowerCase().includes(query);
+      const matchesCategory = (card.category ?? '').toLowerCase().includes(query);
+      return matchesTitle || matchesLocation || matchesCategory;
+    });
+    setSearchResults(filteredCards);
+  }
   const handleLogout = async () => {
     try {
       await logout();
@@ -201,6 +220,11 @@ const Dashboard = () => {
       boost: "Active",
       color: "var(--gradient-primary)",
       geometry: "wave",
+      location: "New York",
+      category: "Business",
+      status: "completed",
+      verified: true,
+      reviews: 28,
     },
     {
       id: 2,
@@ -209,6 +233,11 @@ const Dashboard = () => {
       boost: "Inactive",
       color: "var(--gradient-secondary)",
       geometry: "slope",
+      location: "Pune",
+      category: "Design",
+      status: "review",
+      verified: false,
+      reviews: 9,
     },
     {
       id: 3,
@@ -217,16 +246,21 @@ const Dashboard = () => {
       boost: "Active",
       color: "var(--gradient-accent)",
       geometry: "swoosh",
+      location: "Delhi",
+      category: "Networking",
+      status: "completed",
+      verified: true,
+      reviews: 54,
     },
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--background)] px-8 sm:px-14 py-14 lg:ml-64 transition-all duration-300">
+  <div className="min-h-screen bg-background px-8 sm:px-14 py-14 lg:ml-64 transition-all duration-300">
       {/* Top Bar with User Info and Logout */}
       {isAuthenticated && user && (
         <div className="flex justify-between items-center mb-8 px-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-green to-primary-green-dark flex items-center justify-center text-white font-bold">
+            <div className="w-10 h-10 rounded-full bg-linear-to-br from-primary-green to-primary-green-dark flex items-center justify-center text-white font-bold">
               {user.fullName?.charAt(0) || user.email.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -245,24 +279,85 @@ const Dashboard = () => {
         </div>
       )}
       
-      {/* Top Create Button with generous space */}
-      <div className="flex justify-center my-20">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => router.push("/dashboard/create")}
-          className="relative flex items-center justify-center gap-3 btn btn-large btn-primary shadow-xl hover:shadow-colored transition-all text-xl font-bold px-14 py-6"
-          suppressHydrationWarning
-        >
-          <FiPlus className="text-2xl" /> Create New Card
-        </motion.button>
-      </div>
+      {/* Top area: search at top-right, create button centered below */}
+      <div className="relative my-8">
+        {/* Search at top-right */}
+        <div className="absolute right-0 top-0 flex items-center gap-2">
+          <input
+            type="text"
+            onChange={SearchCard}
+            placeholder="Search by title, location, category..."
+            className="border rounded-md px-3 py-2 w-64"
+            aria-label="Search cards"
+          />
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((v) => !v)}
+            className="p-2 rounded-md border hover:bg-gray-50"
+            aria-label="Open filters"
+            title="Filters"
+          >
+            <Filter className="w-4 h-4" />
+          </button>
 
+          {filtersOpen && (
+            <div className="absolute right-0 top-10 z-20 bg-white border rounded-lg shadow-lg p-3 w-64">
+              <p className="text-sm font-semibold mb-2">Filter by</p>
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="radio"
+                    name="filterMode"
+                    checked={filterMode === "review"}
+                    onChange={() => setFilterMode("review")}
+                  />
+                  <span>Review</span>
+                </label>
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="radio"
+                    name="filterMode"
+                    checked={filterMode === "verified"}
+                    onChange={() => setFilterMode("verified")}
+                  />
+                  <span>Verified</span>
+                </label>
+              </div>
+              <button
+                type="button"
+                className="mt-3 text-xs text-primary-green-dark hover:underline"
+                onClick={() => setFilterMode("none")}
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Centered Create Button */}
+        <div className="flex justify-center mt-6">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => router.push("/dashboard/create")}
+            className="relative flex items-center justify-center gap-3 btn btn-large btn-primary shadow-xl hover:shadow-colored transition-all text-xl font-bold px-14 py-6"
+            suppressHydrationWarning
+          >
+            <FiPlus className="text-2xl" /> Create New Card
+          </motion.button>
+        </div>
+      </div>
       {/* Cards Grid with wide spacing and room from header/sidebar */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-14 justify-items-center mt-12">
-        {cards.map((card) => (
-          <CardItem key={card.id} card={card} />
-        ))}
+        {(() => {
+          const baseList = searchResults.length > 0 ? searchResults : cards;
+          const afterFilters = baseList.filter((c) => {
+            if (filterMode === "review") return c.status === "review";
+            if (filterMode === "verified") return !!c.verified;
+            return true; // none -> no filtering
+          });
+          return afterFilters.map((card) => <CardItem key={card.id} card={card} />);
+        })()}
       </div>
     </div>
   );
