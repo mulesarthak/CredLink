@@ -1,9 +1,25 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { verifyUserToken, verifyAdminToken } from '@/lib/jwt'
+
+// NOTE: Middleware runs on the Edge runtime. Avoid Node-only libraries here (like jsonwebtoken).
+// We'll decode JWT payloads locally (without verification) just to forward IDs via headers.
+// API route handlers must still VERIFY tokens server-side for real auth decisions.
+function decodeJwtPayload(token: string): any | null {
+  try {
+    const base64Url = token.split('.')[1]
+    if (!base64Url) return null
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=')
+    const json = atob(padded)
+    return JSON.parse(json)
+  } catch {
+    return null
+  }
+}
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
+  const isApiRequest = path.startsWith('/api')
 
   // Public paths that don't require authentication
   const publicPaths = [
@@ -19,7 +35,10 @@ export function middleware(request: NextRequest) {
     '/faq',
     '/terms',
     '/privacy',
-    '/create-card'
+    '/create-card',
+    '/dashboard/messages',
+    '/api/message/receive',
+    '/api/message/send'
   ]
   
   const isAuthPath = path.startsWith('/auth')
@@ -35,6 +54,10 @@ export function middleware(request: NextRequest) {
   // Get tokens from cookies
   const userToken = request.cookies.get('user_token')?.value
   const adminToken = request.cookies.get('admin_token')?.value
+  const authHeader = request.headers.get('authorization') || request.headers.get('Authorization')
+  const bearerToken = authHeader?.startsWith('Bearer ')
+    ? authHeader.substring('Bearer '.length).trim()
+    : undefined
   
   // Check if user is authenticated (check for custom user_token or admin_token)
   const isAuthenticated = request.cookies.has('user_token') || 
@@ -47,16 +70,24 @@ export function middleware(request: NextRequest) {
   let adminId: string | null = null
   
   if (userToken) {
-    const decoded = verifyUserToken(userToken)
+    const decoded = decodeJwtPayload(userToken)
     if (decoded) {
-      userId = decoded.userId ?? null
+      userId = decoded.userId || decoded.id || null
     }
   }
-  
+
   if (adminToken) {
-    const decoded = verifyAdminToken(adminToken)
+    const decoded = decodeJwtPayload(adminToken)
     if (decoded) {
-      adminId = decoded.adminId ?? null
+      adminId = decoded.adminId || decoded.id || null
+    }
+  }
+
+  // If Authorization: Bearer <token> is provided, prefer it for user ID extraction
+  if (!userId && bearerToken) {
+    const decoded = decodeJwtPayload(bearerToken)
+    if (decoded) {
+      userId = decoded.userId || decoded.id || null
     }
   }
 
@@ -66,8 +97,11 @@ export function middleware(request: NextRequest) {
   // }
 
   // Redirect unauthenticated users to login page (except for public paths)
-  if (!isAuthenticated && !isCombinedPublicPath) {
-    return NextResponse.redirect(new URL('/auth/login', request.url))
+  // For API requests, do not redirect; just pass through with enriched headers.
+  if (!isApiRequest) {
+    if (!isAuthenticated && !isCombinedPublicPath) {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
+    }
   }
 
   // Clone the request headers and add user/admin ID
@@ -89,5 +123,6 @@ export function middleware(request: NextRequest) {
 
 // Configure the paths that should be protected
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*?)'],
+  // Include API so we can enrich requests (e.g., forward x-user-id) while still skipping redirects for API.
+  matcher: ['/api/:path*', '/((?!_next/static|_next/image|favicon.ico).*?)'],
 }

@@ -78,7 +78,9 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen">
+      <div className="max-w-[1320px] mx-auto px-6 py-8 space-y-10">
+        <div className="space-y-6">
       {/* Welcome Header with Gradient */}
       <div className="bg-gradient-to-r from-primary-green via-emerald-600 to-teal-600 rounded-2xl shadow-xl p-8 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32" />
@@ -225,6 +227,8 @@ export default function AdminDashboardPage() {
             <h3 className="font-bold text-lg mb-2 text-gray-900">Analytics</h3>
             <p className="text-sm text-gray-600">View platform statistics</p>
           </div>
+        </div>
+        </div>
         </div>
       </div>
     </div>

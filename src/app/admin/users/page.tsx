@@ -68,28 +68,28 @@ export default function UsersPage() {
   })
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-pink-50 to-sky-50">
+      <div className="max-w-[1320px] mx-auto px-6 py-12 space-y-16">
       {/* Header with Stats */}
-      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl shadow-xl p-8 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24" />
+      <div className="relative rounded-2xl shadow-xl p-8 bg-white/70 backdrop-blur-md border border-white/60 overflow-hidden">
+        <div className="absolute inset-0 rounded-2xl pointer-events-none bg-gradient-to-r from-indigo-200/20 via-rose-200/20 to-sky-200/20" />
         <div className="relative z-10">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight mb-2">User Management</h1>
-              <p className="text-white/90 text-base">Manage all registered users on the platform</p>
-              <div className="flex items-center gap-6 mt-4">
+              <h1 className="text-3xl font-bold tracking-tight mb-2 text-slate-900">User Management</h1>
+              <p className="text-slate-600 text-base">Manage all registered users on the platform</p>
+              <div className="flex items-center gap-8 mt-6">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                  <span className="text-sm font-medium">{users.length} Total Users</span>
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
+                  <span className="text-sm font-medium text-slate-700">{users.length} Total Users</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-300 rounded-full" />
-                  <span className="text-sm font-medium">{filteredUsers.length} Filtered</span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full" />
+                  <span className="text-sm font-medium text-slate-700">{filteredUsers.length} Filtered</span>
                 </div>
               </div>
             </div>
-            <button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-xl transition-all font-medium shadow-lg flex items-center gap-2">
+            <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl transition-all font-semibold shadow flex items-center gap-2">
               <Shield className="w-4 h-4" />
               Export Users
             </button>
@@ -98,30 +98,30 @@ export default function UsersPage() {
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-        <div className="flex flex-col sm:flex-row gap-4">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+        <div className="flex flex-col sm:flex-row gap-6">
           <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary-green h-5 w-5" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-600 h-5 w-5" />
             <input
               type="text"
               placeholder="Search users by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-primary-green focus:border-primary-green focus:bg-white transition-all text-base"
+              className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all text-base"
             />
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full sm:w-auto px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-green focus:border-primary-green bg-white font-medium"
+              className="w-full sm:w-auto px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white font-medium"
             >
               <option value="all">All Users</option>
               <option value="verified">Verified</option>
               <option value="unverified">Unverified</option>
             </select>
             <button className="w-full sm:w-auto flex items-center justify-center px-4 py-3.5 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all bg-white font-medium">
-              <Filter className="h-4 w-4 mr-2" />
+              <Filter className="h-4 w-4 mr-2 text-indigo-700" />
               More Filters
             </button>
           </div>
@@ -223,6 +223,7 @@ export default function UsersPage() {
           </table>
         </div>
         )}
+      </div>
       </div>
     </div>
   )

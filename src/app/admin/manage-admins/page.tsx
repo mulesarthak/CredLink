@@ -217,23 +217,24 @@ export default function ManageAdminsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-pink-50 to-sky-50">
+      <div className="max-w-[1320px] mx-auto px-6 py-12 space-y-16">
+        <div className="space-y-10">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-2xl shadow-xl p-8 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24" />
+      <div className="relative rounded-2xl shadow-xl p-8 bg-white/70 backdrop-blur-md border border-white/60 overflow-hidden">
+        <div className="absolute inset-0 rounded-2xl pointer-events-none bg-gradient-to-r from-indigo-200/20 via-rose-200/20 to-sky-200/20" />
         <div className="relative z-10">
-          <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center justify-between flex-wrap gap-8">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
-                <Shield className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-indigo-600/10 rounded-2xl flex items-center justify-center shadow">
+                <Shield className="w-8 h-8 text-indigo-700" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold mb-1">Admin Management</h1>
-                <p className="text-white/90 text-base">Create and manage admin accounts with permissions</p>
-                <div className="flex items-center gap-2 mt-3">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                  <span className="text-sm font-medium">{admins.length} Active Admins</span>
+                <h1 className="text-3xl font-bold mb-2 text-slate-900">Admin Management</h1>
+                <p className="text-slate-600 text-base">Create and manage admin accounts with permissions</p>
+                <div className="flex items-center gap-4 mt-4">
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
+                  <span className="text-sm font-medium text-slate-700">{admins.length} Active Admins</span>
                 </div>
               </div>
             </div>
@@ -242,7 +243,7 @@ export default function ManageAdminsPage() {
                 setFormData({ email: '', fullName: '', password: '', role: 'SUB_ADMIN', permissions: [] })
                 setShowCreateModal(true)
               }}
-              className="flex items-center gap-2 px-6 py-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-xl transition-all font-medium shadow-lg"
+              className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all font-semibold shadow"
             >
               <Plus className="w-5 h-5" />
               Create Admin
@@ -257,22 +258,22 @@ export default function ManageAdminsPage() {
           <table className="w-full">
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-8 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Admin
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-8 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Role
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-8 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Permissions
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-8 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-8 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Last Login
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-8 py-5 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -280,20 +281,20 @@ export default function ManageAdminsPage() {
             <tbody className="bg-white divide-y divide-gray-100">
                 {admins.map((admin) => (
                   <tr key={admin.id} className="hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent transition-all group">
-                    <td className="px-6 py-5 whitespace-nowrap">
+                    <td className="px-8 py-6 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="h-12 w-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
                           <span className="text-sm font-bold text-white">
                             {admin.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
                           </span>
                         </div>
-                        <div className="ml-4">
+                        <div className="ml-5">
                           <div className="text-sm font-bold text-gray-900">{admin.fullName}</div>
                           <div className="text-xs text-gray-600">{admin.email}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
+                    <td className="px-8 py-6 whitespace-nowrap">
                       <span className={`inline-flex items-center px-3 py-1.5 text-xs font-bold rounded-xl shadow-sm ${
                         admin.role === 'SUPER_ADMIN' 
                           ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
@@ -304,15 +305,15 @@ export default function ManageAdminsPage() {
                         {admin.role.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2">
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-3">
                         <div className="w-2 h-2 bg-primary-green rounded-full" />
                         <span className="text-sm font-medium text-gray-700">
                           {admin.permissions.length} permissions
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
+                    <td className="px-8 py-6 whitespace-nowrap">
                       <span className={`inline-flex items-center px-3 py-1.5 text-xs font-bold rounded-xl ${
                         admin.isActive
                           ? 'bg-green-100 text-green-800'
@@ -321,11 +322,11 @@ export default function ManageAdminsPage() {
                         {admin.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-sm font-medium text-gray-700">
+                    <td className="px-8 py-6 whitespace-nowrap text-sm font-medium text-gray-700">
                       {admin.lastLogin ? new Date(admin.lastLogin).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Never'}
                     </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
+                    <td className="px-8 py-6 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end space-x-3">
                         <button
                           onClick={() => openEditModal(admin)}
                           className="text-blue-600 hover:text-white hover:bg-blue-600 p-2.5 rounded-xl transition-all shadow-sm hover:shadow-md"
@@ -569,6 +570,8 @@ export default function ManageAdminsPage() {
           </div>
         </div>
       )}
+        </div>
+      </div>
     </div>
   )
 }
