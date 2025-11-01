@@ -73,7 +73,7 @@ export default function LoginPage() {
         setError(data?.error || 'Login failed. Please try again.')
         return
       }
-      alert("it's done")
+      
       // On success, go to dashboard
       window.location.href = '/dashboard'
     } catch {

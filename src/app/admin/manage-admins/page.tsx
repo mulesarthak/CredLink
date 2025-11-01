@@ -227,7 +227,10 @@ export default function ManageAdminsPage() {
               <p className="text-sm text-secondary">Create and manage admin accounts</p>
             </div>
             <button
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => {
+                setFormData({ email: '', fullName: '', password: '', role: 'SUB_ADMIN', permissions: [] })
+                setShowCreateModal(true)
+              }}
               className="flex items-center gap-2 px-4 py-2 bg-gradient-primary text-white rounded-md hover:opacity-90 transition-opacity"
             >
               <Plus className="w-4 h-4" />
@@ -332,7 +335,10 @@ export default function ManageAdminsPage() {
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold">Create New Admin</h2>
-                <button onClick={() => setShowCreateModal(false)}>
+                <button onClick={() => {
+                  setShowCreateModal(false)
+                  setFormData({ email: '', fullName: '', password: '', role: 'SUB_ADMIN', permissions: [] })
+                }}>
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -412,7 +418,10 @@ export default function ManageAdminsPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setShowCreateModal(false)}
+                    onClick={() => {
+                      setShowCreateModal(false)
+                      setFormData({ email: '', fullName: '', password: '', role: 'SUB_ADMIN', permissions: [] })
+                    }}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                   >
                     Cancel
