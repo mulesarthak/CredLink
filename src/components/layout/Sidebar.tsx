@@ -105,22 +105,18 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
 
       {/* Sidebar */}
       <motion.div
-        initial={{ 
-          width: isMobile ? 0 : (expanded ? 270 : 90),
-          x: isMobile ? -270 : 0
-        }}
         animate={{ 
-          width: isMobile ? 270 : (expanded ? 270 : 90),
-          x: isMobile ? (isMobileOpen ? 0 : -270) : 0
+          width: isMobile ? (isMobileOpen ? "17rem" : "0rem") : (expanded ? "17rem" : "5.5rem")
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className={`fixed left-0 top-0 h-screen flex flex-col justify-between bg-gradient-to-b from-[#0072EE] via-[#0052CC] to-[#0072EE] border-r border-blue-800/30 shadow-2xl ${
+        className={`fixed left-0 top-0 h-screen flex flex-col justify-between bg-gradient-to-b from-[#0072EE] via-[#0052CC] to-[#0072EE] border-r border-blue-800/30 shadow-2xl overflow-hidden ${
           isMobile ? 'z-40' : 'z-40'
         }`}
         style={{
           boxShadow: isMobile 
             ? '8px 0 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)'
-            : '4px 0 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1)'
+            : '4px 0 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+          transform: isMobile && !isMobileOpen ? 'translateX(-100%)' : 'translateX(0)'
         }}
       >
       {/* ---------- Top Section ---------- */}

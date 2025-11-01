@@ -41,19 +41,19 @@ export default function DashboardLayout({
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: '#f8fafc' }}>
+    <div className="h-screen overflow-hidden" style={{ backgroundColor: '#f8fafc' }}>
       {/* Sidebar */}
       <Sidebar expanded={expanded} setExpanded={setExpanded} />
 
       {/* Main Content */}
       <motion.div
-        animate={{ 
-          marginLeft: isMobile ? 0 : (expanded ? 280 : 80)
+        animate={{
+          marginLeft: isMobile ? '0rem' : (expanded ? '17rem' : '5.5rem')
         }}
-        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-        className="flex-1 flex flex-col min-w-0"
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="h-full flex flex-col"
         style={{ 
-          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
         }}
       >
         {/* Header */}
