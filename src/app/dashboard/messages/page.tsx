@@ -16,6 +16,10 @@ interface MessageItem {
   read: boolean;
   starred: boolean;
   tag: MessageTag;
+  replies?: {
+    text: string;
+    date: string;
+  }[];
 }
 
 export default function MessagesPage() {
@@ -130,7 +134,18 @@ export default function MessagesPage() {
 
   const sendReply = () => {
     if (!replyId || !replyText.trim()) return;
-    setMessages(prev => prev.map(m => m.id === replyId ? { ...m, status: "Replied", read: true } : m));
+    setMessages(prev => prev.map(m => m.id === replyId ? { 
+      ...m, 
+      status: "Replied", 
+      read: true,
+      replies: [
+        ...(m.replies || []),
+        {
+          text: replyText,
+          date: new Date().toISOString()
+        }
+      ]
+    } : m));
     setReplyId(null);
     setReplyText("");
   };
@@ -369,6 +384,14 @@ export default function MessagesPage() {
                         <span className={getStatusBadge(m.status)}>{m.status}</span>
                       </div>
                       <p style={{ marginTop: 4, fontSize: "var(--text-sm)", color: "#475569" }} className="line-clamp-2">{m.message}</p>
+                      {m.replies && m.replies.length > 0 && (
+                        <div style={{ marginTop: 8 }}>
+                          <p style={{ fontSize: "var(--text-xs)", color: "#6B7280" }}>Replies:</p>
+                          {m.replies.map(reply => (
+                            <p key={reply.date} style={{ fontSize: "var(--text-sm)", color: "#1F2937" }}>{reply.text}</p>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Date */}
@@ -459,6 +482,15 @@ export default function MessagesPage() {
                   >
                     {msg.message}
                   </div>
+
+                  {msg.replies && msg.replies.length > 0 && (
+                    <div style={{ marginTop: 16 }}>
+                      <p style={{ fontSize: "var(--text-xs)", color: "#6B7280" }}>Replies:</p>
+                      {msg.replies.map(reply => (
+                        <p key={reply.date} style={{ fontSize: "var(--text-sm)", color: "#1F2937" }}>{reply.text}</p>
+                      ))}
+                    </div>
+                  )}
 
                   <div className="flex gap-3" style={{ marginTop: 24 }}>
                     <button

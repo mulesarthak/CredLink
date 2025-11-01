@@ -17,9 +17,10 @@ import { motion, AnimatePresence } from "framer-motion";
 interface SidebarProps {
   expanded: boolean;
   setExpanded: (v: boolean) => void;
+  mobileOpen?: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
+const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = false }) => {
   const pathname = usePathname();
 
   const menuItems = [
@@ -38,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
       initial={{ width: expanded ? 270 : 90 }}
       animate={{ width: expanded ? 270 : 90 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="fixed left-0 top-0 h-screen flex flex-col justify-between bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200 shadow-xl z-40"
+      className={`fixed left-0 top-0 h-screen flex flex-col justify-between bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200 shadow-xl z-40 transform transition-transform duration-300 -translate-x-full lg:translate-x-0 ${mobileOpen ? '!translate-x-0' : ''}`}
       style={{
         background: 'linear-gradient(180deg, #ffffff 0%, #f9fafb 50%, #ffffff 100%)'
       }}
