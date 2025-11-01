@@ -2,11 +2,15 @@
 
 import Link from "next/link"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Search, Menu, X, User, LogOut } from "lucide-react"
+import { useAuth } from "@/lib/hooks/use-auth"
+import { toast } from "react-hot-toast"
 
 export function Header() {
+  const router = useRouter()
+  const { user, isAuthenticated, logout } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // This will be managed by auth context
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -27,6 +31,7 @@ export function Header() {
                 type="text"
                 placeholder="Search professionals, services, or locations..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                suppressHydrationWarning
               />
             </div>
           </div>
@@ -36,7 +41,7 @@ export function Header() {
             <Link href="/search" className="text-gray-700 hover:text-blue-600">
               Discover
             </Link>
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <>
                 <Link href="/dashboard" className="text-gray-700 hover:text-blue-600">
                   Dashboard
@@ -45,7 +50,7 @@ export function Header() {
                   My Profile
                 </Link>
                 <div className="relative group">
-                  <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600">
+                  <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600" suppressHydrationWarning>
                     <User className="h-4 w-4" />
                     <span>Account</span>
                   </button>
@@ -53,7 +58,15 @@ export function Header() {
                     <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                       Settings
                     </Link>
-                    <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                    <button 
+                      onClick={async () => {
+                        await logout()
+                        toast.success('Logged out successfully')
+                        router.push('/')
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" 
+                      suppressHydrationWarning
+                    >
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out
                     </button>
@@ -66,7 +79,7 @@ export function Header() {
                   Sign In
                 </Link>
                 <Link
-                  href="/auth/register"
+                  href="/auth/signup"
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Get Started
@@ -80,6 +93,7 @@ export function Header() {
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="text-gray-700 hover:text-blue-600"
+              suppressHydrationWarning
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -94,6 +108,7 @@ export function Header() {
               type="text"
               placeholder="Search professionals..."
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              suppressHydrationWarning
             />
           </div>
         </div>
@@ -105,7 +120,7 @@ export function Header() {
               <Link href="/search" className="text-gray-700 hover:text-blue-600">
                 Discover
               </Link>
-              {isLoggedIn ? (
+              {isAuthenticated ? (
                 <>
                   <Link href="/dashboard" className="text-gray-700 hover:text-blue-600">
                     Dashboard
@@ -116,7 +131,15 @@ export function Header() {
                   <Link href="/settings" className="text-gray-700 hover:text-blue-600">
                     Settings
                   </Link>
-                  <button className="text-left text-gray-700 hover:text-blue-600 flex items-center">
+                  <button 
+                    onClick={async () => {
+                      await logout()
+                      toast.success('Logged out successfully')
+                      router.push('/')
+                    }}
+                    className="text-left text-gray-700 hover:text-blue-600 flex items-center" 
+                    suppressHydrationWarning
+                  >
                     <LogOut className="h-4 w-4 mr-2" />
                     Sign Out
                   </button>
@@ -127,7 +150,7 @@ export function Header() {
                     Sign In
                   </Link>
                   <Link
-                    href="/auth/register"
+                    href="/auth/signup"
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
                   >
                     Get Started
@@ -141,3 +164,4 @@ export function Header() {
     </header>
   )
 }
+

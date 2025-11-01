@@ -1,26 +1,126 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import { verify } from 'jsonwebtoken'
+import { prisma } from '@/lib/prisma'
+
+const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'your-secret-key'
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params
-  return NextResponse.json({ ok: true, resource: 'users', id })
+  try {
+    const { id } = await params
+    const cookieStore = await cookies()
+    const token = cookieStore.get('admin_token')?.value
+
+    if (!token) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    })
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    return NextResponse.json({ user })
+  } catch (error) {
+    console.error('Get user error:', error)
+    return NextResponse.json({ error: 'Failed to fetch user' }, { status: 500 })
+  }
 }
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params
-  const data = await req.json().catch(() => ({}))
-  return NextResponse.json({ ok: true, resource: 'users', id, updated: data })
+  try {
+    const { id } = await params
+    const cookieStore = await cookies()
+    const token = cookieStore.get('admin_token')?.value
+
+    if (!token) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+    }
+
+    const decoded = verify(token, JWT_SECRET) as {
+      adminId: string
+      role: string
+      permissions: string[]
+    }
+
+    if (!decoded.adminId) {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+    }
+
+    const body = await req.json()
+    const { fullName, phone } = body
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        ...(fullName && { fullName }),
+        ...(phone && { phone })
+      }
+    })
+
+    return NextResponse.json({ 
+      success: true, 
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        fullName: updatedUser.fullName,
+        phone: updatedUser.phone
+      }
+    })
+  } catch (error) {
+    console.error('Update user error:', error)
+    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 })
+  }
 }
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params
-  return NextResponse.json({ ok: true, resource: 'users', id, deleted: true })
+  try {
+    const { id } = await params
+    const cookieStore = await cookies()
+    const token = cookieStore.get('admin_token')?.value
+
+    if (!token) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+    }
+
+    const decoded = verify(token, JWT_SECRET) as {
+      adminId: string
+      role: string
+      permissions: string[]
+    }
+
+    // Only SUPER_ADMIN can delete users
+    if (decoded.role !== 'SUPER_ADMIN') {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+    }
+
+    await prisma.user.delete({
+      where: { id }
+    })
+
+    return NextResponse.json({ success: true, message: 'User deleted successfully' })
+  } catch (error) {
+    console.error('Delete user error:', error)
+    return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 })
+  }
 }

@@ -78,117 +78,116 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-primary">Admin Dashboard</h1>
-                <p className="text-sm text-secondary">CredLink Administration</p>
-              </div>
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center shadow-md">
+              <Shield className="w-6 h-6 text-white" />
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              Logout
-            </button>
+            <div>
+              <h1 className="text-2xl font-bold text-primary">Admin Dashboard</h1>
+              <p className="text-sm text-secondary mt-0.5">CredLink Administration</p>
+            </div>
           </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors shadow-sm hover:shadow"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Admin Info Card */}
-        <div className="card mb-8">
-          <div className="flex items-start justify-between">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">{admin.fullName}</h2>
-              <p className="text-secondary mb-3">{admin.email}</p>
-              <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getRoleBadgeColor(admin.role)}`}>
-                {admin.role.replace('_', ' ')}
+      {/* Admin Info Card */}
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-8">
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-3xl font-bold mb-3">{admin.fullName}</h2>
+            <p className="text-secondary mb-4 text-base">{admin.email}</p>
+            <span className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${getRoleBadgeColor(admin.role)}`}>
+              {admin.role.replace('_', ' ')}
+            </span>
+          </div>
+          <Shield className="w-14 h-14 text-primary-green" />
+        </div>
+      </div>
+
+      {/* Permissions Card */}
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-8">
+        <div className="mb-6">
+          <h3 className="text-xl font-bold text-primary">Your Permissions</h3>
+          <p className="text-sm text-secondary mt-1">Access rights granted to your account</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {admin.permissions.map((permission) => (
+            <div
+              key={permission}
+              className="flex items-center gap-3 p-4 bg-background-light-green rounded-lg hover:bg-opacity-80 transition-colors"
+            >
+              <div className="w-2.5 h-2.5 bg-primary-green rounded-full"></div>
+              <span className="text-sm font-medium">
+                {permission.replace(/_/g, ' ')}
               </span>
             </div>
-            <Shield className="w-12 h-12 text-primary-green" />
-          </div>
+          ))}
         </div>
+      </div>
 
-        {/* Permissions Card */}
-        <div className="card mb-8">
-          <div className="card-header">
-            <h3 className="card-title">Your Permissions</h3>
-            <p className="card-description">Access rights granted to your account</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {admin.permissions.map((permission) => (
-              <div
-                key={permission}
-                className="flex items-center gap-2 p-3 bg-background-light-green rounded-md"
-              >
-                <div className="w-2 h-2 bg-primary-green rounded-full"></div>
-                <span className="text-sm font-medium">
-                  {permission.replace(/_/g, ' ')}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Quick Actions */}
+      {/* Quick Actions */}
+      <div>
+        <h3 className="text-xl font-bold text-primary mb-6">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(admin.role === 'SUPER_ADMIN' || admin.permissions.includes('MANAGE_ADMINS')) && (
             <div 
               onClick={() => router.push('/admin/manage-admins')}
-              className="card hover:shadow-lg transition-shadow cursor-pointer"
+              className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 hover:shadow-xl transition-all cursor-pointer hover:-translate-y-1"
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-background-light-green rounded-lg flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-primary-green" />
+                <div className="w-14 h-14 bg-background-light-green rounded-xl flex items-center justify-center shadow-sm">
+                  <Shield className="w-7 h-7 text-primary-green" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Manage Admins</h3>
+                  <h3 className="font-semibold text-base mb-1">Manage Admins</h3>
                   <p className="text-sm text-secondary">Create and manage admin accounts</p>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="card hover:shadow-lg transition-shadow cursor-pointer">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 hover:shadow-xl transition-all cursor-pointer hover:-translate-y-1">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-background-light-green rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-primary-green" />
+              <div className="w-14 h-14 bg-background-light-green rounded-xl flex items-center justify-center shadow-sm">
+                <Users className="w-7 h-7 text-primary-green" />
               </div>
               <div>
-                <h3 className="font-semibold">Manage Users</h3>
+                <h3 className="font-semibold text-base mb-1">Manage Users</h3>
                 <p className="text-sm text-secondary">View and manage user accounts</p>
               </div>
             </div>
           </div>
 
-          <div className="card hover:shadow-lg transition-shadow cursor-pointer">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 hover:shadow-xl transition-all cursor-pointer hover:-translate-y-1">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-background-light-green rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-primary-green" />
+              <div className="w-14 h-14 bg-background-light-green rounded-xl flex items-center justify-center shadow-sm">
+                <BarChart3 className="w-7 h-7 text-primary-green" />
               </div>
               <div>
-                <h3 className="font-semibold">Analytics</h3>
+                <h3 className="font-semibold text-base mb-1">Analytics</h3>
                 <p className="text-sm text-secondary">View platform statistics</p>
               </div>
             </div>
           </div>
 
-          <div className="card hover:shadow-lg transition-shadow cursor-pointer">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 hover:shadow-xl transition-all cursor-pointer hover:-translate-y-1">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-background-light-green rounded-lg flex items-center justify-center">
-                <Settings className="w-6 h-6 text-primary-green" />
+              <div className="w-14 h-14 bg-background-light-green rounded-xl flex items-center justify-center shadow-sm">
+                <Settings className="w-7 h-7 text-primary-green" />
               </div>
               <div>
-                <h3 className="font-semibold">Settings</h3>
+                <h3 className="font-semibold text-base mb-1">Settings</h3>
                 <p className="text-sm text-secondary">Configure platform settings</p>
               </div>
             </div>
