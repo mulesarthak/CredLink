@@ -52,32 +52,43 @@ export default function LoginPage() {
       setError('Please enter your email/phone and password')
       return
     }
-    
-    // Only support email login for now
-    if (identifierType !== 'email') {
-      setError('Please enter a valid email address')
-      return
-    }
-    
     setLoading(true)
     setError('')
-    
     try {
-      console.log('🔐 Attempting login for:', identifier)
-      await login(identifier, password)
-      console.log('✅ Login hook completed successfully')
-      toast.success('Login successful!')
-      console.log('🔄 Redirecting to dashboard...')
+      console.log('identifier', identifier)
+      console.log('password', password)
+      // Send login payload to backend JSON API (email + password)
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: identifier,
+          password,
+        }),
+      })
+
       
-      // Use window.location for a full page reload to ensure cookies are recognized
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setError(data?.error || 'Login failed. Please try again.')
+        return
+      }
+      
+      // On success, go to dashboard
       window.location.href = '/dashboard'
-    } catch (err: any) {
-      console.error('❌ Login error:', err)
-      const errorMessage = err.message || 'Login failed. Please try again.'
-      setError(errorMessage)
-      toast.error(errorMessage)
+    } catch {
+      setError('Login failed. Please try again.')
     } finally {
       setLoading(false)
+    }
+  }
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/logout', { method: 'POST' })
+      toast.success('Logged out successfully')
+      router.push('/')
+    } catch {
+      toast.error('Failed to log out')
     }
   }
 
