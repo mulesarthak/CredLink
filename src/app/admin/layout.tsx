@@ -109,6 +109,7 @@ export default function AdminLayout({
               const Icon = item.icon
               const isActive = pathname === item.href
               return (
+                <div key={item.name} className="p-5">
                 <Link
                   key={item.name}
                   href={item.href}
@@ -116,11 +117,12 @@ export default function AdminLayout({
                     isActive
                       ? "bg-gray-800 text-white shadow-lg"
                       : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                  } group flex items-center px-5 py-4 text-base font-medium rounded-xl transition-all duration-200 hover:shadow-md`}
+                  } group flex items-center px-6 py-5 text-base font-medium rounded-xl transition-all duration-200 hover:shadow-md`}
                 >
                   <Icon className="mr-4 h-6 w-6 flex-shrink-0" />
                   {item.name}
                 </Link>
+                </div>
               )
             })}
           </div>
@@ -129,14 +131,14 @@ export default function AdminLayout({
             <div className="space-y-1">
               <Link
                 href="/"
-                className="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-5 py-4 text-base font-medium rounded-xl transition-all duration-200 hover:shadow-md"
+                className="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-6 py-5 text-base font-medium rounded-xl transition-all duration-200 hover:shadow-md"
               >
                 <Home className="mr-4 h-6 w-6 flex-shrink-0" />
                 Back to Site
               </Link>
               <button 
                 onClick={handleLogout}
-                className="w-full text-left text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-5 py-4 text-base font-medium rounded-xl transition-all duration-200 hover:shadow-md"
+                className="w-full text-left text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-6 py-5 text-base font-medium rounded-xl transition-all duration-200 hover:shadow-md"
               >
                 <LogOut className="mr-4 h-6 w-6 flex-shrink-0" />
                 Sign Out
