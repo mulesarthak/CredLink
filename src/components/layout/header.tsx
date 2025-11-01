@@ -79,7 +79,7 @@ export function Header() {
                   Sign In
                 </Link>
                 <Link
-                  href="/auth/register"
+                  href="/auth/signup"
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Get Started
@@ -150,7 +150,7 @@ export function Header() {
                     Sign In
                   </Link>
                   <Link
-                    href="/auth/register"
+                    href="/auth/signup"
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
                   >
                     Get Started
