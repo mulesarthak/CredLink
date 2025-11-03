@@ -64,7 +64,7 @@ export default function ProfilesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-pink-50 to-sky-50">
-      <div className="max-w-[1320px] mx-auto px-6 py-8 text-sm text-gray-700 space-y-10">
+      <div className="space-y-16 max-w-[1320px] mx-auto px-4 md:px-6 py-10 md:py-12 text-sm text-gray-700">
       {/* Header */}
       <div className="relative rounded-2xl shadow-xl p-8 bg-white/70 backdrop-blur-md border border-white/60 overflow-hidden">
         <div className="absolute inset-0 rounded-2xl pointer-events-none bg-gradient-to-r from-indigo-200/20 via-rose-200/20 to-sky-200/20" />
@@ -130,8 +130,8 @@ export default function ProfilesPage() {
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+      <div className="bg-white rounded-xl shadow-md border border-gray-100 p-4 md:p-8 relative overflow-visible">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-600 h-5 w-5" />
             <input
@@ -142,18 +142,18 @@ export default function ProfilesPage() {
               className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all text-base"
             />
           </div>
-          <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto justify-center sm:justify-end">
+          <div className="flex items-center gap-4 sm:gap-8 w-full sm:w-auto justify-center sm:justify-end">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white font-medium"
+              className="px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white font-medium w-full sm:w-auto min-w-0"
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
               <option value="rejected">Rejected</option>
             </select>
-            <button className="flex items-center px-4 py-3.5 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all font-medium">
+            <button className="flex items-center px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all font-medium w-full sm:w-auto">
               <Filter className="h-4 w-4 mr-2 text-indigo-700" />
               More Filters
             </button>

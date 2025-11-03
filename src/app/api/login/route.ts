@@ -17,9 +17,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'email and password are required' }, { status: 400 })
     }
 
-    // Find user by email
-    const user = await prisma.user.findUnique({ where: { email } })
-
+  // Find user by email
+  const user = await prisma.user.findUnique({ where: { email } })
+ console.log("Login attempt for user:", user);
     if (!user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
 
-    const token = await signToken({ userId: user.id, email: user.email })
+    const token = signToken({ userId: user.id, email: user.email })
     if(!token){
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
@@ -43,7 +43,21 @@ export async function POST(req: NextRequest) {
       },
       token,
     })
-  } catch (err) {
+  } catch (err: any) {
+    // Handle common Prisma connectivity issues more gracefully
+    const code = err?.code
+    if (code === 'P1001') {
+      // Database unreachable
+      return NextResponse.json({
+        error: 'Database is unreachable. Please try again shortly.'
+      }, { status: 503 })
+    }
+    if (code === 'P2024') {
+      // Timed out fetching a new connection from the pool
+      return NextResponse.json({
+        error: 'Service is busy. Please retry in a moment.'
+      }, { status: 503 })
+    }
     console.error('Login error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
