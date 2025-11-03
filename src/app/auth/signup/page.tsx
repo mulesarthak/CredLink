@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Mail, Eye, EyeOff, Loader2, Check } from "lucide-react"
@@ -10,6 +10,16 @@ import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { signupSchema } from "@/lib/validations/auth"
 import type { z } from "zod"
+//import { signInWithPhoneNumber } from "@/lib/firebase"
+//import { auth } from "@/lib/firebase"
+import { RecaptchaVerifier, type ConfirmationResult } from "firebase/auth"
+
+// Augment window for reCAPTCHA handle (must be top-level)
+declare global {
+  interface Window {
+    recaptchaVerifier?: RecaptchaVerifier
+  }
+}
 
 type SignupForm = z.infer<typeof signupSchema>
 
@@ -17,8 +27,12 @@ export default function SignupPage() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
-  const { register, handleSubmit, formState: { errors, isSubmitting }, watch } = useForm<SignupForm>({
+  const [identifier, setIdentifier] = useState('')
+  const [identifierType, setIdentifierType] = useState<'email' | 'phone' | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [otp, setOtp] = useState('')
+  const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setValue } = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       fullName: '',
@@ -29,97 +43,213 @@ export default function SignupPage() {
     }
   })
 
-  const onSubmit = async (data: SignupForm) => {
+  // Detect input type
+  const detectInputType = (value: string) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const phonePattern = /^\d{10}$/
+    if (emailPattern.test(value)) return 'email'
+    if (phonePattern.test(value)) return 'phone'
+    return null
+  }
+
+  const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.trim()
+    setIdentifier(value)
+    setError('')
+    const type = detectInputType(value)
+    setIdentifierType(type)
+    
+    // Update form values based on detected type
+    if (type === 'email') {
+      setValue('email', value)
+      setValue('phone', '')
+    } else if (type === 'phone') {
+      setValue('phone', value)
+      setValue('email', '')
+    }
+  }
+/*
+  const sendOtp = async () => {
     try {
-      // Add your signup logic here
-      toast.loading('Creating your account...')
-      await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate API call
-      toast.success('Account created successfully!')
-      router.push('/auth/login')
+      const verifier = setupRecaptcha()
+      const phoneNumber = "+91" + identifier
+      const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, verifier)
+      // Persist verificationId for the verify page
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('verificationId', confirmationResult.verificationId)
+        sessionStorage.setItem('otpPhone', phoneNumber)
+      }
+      toast.success('OTP sent!')
+      router.push(`/auth/verify-otp?phone=${encodeURIComponent(identifier)}`)
+    } catch (error: any) {
+      console.error(error)
+      toast.error(error?.message || 'Failed to send OTP')
+    }
+  }
+
+  // OTP verification happens on /auth/verify-otp page using verificationId
+  
+  const setupRecaptcha = () => {
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+        size: "invisible",
+      })
+    }
+    return window.recaptchaVerifier
+  }
+*/
+  const onSubmit = async (data: SignupForm) => {
+    if (identifierType === 'phone') {
+      //await sendOtp()
+      return
+    }
+    
+    // For email signup, continue as before
+    try {
+      const loadingToast = toast.loading('Creating your account...')
+      
+      // Send register payload to backend JSON API
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          fullName: data.fullName,
+          phone: data.phone
+        }),
+      })
+
+     /* const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          fullName: data.fullName,
+          phone: data.phone
+        }),
+      })
+*/
+      const result = await response.json()
+      toast.dismiss(loadingToast)
+
+      if (!response.ok) {
+        toast.error(result.error || 'Failed to create account')
+        setError(result.error || 'Failed to create account')
+        return
+      }
+
+      // Show success message and redirect
+      toast.success('🎉 Account created successfully! Redirecting to login...', {
+        duration: 3000,
+      })
+      
+      // Wait a moment before redirecting so user sees the message
+      setTimeout(() => {
+        router.push('/auth/login')
+      }, 1500)
     } catch (error) {
+      console.error('Signup error:', error)
       toast.error('Failed to create account. Please try again.')
+      setError('Failed to create account. Please try again.')
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl">
-        <div className="text-center">
-          <div className="mx-auto h-12 w-12 relative mb-4">
-            <div className="absolute inset-0 bg-green-500 rounded-xl transform rotate-6"></div>
-            <div className="absolute inset-0 bg-green-600 rounded-xl transform -rotate-6"></div>
-            <div className="absolute inset-0 bg-white rounded-xl flex items-center justify-center">
-              <span className="text-2xl font-bold text-green-600">C</span>
-            </div>
-          </div>
-          
-          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <Link href="/" className="block">
+            <h1 className="auth-logo">CredLink</h1>
+          </Link>
+          <h2 className="auth-title">
             Create your account
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="auth-subtitle">
             Already have an account?{' '}
-            <Link href="/auth/login" className="font-medium text-green-600 hover:text-green-500 transition-colors">
-              login 
+            <Link href="/auth/login" className="text-primary-green hover:text-primary-green-dark">
+              Sign in
             </Link>
           </p>
         </div>
 
+        {/* Invisible reCAPTCHA container for Firebase phone auth */}
+        <div id="recaptcha-container" className="hidden" />
+
         <form
-          className="mt-8 space-y-6"
+          className="auth-form"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <div className="rounded-2xl shadow-sm space-y-4">
-            <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="space-y-4">
+            <div className="auth-input-group">
+              <label htmlFor="fullName" className="label">
                 Full Name
               </label>
               <input
                 id="fullName"
                 type="text"
                 {...register('fullName')}
-                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
+                className="auth-input"
                 placeholder="Enter your full name"
               />
               {errors.fullName && (
-                <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>
+                <p className="form-error">{errors.fullName.message}</p>
               )}
             </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
+            <div className="auth-input-group">
+              <label htmlFor="identifier" className="label">
+                 Phone Number
               </label>
               <input
-                id="email"
+                id="identifier"
+                type="number"
+                {...register('phone')}
+                //onChange={handleIdentifierChange}
+                className="auth-input"
+                placeholder="Enter phone number"
+                maxLength={50}
+                //autoComplete="email tel"
+                required
+              />
+              {identifierType && (
+                <p className="text-xs text-gray-500 mt-1">
+                  {identifierType === 'email' ? '✓ Valid email' : '✓ Valid phone number'}
+                </p>
+              )}
+              {error && <p className="form-error mt-2">{error}</p>}
+              {errors.email && <p className="form-error mt-2">{errors.email.message}</p>}
+            </div>
+
+            <div className="auth-input-group">
+              <label htmlFor="identifier" className="label">
+                Email 
+              </label>
+              <input
+                id="identifier"
                 type="email"
                 {...register('email')}
-                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
-                placeholder="Enter your email"
+                //onChange={handleIdentifierChange}
+                className="auth-input"
+                placeholder="Enter email"
+                maxLength={50}
+                autoComplete="email tel"
+                required
               />
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              {identifierType && (
+                <p className="text-xs text-gray-500 mt-1">
+                  {identifierType === 'email' ? '✓ Valid email' : '✓ Valid phone number'}
+                </p>
               )}
+              {error && <p className="form-error mt-2">{error}</p>}
+              {errors.email && <p className="form-error mt-2">{errors.email.message}</p>}
             </div>
 
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
-              <input
-                id="phone"
-                type="tel"
-                maxLength={10}
-                {...register('phone')}
-                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
-                placeholder="Enter your phone number"
-              />
-              {errors.phone && (
-                <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="auth-input-group">
+              <label htmlFor="password" className="label">
                 Password
               </label>
               <div className="relative">
@@ -127,28 +257,32 @@ export default function SignupPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   {...register('password')}
-                  className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
+                  className="auth-input"
                   placeholder="Create a strong password"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
+                  tabIndex={-1}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowPassword(!showPassword);
+                  }}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  {!showPassword ? (
+                    <EyeOff className="h-5 w-5" aria-label="Show password" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <Eye className="h-5 w-5" aria-label="Hide password" />
                   )}
                 </button>
               </div>
               {errors.password && (
-                <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+                <p className="form-error">{errors.password.message}</p>
               )}
             </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="auth-input-group">
+              <label htmlFor="confirmPassword" className="label">
                 Confirm Password
               </label>
               <div className="relative">
@@ -156,39 +290,43 @@ export default function SignupPage() {
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   {...register('confirmPassword')}
-                  className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:z-10 sm:text-sm transition-all duration-200"
+                  className="auth-input"
                   placeholder="Confirm your password"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  tabIndex={-1}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowConfirmPassword(!showConfirmPassword);
+                  }}
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  {!showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" aria-label="Show password" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <Eye className="h-5 w-5" aria-label="Hide password" />
                   )}
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>
+                <p className="form-error">{errors.confirmPassword.message}</p>
               )}
             </div>
           </div>
 
           <div>
-            <Button
+            <button
               type="submit"
-              disabled={isSubmitting}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting || loading}
+              className={`auth-submit-button ${(isSubmitting || loading) ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
-              {isSubmitting ? (
+              {(isSubmitting || loading) ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 'Create Account'
               )}
-            </Button>
+            </button>
           </div>
         </form>
       </div>
