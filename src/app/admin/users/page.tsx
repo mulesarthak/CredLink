@@ -69,16 +69,16 @@ export default function UsersPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-pink-50 to-sky-50">
-      <div className="max-w-[1320px] mx-auto px-6 py-12 space-y-16">
+      <div className="max-w-[1320px] mx-auto px-6 py-8 space-y-10">
       {/* Header with Stats */}
       <div className="relative rounded-2xl shadow-xl p-8 bg-white/70 backdrop-blur-md border border-white/60 overflow-hidden">
         <div className="absolute inset-0 rounded-2xl pointer-events-none bg-gradient-to-r from-indigo-200/20 via-rose-200/20 to-sky-200/20" />
         <div className="relative z-10">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold tracking-tight mb-2 text-slate-900">User Management</h1>
               <p className="text-slate-600 text-base">Manage all registered users on the platform</p>
-              <div className="flex items-center gap-8 mt-6">
+              <div className="flex items-center gap-6 mt-4">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
                   <span className="text-sm font-medium text-slate-700">{users.length} Total Users</span>
@@ -98,8 +98,8 @@ export default function UsersPage() {
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-        <div className="flex flex-col sm:flex-row gap-6">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+        <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-600 h-5 w-5" />
             <input
@@ -110,7 +110,7 @@ export default function UsersPage() {
               className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all text-base"
             />
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
