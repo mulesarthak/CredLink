@@ -18,6 +18,7 @@ interface MessageItem {
   read: boolean;
   starred: boolean;
   tag: MessageTag;
+  senderId: string; // Store the original sender's ID for replies
   replies?: {
     text: string;
     date: string;
@@ -91,6 +92,7 @@ export default function MessagesPage() {
             read: typeof msg.read === 'boolean' ? msg.read : false,
             starred: false,
             tag: tagMap[String(msg.tag)] || null,
+            senderId: msg.senderId, // Store senderId for replies
             replies: [],
           } as MessageItem;
         });
@@ -200,22 +202,56 @@ export default function MessagesPage() {
     if (replyId === id) setReplyId(null);
   };
 
-  const sendReply = () => {
+  const sendReply = async () => {
     if (!replyId || !replyText.trim()) return;
-    setMessages(prev => prev.map(m => m.id === replyId ? { 
-      ...m, 
-      status: "Replied", 
-      read: true,
-      replies: [
-        ...(m.replies || []),
-        {
-          text: replyText,
-          date: new Date().toISOString()
-        }
-      ]
-    } : m));
-    setReplyId(null);
-    setReplyText("");
+    
+    const originalMessage = messages.find(m => m.id === replyId);
+    if (!originalMessage) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/message/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          message: replyText.trim(),
+          receiverId: originalMessage.senderId, // Send reply back to original sender
+          status: 'REPLIED',
+          tag: originalMessage.tag?.toUpperCase() || 'SUPPORT',
+          read: false,
+        }),
+      });
+
+      if (response.ok) {
+        // Update local state to reflect the reply
+        setMessages(prev => prev.map(m => m.id === replyId ? { 
+          ...m, 
+          status: "Replied", 
+          read: true,
+          replies: [
+            ...(m.replies || []),
+            {
+              text: replyText,
+              date: new Date().toISOString()
+            }
+          ]
+        } : m));
+        setReplyId(null);
+        setReplyText("");
+        // Optionally refetch messages to sync with backend
+        // fetchMessages();
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to send reply:', errorData);
+        alert('Failed to send reply. Please try again.');
+      }
+    } catch (err) {
+      console.error('Error sending reply:', err);
+      alert('Error sending reply. Please check your connection.');
+    }
   };
 
   const getStatusBadge = (status: MessageStatus) => {

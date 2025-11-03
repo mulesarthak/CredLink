@@ -30,6 +30,66 @@ const EditPage = () => {
   const [bannerImage, setBannerImage] = useState<string | null>(null); // New state for banner image
   const [cardLocation, setCardLocation] = useState('California, USA'); // New state for card location
   const [cardDescription, setCardDescription] = useState('A modern digital visiting card for software designer showcasing professional details, social links, and portfolio'); // New state for card description
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Save profile data
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/profile/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          firstName,
+          middleName,
+          lastName,
+          prefix,
+          suffix,
+          preferredName,
+          maidenName,
+          pronouns,
+          title,
+          company,
+          department,
+          affiliation,
+          headline,
+          accreditations,
+          email,
+          phone,
+          emailLink,
+          phoneLink,
+          location: cardLocation,
+          cardName,
+          cardType,
+          selectedDesign,
+          selectedColor,
+          selectedFont,
+          profileImage,
+          bannerImage,
+          bio: cardDescription,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert('Profile saved successfully!');
+        console.log('Saved profile:', data);
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to save profile:', errorData);
+        alert(`Failed to save profile: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error('Error saving profile:', err);
+      alert('Error saving profile. Please check your connection.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // New state for RGB and Hex values
   const hexToRgb = (hex: string) => {
@@ -1220,31 +1280,38 @@ const EditPage = () => {
 
         {/* Action Buttons */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '15px', marginTop: '30px' }}>
-          <button style={{
-            backgroundColor: 'transparent',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            padding: '12px 25px',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            color: '#555',
-            cursor: 'pointer',
-            outline: 'none'
-          }}>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              backgroundColor: 'transparent',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              padding: '12px 25px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              color: '#555',
+              cursor: 'pointer',
+              outline: 'none'
+            }}
+          >
             Cancel
           </button>
-          <button style={{
-            backgroundColor: selectedColor,
-            border: 'none',
-            borderRadius: '8px',
-            padding: '12px 25px',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            color: 'white',
-            cursor: 'pointer',
-            outline: 'none'
-          }}>
-            Save
+          <button 
+            onClick={handleSave}
+            disabled={isSaving}
+            style={{
+              backgroundColor: isSaving ? '#ccc' : selectedColor,
+              border: 'none',
+              borderRadius: '8px',
+              padding: '12px 25px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              color: 'white',
+              cursor: isSaving ? 'not-allowed' : 'pointer',
+              outline: 'none'
+            }}
+          >
+            {isSaving ? 'Saving...' : 'Save'}
           </button>
         </div>
       </div>

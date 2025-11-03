@@ -17,11 +17,55 @@ model User {
   password         String
   fullName         String
   phone            String?
+  username         String    @unique
+  
+  // Personal Information
+  firstName        String?
+  middleName       String?
+  lastName         String?
+  prefix           String?
+  suffix           String?
+  preferredName    String?
+  maidenName       String?
+  pronouns         String?
+  
+  // Professional Information
+  title            String?
+  company          String?
+  department       String?
+  affiliation      String?
+  headline         String?
+  accreditations   String?
+  
+  // Contact Information
+  emailLink        String?
+  phoneLink        String?
+  location         String?
+  
+  // Card Customization
+  cardName         String?
+  cardType         String?   @default("Personal")
+  selectedDesign   String?   @default("Classic")
+  selectedColor    String?   @default("#145dfd")
+  selectedFont     String?   @default("Arial, sans-serif")
+  
+  // Media
+  profileImage     String?   @db.Text
+  bannerImage      String?   @db.Text
+  
+  // Content
+  bio              String?   @db.Text
+  
+  // Metadata
+  status           String?   @default("draft")
+  views            Int       @default(0)
+  
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   receivedMessages Message[] @relation("ReceivedMessages")
   sentMessages     Message[] @relation("SentMessages")
 
+  @@index([username])
   @@map("users")
 }
 
