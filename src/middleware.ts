@@ -66,7 +66,7 @@ export function middleware(request: NextRequest) {
   // }
 
   // Redirect unauthenticated users to login page (except for public paths)
-  if (!isAuthenticated && !isCombinedPublicPath) {
+  if (!isAuthenticated && !isPublicPath) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 

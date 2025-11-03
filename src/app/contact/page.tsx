@@ -202,123 +202,381 @@ export default function ContactPage() {
               </div>
             </div>
 
-            
-
             {/* Right Side - Contact Form */}
             <div className="relative">
-              <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-20 shadow-2xl border border-white/20 min-h-[500px]">
-                <div className="text-center mb-16">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-6">Send us a message</h2>
-                 
+              {/* Floating Elements for Visual Appeal */}
+              <div style={{
+                position: 'absolute',
+                top: '-20px',
+                right: '-20px',
+                width: '100px',
+                height: '100px',
+                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1))',
+                borderRadius: '50%',
+                filter: 'blur(20px)',
+                zIndex: 0
+              }} />
+              <div style={{
+                position: 'absolute',
+                bottom: '-30px',
+                left: '-30px',
+                width: '80px',
+                height: '80px',
+                background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.1), rgba(79, 70, 229, 0.1))',
+                borderRadius: '50%',
+                filter: 'blur(15px)',
+                zIndex: 0
+              }} />
+              
+              <div style={{
+                background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85))',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '32px',
+                padding: '48px',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.3)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                position: 'relative',
+                zIndex: 1,
+                minHeight: '600px'
+              }}>
+                {/* Header Section */}
+                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                  
+                  <h2 style={{
+                    fontSize: '36px',
+                    fontWeight: '800',
+                    background: 'linear-gradient(135deg, #1F2937, #374151)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    marginBottom: '12px',
+                    lineHeight: '1.2'
+                  }}>
+                    Let's Create Something Amazing Together
+                  </h2>
+                  
                 </div>
 
-                <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
-                  <div className="grid grid-cols-2" style={{gap: '48px'}}>
-                    <div className="relative">
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  {/* Name Fields Row */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    <div style={{ position: 'relative' }}>
+                      <label style={{
+                        display: 'block',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#374151',
+                        marginBottom: '8px',
+                        paddingLeft: '4px'
+                      }}>
+                        First Name *
+                      </label>
+                      <div style={{ position: 'relative' }}>
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          required
+                          style={{
+                            width: '100%',
+                            height: '56px',
+                            padding: '0 20px 0 48px',
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            color: '#1F2937',
+                            background: 'rgba(249, 250, 251, 0.8)',
+                            border: '2px solid rgba(209, 213, 219, 0.6)',
+                            borderRadius: '16px',
+                            outline: 'none',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            backdropFilter: 'blur(10px)'
+                          }}
+                          placeholder="Enter first name"
+                          onFocus={(e) => {
+                            e.target.style.borderColor = '#3B82F6';
+                            e.target.style.background = 'rgba(255, 255, 255, 0.95)';
+                            e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = 'rgba(209, 213, 219, 0.6)';
+                            e.target.style.background = 'rgba(249, 250, 251, 0.8)';
+                            e.target.style.boxShadow = 'none';
+                          }}
+                        />
+                        
+                      </div>
+                    </div>
+                    
+                    <div style={{ position: 'relative' }}>
+                      <label style={{
+                        display: 'block',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#374151',
+                        marginBottom: '8px',
+                        paddingLeft: '4px'
+                      }}>
+                        Last Name
+                      </label>
+                      <div style={{ position: 'relative' }}>
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          style={{
+                            width: '100%',
+                            height: '56px',
+                            padding: '0 20px 0 48px',
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            color: '#1F2937',
+                            background: 'rgba(249, 250, 251, 0.8)',
+                            border: '2px solid rgba(209, 213, 219, 0.6)',
+                            borderRadius: '16px',
+                            outline: 'none',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            backdropFilter: 'blur(10px)'
+                          }}
+                          placeholder="Enter last name"
+                          onFocus={(e) => {
+                            e.target.style.borderColor = '#3B82F6';
+                            e.target.style.background = 'rgba(255, 255, 255, 0.95)';
+                            e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = 'rgba(209, 213, 219, 0.6)';
+                            e.target.style.background = 'rgba(249, 250, 251, 0.8)';
+                            e.target.style.boxShadow = 'none';
+                          }}
+                        />
+                        
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Phone Field */}
+                  <div style={{ position: 'relative' }}>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: '#374151',
+                      marginBottom: '8px',
+                      paddingLeft: '4px'
+                    }}>
+                      Phone Number *
+                    </label>
+                    <div style={{ position: 'relative' }}>
                       <input
-                        type="text"
-                        name="firstName"
-                        value={formData.firstName}
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
                         onChange={handleInputChange}
                         required
-                        className="w-full py-6 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all duration-300 text-gray-900 font-medium outline-none text-lg h-12"
-                      style={{paddingLeft: '25px', paddingRight: '32px'}}
-                        placeholder="First Name *"
+                        style={{
+                          width: '100%',
+                          height: '56px',
+                          padding: '0 20px 0 48px',
+                          fontSize: '16px',
+                          fontWeight: '500',
+                          color: '#1F2937',
+                          background: 'rgba(249, 250, 251, 0.8)',
+                          border: '2px solid rgba(209, 213, 219, 0.6)',
+                          borderRadius: '16px',
+                          outline: 'none',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          backdropFilter: 'blur(10px)'
+                        }}
+                        placeholder="Enter your phone number"
+                        onFocus={(e) => {
+                          e.target.style.borderColor = '#3B82F6';
+                          e.target.style.background = 'rgba(255, 255, 255, 0.95)';
+                          e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'rgba(209, 213, 219, 0.6)';
+                          e.target.style.background = 'rgba(249, 250, 251, 0.8)';
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
-                      <label className="absolute left-4 top-2 text-xs text-gray-500 font-medium">
-                        
-                      </label>
+                      
                     </div>
-                    <div className="relative">
+                  </div>
+
+                  {/* Email Field */}
+                  <div style={{ position: 'relative' }}>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: '#374151',
+                      marginBottom: '8px',
+                      paddingLeft: '4px'
+                    }}>
+                      Email Address *
+                    </label>
+                    <div style={{ position: 'relative' }}>
                       <input
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
+                        type="email"
+                        name="email"
+                        value={formData.email}
                         onChange={handleInputChange}
-                        className="w-full py-6 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all duration-300 text-gray-900 font-medium outline-none text-lg h-12"
-                      style={{paddingLeft: '25px', paddingRight: '32px'}}
-                        placeholder="Last Name"
+                        required
+                        style={{
+                          width: '100%',
+                          height: '56px',
+                          padding: '0 20px 0 48px',
+                          fontSize: '16px',
+                          fontWeight: '500',
+                          color: '#1F2937',
+                          background: 'rgba(249, 250, 251, 0.8)',
+                          border: '2px solid rgba(209, 213, 219, 0.6)',
+                          borderRadius: '16px',
+                          outline: 'none',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          backdropFilter: 'blur(10px)'
+                        }}
+                        placeholder="Enter your email address"
+                        onFocus={(e) => {
+                          e.target.style.borderColor = '#3B82F6';
+                          e.target.style.background = 'rgba(255, 255, 255, 0.95)';
+                          e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'rgba(209, 213, 219, 0.6)';
+                          e.target.style.background = 'rgba(249, 250, 251, 0.8)';
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
-
+                      
                     </div>
                   </div>
 
-                  <div className="relative" style={{marginBottom: '10px'}}>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full py-6 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all duration-300 text-gray-900 font-medium outline-none text-lg h-12"
-                      style={{paddingLeft: '25px', paddingRight: '32px'}}
-                      placeholder="Phone Number *"
-                    />
-                    
+                  {/* Message Field */}
+                  <div style={{ position: 'relative' }}>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: '#374151',
+                      marginBottom: '8px',
+                      paddingLeft: '4px'
+                    }}>
+                      Your Message
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <textarea
+                        name="message"
+                        value={formData.message}
+                        onChange={handleInputChange}
+                        rows={4}
+                        style={{
+                          width: '100%',
+                          minHeight: '120px',
+                          padding: '16px 20px 16px 48px',
+                          fontSize: '16px',
+                          fontWeight: '500',
+                          color: '#1F2937',
+                          background: 'rgba(249, 250, 251, 0.8)',
+                          border: '2px solid rgba(209, 213, 219, 0.6)',
+                          borderRadius: '16px',
+                          outline: 'none',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          backdropFilter: 'blur(10px)',
+                          resize: 'vertical',
+                          fontFamily: 'inherit'
+                        }}
+                        placeholder="Tell us about your project or ask us anything..."
+                        onFocus={(e) => {
+                          e.target.style.borderColor = '#3B82F6';
+                          e.target.style.background = 'rgba(255, 255, 255, 0.95)';
+                          e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'rgba(209, 213, 219, 0.6)';
+                          e.target.style.background = 'rgba(249, 250, 251, 0.8)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
+                      
+                    </div>
                   </div>
 
-                  <div className="relative" style={{marginBottom: '10px'}}>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full py-6 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all duration-300 text-gray-900 font-medium outline-none text-lg h-12"
-                      style={{paddingLeft: '25px', paddingRight: '32px'}}
-                      placeholder="Email Address *"
-                    />
-                    
-                  </div>
-
-                  <div className="relative" style={{marginBottom: '10px'}}>
-                    <textarea
-                      name="message"
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      rows={3}
-                      className="w-full py-6 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all duration-300 resize-none text-gray-900 font-medium outline-none text-lg h-20"
-                      style={{paddingLeft: '25px', paddingRight: '32px'}}
-                      placeholder="Your Message"
-                    />
-                    
-                  </div>
-
+                  {/* Submit Button */}
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    // className="w-full py-6 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all duration-300 text-gray-900 font-medium outline-none text-lg h-12"
-                    //   style={{paddingLeft: '25px', paddingRight: '32px'}}
-                    className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white font-bold py-5 px-8 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 text-lg h-12"
+                    style={{
+                      width: '100%',
+                      height: '64px',
+                      background: isSubmitting 
+                        ? 'linear-gradient(135deg, #9CA3AF, #6B7280)' 
+                        : 'linear-gradient(135deg, #3B82F6, #9333EA, #4F46E5)',
+                      color: 'white',
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      border: 'none',
+                      borderRadius: '20px',
+                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '12px',
+                      boxShadow: isSubmitting 
+                        ? 'none' 
+                        : '0 10px 25px rgba(59, 130, 246, 0.3)',
+                      transform: isSubmitting ? 'none' : 'translateY(0)',
+                      marginTop: '8px'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSubmitting) {
+                        const target = e.target as HTMLButtonElement;
+                        target.style.transform = 'translateY(-2px)';
+                        target.style.boxShadow = '0 15px 35px rgba(59, 130, 246, 0.4)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSubmitting) {
+                        const target = e.target as HTMLButtonElement;
+                        target.style.transform = 'translateY(0)';
+                        target.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)';
+                      }
+                    }}
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <div 
+                          className="animate-spin"
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                            border: '3px solid rgba(255, 255, 255, 0.3)',
+                            borderTop: '3px solid white',
+                            borderRadius: '50%'
+                          }} 
+                        />
                         <span>Sending Message...</span>
                       </>
                     ) : (
                       <>
-                       
+                        
                         <span>Send Message</span>
                       </>
                     )}
                   </button>
 
-                  <div className="text-center pt-6">
-                    
-                  </div>
+                  {/* Footer Note */}
+                  
                 </form>
               </div>
+              
             </div>
-          
-
-      {/* FAQ Section */}
-      
-      {/* Social Media Section */}
-      
-    </div>
-    </div>
+          </div>
         </div>
       </div>
+    </div>
   );
 }
