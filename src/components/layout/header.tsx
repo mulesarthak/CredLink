@@ -226,6 +226,24 @@ export function Header() {
                 )}
               </AnimatePresence>
             </div>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth/login" className="text-gray-700 hover:text-blue-600">
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/auth/signup"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
+                  >
+                    Get Started
+                  </Link>
+                </>
+              )}
+            </nav>
           </div>
         </div>
         
@@ -243,3 +261,4 @@ export function Header() {
     </>
   )
 }
+

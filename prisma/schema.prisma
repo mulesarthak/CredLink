@@ -12,34 +12,30 @@ model ConnectionTest {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  fullName  String
-  phone     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String    @id @default(uuid())
+  email            String    @unique
+  password         String
+  fullName         String
+  phone            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  receivedMessages Message[] @relation("ReceivedMessages")
+  sentMessages     Message[] @relation("SentMessages")
 
   @@map("users")
 }
 
-enum AdminRole {
-  SUPER_ADMIN
-  ADMIN
-  SUB_ADMIN
-}
-
 model Admin {
-  id          String   @id @default(uuid())
-  email       String   @unique
+  id          String    @id @default(uuid())
+  email       String    @unique
   password    String
   fullName    String
   role        AdminRole @default(SUB_ADMIN)
-  permissions String   @db.Text // Store as JSON string
-  isActive    Boolean  @default(true)
+  permissions String    @db.Text
+  isActive    Boolean   @default(true)
   createdBy   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   lastLogin   DateTime?
 
   @@map("admins")
@@ -53,4 +49,25 @@ model AdminSession {
   createdAt DateTime @default(now())
 
   @@map("admin_sessions")
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  text       String   @db.Text
+  senderId   String
+  receiverId String
+  createdAt  DateTime @default(now())
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  SUB_ADMIN
 }
