@@ -16,12 +16,27 @@ function decodeJwtPayload(token: string): any | null {
     return null
   }
 }
+import { verifyToken } from '@/lib/jwt'
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
   const isApiRequest = path.startsWith('/api')
 
   // Public paths that don't require authentication
+  // Add any routes here that should be accessible without logging in (e.g. /pricing)
+  const isPublicPath =
+    path === '/auth/login' ||
+    path === '/auth/signup' ||
+    path === '/pricing' ||
+    path.startsWith('/pricing/') ||
+    path === '/profile'
+
+  // Check if user is authenticated
+  const isAuthenticated = request.cookies.has('authToken') // Replace with your auth token name
+
+  // Redirect authenticated users away from auth pages
+  if (isAuthenticated && isPublicPath) {
+    return NextResponse.redirect(new URL('/', request.url))
   const publicPaths = [
     '/',
     '/dashboard',
@@ -43,13 +58,14 @@ export function middleware(request: NextRequest) {
   
   const isAuthPath = path.startsWith('/auth')
   const isAdminPath = path.startsWith('/admin')
+  const isDashboardPath = path.startsWith('/dashboard')
   const isPricingPath = path === '/pricing' || path.startsWith('/pricing/')
   const isContactPath = path === '/contact' || path.startsWith('/contact/')
   const isDashboardContactPath = path === '/dashboardcontact' || path.startsWith('/dashboardcontact/')
   
   // Check if the current path is in the public paths array or matches public path patterns
   const isInPublicPaths = publicPaths.includes(path)
-  const isCombinedPublicPath = isInPublicPaths || isAuthPath || isAdminPath || isPricingPath || isContactPath || isDashboardContactPath
+  const isCombinedPublicPath = isInPublicPaths || isAuthPath || isAdminPath || isDashboardPath || isPricingPath || isContactPath || isDashboardContactPath
 
   // Get tokens from cookies
   const userToken = request.cookies.get('user_token')?.value
@@ -73,6 +89,13 @@ export function middleware(request: NextRequest) {
     const decoded = decodeJwtPayload(userToken)
     if (decoded) {
       userId = decoded.userId || decoded.id || null
+    try {
+      const decoded = verifyToken(userToken) as any
+      if (decoded) {
+        userId = decoded.userId ?? null
+      }
+    } catch (error) {
+      // Invalid token, ignore
     }
   }
 
@@ -88,6 +111,13 @@ export function middleware(request: NextRequest) {
     const decoded = decodeJwtPayload(bearerToken)
     if (decoded) {
       userId = decoded.userId || decoded.id || null
+    try {
+      const decoded = verifyToken(adminToken) as any
+      if (decoded) {
+        adminId = decoded.adminId ?? null
+      }
+    } catch (error) {
+      // Invalid token, ignore
     }
   }
 

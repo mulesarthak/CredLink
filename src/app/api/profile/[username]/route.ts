@@ -28,8 +28,8 @@ const profiles = [
   }
 ]
 
-export async function GET(request: Request, { params }: { params: { username: string } }) {
-  const { username } = params
+export async function GET(request: Request, { params }: { params: Promise<{ username: string }> }) {
+  const { username } = await params
   const profile = profiles.find(p => p.username === username)
   if (!profile) {
     return NextResponse.json({ error: "Profile not found" }, { status: 404 })

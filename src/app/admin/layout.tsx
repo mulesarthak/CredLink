@@ -112,14 +112,15 @@ export default function AdminLayout({
               const Icon = item.icon
               const isActive = pathname === item.href
               return (
+                <div key={item.name} className="p-5">
                 <Link
                   key={item.name}
                   href={item.href}
                   className={`${
                     isActive
-                      ? "bg-gradient-to-r from-primary-green to-emerald-600 text-white shadow-lg shadow-primary-green/20 scale-[1.02]"
-                      : "text-gray-300 hover:bg-white/5 hover:text-white"
-                  } group flex items-center px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-200 hover:scale-[1.02]`}
+                      ? "bg-gray-800 text-white shadow-lg"
+                      : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                  } group flex items-center px-6 py-5 text-base font-medium rounded-xl transition-all duration-200 hover:shadow-md`}
                 >
                   <Icon className={`mr-3.5 h-5 w-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'} transition-colors`} />
                   <span className="flex-1">{item.name}</span>
@@ -127,6 +128,7 @@ export default function AdminLayout({
                     <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                   )}
                 </Link>
+                </div>
               )
             })}
           </div>
@@ -135,14 +137,14 @@ export default function AdminLayout({
             <div className="space-y-2">
               <Link
                 href="/"
-                className="text-gray-300 hover:bg-white/5 hover:text-white group flex items-center px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-200"
+                className="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-6 py-5 text-base font-medium rounded-xl transition-all duration-200 hover:shadow-md"
               >
                 <Home className="mr-3.5 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-white transition-colors" />
                 Back to Site
               </Link>
               <button 
                 onClick={handleLogout}
-                className="w-full text-left text-gray-300 hover:bg-red-500/10 hover:text-red-400 group flex items-center px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-200"
+                className="w-full text-left text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-6 py-5 text-base font-medium rounded-xl transition-all duration-200 hover:shadow-md"
               >
                 <LogOut className="mr-3.5 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-red-400 transition-colors" />
                 Sign Out
