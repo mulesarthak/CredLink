@@ -422,12 +422,14 @@ className="bg-white border border-gray-200 shadow-md rounded-2xl overflow-y-auto
               {/* Left spacer */}
               <div style={{ width: '12px', height: '1px', visibility: 'hidden' }}></div>
               
-              <button
-                className="flex items-center justify-center gap-3 min-w-40 h-12 bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer transition-all shadow-md hover:shadow-lg rounded-xl font-semibold"
-              >
-                <FiEdit size={20} />
-                Edit Card
-              </button>
+              <Link href="/dashboard/edit">
+                <button
+                  className="flex items-center justify-center gap-3 min-w-40 h-12 bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer transition-all shadow-md hover:shadow-lg rounded-xl font-semibold"
+                >
+                  <FiEdit size={20} />
+                  Edit Card
+                </button>
+              </Link>
               
               {/* Right spacer */}
               <div style={{ width: '16px', height: '1px', visibility: 'hidden' }}></div>
