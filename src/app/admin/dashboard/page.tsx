@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Loader2, Shield, Users, Settings, LogOut, BarChart3 } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { Loader2, Shield, Users, Settings, LogOut, BarChart3, Tag } from "lucide-react"
+import { toast } from "react-hot-toast"
 import styles from "./dashboard.module.css";
 
 interface AdminData {
@@ -205,6 +205,17 @@ export default function AdminDashboardPage() {
               </div>
               <h4 className={styles.actionName}>Profiles</h4>
               <p className={styles.actionDesc}>Review and approve profiles</p>
+            </div>
+
+            <div
+              onClick={() => router.push("/admin/categories")}
+              className={styles.actionCard}
+            >
+              <div className={`${styles.actionIcon} ${styles.purple}`}>
+                <Tag />
+              </div>
+              <h4 className={styles.actionName}>Categories</h4>
+              <p className={styles.actionDesc}>Manage professional categories</p>
             </div>
 
             <div

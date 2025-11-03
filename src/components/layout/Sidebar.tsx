@@ -75,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.2 }}
             onClick={toggleMobileMenu}
-            className="fixed top-4 left-4 z-50 p-3 bg-gradient-to-br from-[#0072EE] to-[#0052CC] text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm border border-white/20"
+            className="fixed top-4 left-4 z-50 p-3 bg-linear-to-br from-[#0072EE] to-[#0052CC] text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm border border-white/20"
             style={{
               boxShadow: '0 8px 32px rgba(0, 114, 238, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)'
             }}
@@ -124,25 +124,41 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
             : '4px 0 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1)'
         }}
       >
-      {/* ---------- Top Section ---------- */}
-      <div>
-        {/* Logo / Title */}
-        <div className={`flex items-center ${(isMobile || expanded) ? 'justify-between px-5' : 'justify-center px-2'} h-16 border-b border-white/20 mt-6`}>
-          <AnimatePresence mode="wait">
-            {(isMobile || expanded) && (
-              <motion.span
-                key="logo"
-                initial={{ opacity: 0, x: -15, scale: 0.9 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: -15, scale: 0.9 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-                className="font-extrabold text-3xl tracking-wide text-white"
-                style={{
-                  textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.3)'
-                }}
+        {/* ---------- Top Section ---------- */}
+        <div>
+          {/* Logo / Title */}
+          <div className={`flex items-center ${(isMobile || expanded) ? 'justify-between px-5' : 'justify-center px-2'} h-16 border-b border-white/20 mt-6`}>
+            <AnimatePresence mode="wait">
+              {(isMobile || expanded) && (
+                <motion.span
+                  key="logo"
+                  initial={{ opacity: 0, x: -15, scale: 0.9 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -15, scale: 0.9 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className="font-extrabold text-3xl tracking-wide text-white"
+                  style={{
+                    textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.3)'
+                  }}
+                >
+                  CredLink
+                </motion.span>
+              )}
+            </AnimatePresence>
+
+            {!isMobile && (
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="p-2 hover:bg-white/10 rounded-lg transition-all duration-200"
               >
-                CredLink
-              </motion.span>
+                <motion.div
+                  animate={{ rotate: expanded ? 0 : 180 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="text-white"
+                >
+                  {expanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+                </motion.div>
+              </button>
             )}
           </AnimatePresence>
 
@@ -167,10 +183,10 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
           )}
         </div>
 
-        {/* Top Partition Line */}
-        <div className="h-[1px] bg-white/30 mx-4 mt-0.5 shadow-sm"></div>
-        
-        <p className="opacity-0 select-none text-sm">Spacer</p>
+          {/* Top Partition Line */}
+          <div className="h-px bg-white/30 mx-4 mt-0.5 shadow-sm"></div>
+          
+          <p className="opacity-0 select-none text-sm">Spacer</p>
 
         {/* 2-finger gap above Dashboard (1rem = 16px) */}
         <nav className="mt-8 flex flex-col gap-5 px-2">
@@ -201,35 +217,43 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
                       whileHover={{ rotate: 12, scale: 1.15 }} 
                       className="text-[1.6rem] transition-all duration-300"
                       style={isActive ? { 
-                        filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.9)) drop-shadow(0 0 8px rgba(255,255,255,0.7))' 
-                      } : { 
-                        filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' 
-                      }}
+                        textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.4)',
+                        boxShadow: '0 0 25px rgba(255,255,255,0.4), 0 0 50px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.2)'
+                      } : {}}
                     >
-                      {item.icon}
-                    </motion.div>
+                      <motion.div 
+                        whileHover={{ rotate: 12, scale: 1.15 }} 
+                        className="text-[1.6rem] transition-all duration-300"
+                        style={isActive ? { 
+                          filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.9)) drop-shadow(0 0 8px rgba(255,255,255,0.7))' 
+                        } : { 
+                          filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' 
+                        }}
+                      >
+                        {item.icon}
+                      </motion.div>
 
-                    <AnimatePresence>
-                      {(isMobile || expanded) && (
-                        <motion.span
-                          key={item.name}
-                          initial={{ opacity: 0, x: -15, scale: 0.9 }}
-                          animate={{ opacity: 1, x: 0, scale: 1 }}
-                          exit={{ opacity: 0, x: -15, scale: 0.9 }}
-                          transition={{ duration: 0.3, delay: 0.1 }}
-                          className="text-lg font-semibold tracking-wide"
-                        >
-                          {item.name}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                </Link>
-              </motion.div>
-            );
-          })}
-        </nav>
-      </div>
+                      <AnimatePresence>
+                        {(isMobile || expanded) && (
+                          <motion.span
+                            key={item.name}
+                            initial={{ opacity: 0, x: -15, scale: 0.9 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: -15, scale: 0.9 }}
+                            transition={{ duration: 0.3, delay: 0.1 }}
+                            className="text-lg font-semibold tracking-wide"
+                          >
+                            {item.name}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </nav>
+        </div>
 
       {/* ---------- Bottom Section ---------- */}
       <div className="mb-6"> {/* Added extra gap below Support (1.5rem) */}
@@ -264,13 +288,21 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
                       whileHover={{ rotate: 12, scale: 1.15 }} 
                       className="text-[1.6rem] transition-all duration-300"
                       style={isActive ? { 
-                        filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.9)) drop-shadow(0 0 8px rgba(255,255,255,0.7))' 
-                      } : { 
-                        filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' 
-                      }}
+                        textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.4)',
+                        boxShadow: '0 0 25px rgba(255,255,255,0.4), 0 0 50px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.2)'
+                      } : {}}
                     >
-                      {item.icon}
-                    </motion.div>
+                      <motion.div 
+                        whileHover={{ rotate: 12, scale: 1.15 }} 
+                        className="text-[1.6rem] transition-all duration-300"
+                        style={isActive ? { 
+                          filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.9)) drop-shadow(0 0 8px rgba(255,255,255,0.7))' 
+                        } : { 
+                          filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' 
+                        }}
+                      >
+                        {item.icon}
+                      </motion.div>
 
                     <AnimatePresence>
                       {(isMobile || expanded) && (
@@ -301,4 +333,5 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
 };
 
 export default Sidebar;
+ 
  

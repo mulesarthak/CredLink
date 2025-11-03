@@ -14,7 +14,7 @@ export default function ProfilePage() {
 
   const displayUser = user
     ? {
-        name: user.name || "Josh Hazelwood",
+        name: (user as any).fullName || (user as any).name || "Josh Hazelwood",
         email: user.email || "josh@boostnow.com",
         jobTitle: (user as any)?.jobTitle || "Software Designer",
         company: (user as any)?.company || "BoostNow LLP",
@@ -84,7 +84,7 @@ export default function ProfilePage() {
                   <span className="text-gray-600 text-2xl font-bold">
                     {displayUser.name
                       .split(" ")
-                      .map((n) => n[0])
+                      .map((n: string) => n[0])
                       .join("")}
                   </span>
                 </div>

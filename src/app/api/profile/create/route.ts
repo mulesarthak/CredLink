@@ -1,22 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyToken } from '@/lib/jwt'
 
+// Profile creation is not needed - user is created during signup
+// Use /api/profile/update to add remaining profile information
 export async function POST(req: NextRequest) {
-  const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
-  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined
-  if (!token) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  let decoded: any
-  try {
-    decoded = verifyToken(token)
-  } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const data = await req.json().catch(() => ({}))
-
-  // TODO: Persist profile data using Prisma once Profile model is available
-  return NextResponse.json({ ok: true, resource: 'profile', action: 'create', userId: decoded.userId, data })
+  return NextResponse.json({ 
+    ok: false, 
+    error: 'Profile creation not supported. User is created during signup. Use PUT /api/profile/update to update profile information.' 
+  }, { status: 400 })
 }
