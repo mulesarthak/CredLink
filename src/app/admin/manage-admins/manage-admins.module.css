@@ -1,0 +1,413 @@
+/* ====== Layout ====== */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f6ff, #ffffff);
+  padding: 40px;
+  font-family: "Poppins", sans-serif;
+  color: #1e293b;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.header p {
+  color: #475569;
+  margin-top: 6px;
+}
+
+.createBtn {
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: 0.3s ease;
+}
+
+.createBtn:hover {
+  background: linear-gradient(90deg, #1d4ed8, #2563eb);
+  transform: translateY(-1px);
+}
+
+/* ====== Table ====== */
+.tableWrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 14px 20px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.table th {
+  background: #f8fafc;
+  font-size: 13px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #475569;
+}
+
+.table td {
+  font-size: 15px;
+}
+
+.table tr:hover {
+  background: #f1f5ff;
+}
+
+/* ====== Buttons ====== */
+.actionBtn {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: color 0.2s;
+}
+
+.actionBtn:hover {
+  color: #1e40af;
+}
+
+.deleteBtn {
+  color: #dc2626;
+}
+
+.deleteBtn:hover {
+  color: #b91c1c;
+}
+
+/* ====== Role Badges ====== */
+.roleBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.roleSuper {
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  color: #ffffff;
+}
+
+.roleAdmin {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.roleSub {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+/* ====== Modals ====== */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 30px;
+  width: 100%;
+  max-width: 550px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.modal h2 {
+  margin-bottom: 18px;
+  font-size: 22px;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #334155;
+}
+
+.modal input,
+.modal select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+.modal input:focus,
+.modal select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.permissionList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.permissionItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.modalButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.saveBtn {
+  background: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancelBtn {
+  background: #e2e8f0;
+  border: none;
+  color: #334155;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: #cbd5e1;
+}
+
+/* ====== Status Tags ====== */
+.statusActive {
+  background: #dcfce7;
+  color: #15803d;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.statusInactive {
+  background: #fee2e2;
+  color: #b91c1c;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+/* ============================= */
+/* ✅ RESPONSIVE DESIGN */
+/* ============================= */
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 20px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .createBtn {
+    align-self: flex-start;
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+
+  .tableWrapper {
+    overflow-x: auto;
+  }
+
+  .modal {
+    width: 90%;
+    padding: 25px;
+  }
+
+  .permissionList {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+  }
+
+  .header p {
+    font-size: 14px;
+  }
+
+  .createBtn {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .tableWrapper {
+    border-radius: 10px;
+    box-shadow: none;
+    overflow-x: auto;
+  }
+
+  .table {
+    min-width: 650px;
+  }
+
+  .table th,
+  .table td {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .actionBtn {
+    margin-right: 6px;
+    font-size: 13px;
+  }
+
+  .modal {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .modal h2 {
+    font-size: 20px;
+  }
+
+  .modal form {
+    gap: 10px;
+  }
+
+  .modal input,
+  .modal select {
+    font-size: 14px;
+  }
+
+  .modalButtons {
+    flex-direction: column;
+  }
+
+  .saveBtn,
+  .cancelBtn {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+
+  .header h1 {
+    font-size: 20px;
+  }
+
+  .createBtn {
+    font-size: 13px;
+    padding: 8px 14px;
+  }
+
+  .table th,
+  .table td {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .table {
+    min-width: 600px;
+  }
+
+  .roleBadge {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .modal {
+    padding: 18px;
+  }
+
+  .modal h2 {
+    font-size: 18px;
+  }
+
+  .permissionItem {
+    font-size: 13px;
+  }
+
+  .saveBtn,
+  .cancelBtn {
+    font-size: 13px;
+  }
+
+  .statusActive,
+  .statusInactive {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+}
