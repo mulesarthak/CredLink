@@ -23,23 +23,8 @@ export function middleware(request: NextRequest) {
   const isApiRequest = path.startsWith('/api')
 
   // Public paths that don't require authentication
-  // Add any routes here that should be accessible without logging in (e.g. /pricing)
-  const isPublicPath =
-    path === '/auth/login' ||
-    path === '/auth/signup' ||
-    path === '/pricing' ||
-    path.startsWith('/pricing/') ||
-    path === '/profile'
-
-  // Check if user is authenticated
-  const isAuthenticated = request.cookies.has('authToken') // Replace with your auth token name
-
-  // Redirect authenticated users away from auth pages
-  if (isAuthenticated && isPublicPath) {
-    return NextResponse.redirect(new URL('/', request.url))
   const publicPaths = [
     '/',
-    '/dashboard',
     '/auth/login',
     '/auth/signup',
     '/features',
@@ -50,10 +35,7 @@ export function middleware(request: NextRequest) {
     '/faq',
     '/terms',
     '/privacy',
-    '/create-card',
-    '/dashboard/messages',
-    '/api/message/receive',
-    '/api/message/send'
+    '/create-card'
   ]
   
   const isAuthPath = path.startsWith('/auth')
@@ -71,7 +53,7 @@ export function middleware(request: NextRequest) {
   const userToken = request.cookies.get('user_token')?.value
   const adminToken = request.cookies.get('admin_token')?.value
   const authHeader = request.headers.get('authorization') || request.headers.get('Authorization')
-  const bearerToken = authHeader?.startsWith('Bearer ')
+  const bearerToken = authHeader && authHeader.startsWith('Bearer ')
     ? authHeader.substring('Bearer '.length).trim()
     : undefined
   
@@ -89,13 +71,6 @@ export function middleware(request: NextRequest) {
     const decoded = decodeJwtPayload(userToken)
     if (decoded) {
       userId = decoded.userId || decoded.id || null
-    try {
-      const decoded = verifyToken(userToken) as any
-      if (decoded) {
-        userId = decoded.userId ?? null
-      }
-    } catch (error) {
-      // Invalid token, ignore
     }
   }
 
@@ -111,22 +86,9 @@ export function middleware(request: NextRequest) {
     const decoded = decodeJwtPayload(bearerToken)
     if (decoded) {
       userId = decoded.userId || decoded.id || null
-    try {
-      const decoded = verifyToken(adminToken) as any
-      if (decoded) {
-        adminId = decoded.adminId ?? null
-      }
-    } catch (error) {
-      // Invalid token, ignore
     }
   }
 
-  // Allow authenticated users to access auth pages (for logout/account switching)
-  // if (isAuthenticated && isAuthPath) {
-  //   return NextResponse.redirect(new URL('/dashboard', request.url))
-  // }
-
-  // Redirect unauthenticated users to login page (except for public paths)
   // For API requests, do not redirect; just pass through with enriched headers.
   if (!isApiRequest) {
     if (!isAuthenticated && !isCombinedPublicPath) {
@@ -136,10 +98,10 @@ export function middleware(request: NextRequest) {
 
   // Clone the request headers and add user/admin ID
   const requestHeaders = new Headers(request.headers)
-  if (userId) {
+  if (userId !== null) {
     requestHeaders.set('x-user-id', userId)
   }
-  if (adminId) {
+  if (adminId !== null) {
     requestHeaders.set('x-admin-id', adminId)
   }
 

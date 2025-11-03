@@ -10,9 +10,7 @@ import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { signupSchema } from "@/lib/validations/auth"
 import type { z } from "zod"
-//import { signInWithPhoneNumber } from "@/lib/firebase"
-//import { auth } from "@/lib/firebase"
-import { RecaptchaVerifier, type ConfirmationResult } from "firebase/auth"
+import { auth, RecaptchaVerifier, signInWithPhoneNumber } from "@/lib/firebase"
 
 // Augment window for reCAPTCHA handle (must be top-level)
 declare global {
@@ -68,7 +66,7 @@ export default function SignupPage() {
       setValue('email', '')
     }
   }
-/*
+
   const sendOtp = async () => {
     try {
       const verifier = setupRecaptcha()
@@ -97,7 +95,7 @@ export default function SignupPage() {
     }
     return window.recaptchaVerifier
   }
-*/
+
   const onSubmit = async (data: SignupForm) => {
     if (identifierType === 'phone') {
       //await sendOtp()
