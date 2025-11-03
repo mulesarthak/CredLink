@@ -228,42 +228,58 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
           <div className="h-[1px] bg-white/30 mx-4 mb-6"></div>
 
           <div className="flex flex-col gap-2">
-            {bottomItems.map((item) => {
+            {bottomItems.map((item, index) => {
               const isActive = pathname === item.path;
               return (
-                <Link key={item.name} href={item.path}>
-                  <motion.div
-                    whileHover={{ scale: 1.02, x: 4 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`flex items-center ${(isMobile || expanded) ? 'gap-4 px-4' : 'justify-center px-2'} py-3.5 rounded-xl cursor-pointer transition-all ${
-                      isActive
-                        ? "text-white font-bold shadow-lg shadow-white/25 backdrop-blur-sm border border-white/30"
-                        : "text-white/90 hover:bg-white/15 hover:shadow-lg hover:shadow-white/20"
-                    }`}
-                  >
-                    <motion.div 
-                      whileHover={{ rotate: 8 }} 
-                      className="text-2xl"
+                <motion.div
+                  key={item.name}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  <Link href={item.path}>
+                    <motion.div
+                      whileHover={{ scale: 1.05, x: 6 }}
+                      whileTap={{ scale: 0.97 }}
+                      className={`flex items-center ${(isMobile || expanded) ? 'gap-5 px-4' : 'justify-center px-2'} py-3 rounded-lg cursor-pointer transition-all duration-300 ${
+                        isActive
+                          ? "text-white font-bold shadow-lg shadow-white/25 backdrop-blur-sm border border-white/30"
+                          : "text-white/90 hover:bg-white/15 hover:shadow-lg hover:shadow-white/20 hover:backdrop-blur-sm hover:border hover:border-white/20"
+                      }`}
+                      style={isActive ? { 
+                        textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.4)',
+                        boxShadow: '0 0 25px rgba(255,255,255,0.4), 0 0 50px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.2)'
+                      } : {}}
                     >
-                      {item.icon}
-                    </motion.div>
+                      <motion.div 
+                        whileHover={{ rotate: 12, scale: 1.15 }} 
+                        className="text-[1.6rem] transition-all duration-300"
+                        style={isActive ? { 
+                          filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.9)) drop-shadow(0 0 8px rgba(255,255,255,0.7))' 
+                        } : { 
+                          filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' 
+                        }}
+                      >
+                        {item.icon}
+                      </motion.div>
 
-                    <AnimatePresence>
-                      {(isMobile || expanded) && (
-                        <motion.span
-                          key={item.name}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -10 }}
-                          transition={{ duration: 0.2 }}
-                          className="text-base font-semibold"
-                        >
-                          {item.name}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                </Link>
+                      <AnimatePresence>
+                        {(isMobile || expanded) && (
+                          <motion.span
+                            key={item.name}
+                            initial={{ opacity: 0, x: -15, scale: 0.9 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: -15, scale: 0.9 }}
+                            transition={{ duration: 0.3, delay: 0.1 }}
+                            className="text-lg font-semibold tracking-wide"
+                          >
+                            {item.name}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  </Link>
+                </motion.div>
               );
             })}
           </div>
