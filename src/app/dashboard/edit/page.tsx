@@ -24,12 +24,72 @@ const EditPage = () => {
   const [company, setCompany] = useState('');
   const [headline, setHeadline] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [selectedFont, setSelectedFont] = useState('Arial, sans-serif');
-  const [cardName, setCardName] = useState('');
-  const [cardType, setCardType] = useState('Personal');
-  const [bannerImage, setBannerImage] = useState<string | null>(null);
-  const [cardLocation, setCardLocation] = useState('California, USA');
-  const [cardDescription, setCardDescription] = useState('A modern digital visiting card for software designer showcasing professional details, social links, and portfolio');
+  const [selectedFont, setSelectedFont] = useState('Arial, sans-serif'); // New state for selected font
+  const [cardName, setCardName] = useState(''); // New state for card name
+  const [cardType, setCardType] = useState('Personal'); // New state for card type (Personal/Professional)
+  const [bannerImage, setBannerImage] = useState<string | null>(null); // New state for banner image
+  const [cardLocation, setCardLocation] = useState('California, USA'); // New state for card location
+  const [cardDescription, setCardDescription] = useState('A modern digital visiting card for software designer showcasing professional details, social links, and portfolio'); // New state for card description
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Save profile data
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/profile/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          firstName,
+          middleName,
+          lastName,
+          prefix,
+          suffix,
+          preferredName,
+          maidenName,
+          pronouns,
+          title,
+          company,
+          department,
+          affiliation,
+          headline,
+          accreditations,
+          email,
+          phone,
+          emailLink,
+          phoneLink,
+          location: cardLocation,
+          cardName,
+          cardType,
+          selectedDesign,
+          selectedColor,
+          selectedFont,
+          profileImage,
+          bannerImage,
+          bio: cardDescription,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert('Profile saved successfully!');
+        console.log('Saved profile:', data);
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to save profile:', errorData);
+        alert(`Failed to save profile: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error('Error saving profile:', err);
+      alert('Error saving profile. Please check your connection.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const hexToRgb = (hex: string) => {
     const bigint = parseInt(hex.slice(1), 16);
@@ -933,6 +993,83 @@ const EditPage = () => {
               Save
             </button>
           </div>
+
+        </div>
+
+      </div>
+
+      {/* Right Content Area */}
+      <div style={{
+        flexGrow: '1',
+        flexBasis: 'min(700px, 100%)',
+        backgroundColor: 'white',
+        borderRadius: '15px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        padding: '30px',
+        fontFamily: 'Arial, sans-serif'
+      }}>
+        {/* Tabs */}
+        <div style={{ display: 'flex', borderBottom: '1px solid #eee', marginBottom: '30px' }}>
+          {['Display', 'Information', 'Fields', 'Card'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                padding: '10px 20px',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                border: 'none',
+                backgroundColor: 'transparent',
+                cursor: 'pointer',
+                borderBottom: activeTab === tab ? `2px solid ${selectedColor}` : 'none',
+                color: activeTab === tab ? selectedColor : '#777',
+                outline: 'none',
+                marginRight: '15px'
+              }}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* Conditional Content Rendering */}
+        {renderContent()}
+
+        {/* Action Buttons */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '15px', marginTop: '30px' }}>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              backgroundColor: 'transparent',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              padding: '12px 25px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              color: '#555',
+              cursor: 'pointer',
+              outline: 'none'
+            }}
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={handleSave}
+            disabled={isSaving}
+            style={{
+              backgroundColor: isSaving ? '#ccc' : selectedColor,
+              border: 'none',
+              borderRadius: '8px',
+              padding: '12px 25px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              color: 'white',
+              cursor: isSaving ? 'not-allowed' : 'pointer',
+              outline: 'none'
+            }}
+          >
+            {isSaving ? 'Saving...' : 'Save'}
+          </button>
         </div>
       </div>
     </div>

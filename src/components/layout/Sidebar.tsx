@@ -75,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.2 }}
             onClick={toggleMobileMenu}
-            className="fixed top-4 left-4 z-50 p-3 bg-gradient-to-br from-[#0072EE] to-[#0052CC] text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm border border-white/20"
+            className="fixed top-4 left-4 z-50 p-3 bg-linear-to-br from-[#0072EE] to-[#0052CC] text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm border border-white/20"
             style={{
               boxShadow: '0 8px 32px rgba(0, 114, 238, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)'
             }}
@@ -167,10 +167,10 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
           )}
         </div>
 
-        {/* Top Partition Line */}
-        <div className="h-[1px] bg-white/30 mx-4 mt-0.5 shadow-sm"></div>
-        
-        <p className="opacity-0 select-none text-sm">Spacer</p>
+          {/* Top Partition Line */}
+          <div className="h-px bg-white/30 mx-4 mt-0.5 shadow-sm"></div>
+          
+          <p className="opacity-0 select-none text-sm">Spacer</p>
 
         {/* 2-finger gap above Dashboard (1rem = 16px) */}
         <nav className="mt-8 flex flex-col gap-5 px-2">
