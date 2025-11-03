@@ -17,3 +17,21 @@ export function signToken(payload: object, options: SignOptions = { expiresIn: '
 export function verifyToken(token: string){
   return jwt.verify(token, JWT_SECRET)
 }
+
+export function verifyUserToken(token: string){
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as any
+    return decoded
+  } catch (error) {
+    return null
+  }
+}
+
+export function verifyAdminToken(token: string){
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as any
+    return decoded
+  } catch (error) {
+    return null
+  }
+}

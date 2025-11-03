@@ -533,16 +533,14 @@ export default function ContactPage() {
                     }}
                     onMouseEnter={(e) => {
                       if (!isSubmitting) {
-                        const target = e.target as HTMLButtonElement;
-                        target.style.transform = 'translateY(-2px)';
-                        target.style.boxShadow = '0 15px 35px rgba(59, 130, 246, 0.4)';
+                        e.target.style.transform = 'translateY(-2px)';
+                        e.target.style.boxShadow = '0 15px 35px rgba(59, 130, 246, 0.4)';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isSubmitting) {
-                        const target = e.target as HTMLButtonElement;
-                        target.style.transform = 'translateY(0)';
-                        target.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)';
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)';
                       }
                     }}
                   >

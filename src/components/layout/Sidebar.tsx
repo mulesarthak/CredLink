@@ -26,7 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
   const menuItems = [
     { name: "Dashboard", path: "/dashboard", icon: <FiHome /> },
     { name: "Messages / Leads", path: "/dashboard/messages", icon: <FiMessageSquare /> },
-    { name: "Connections", path: "/dashboard/connections", icon: <FiUsers /> },
+    { name: "Connections", path: "/dashboard/dashcontact", icon: <FiUsers /> },
   ];
 
   const bottomItems = [
@@ -91,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
                 <motion.div
                   whileHover={{ scale: 1.02, x: 4 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`flex items-center gap-4 px-4 py-3.5 rounded-xl cursor-pointer transition-all ${
+                  className={`flex items-center gap-4 px-6 py-4 rounded-xl cursor-pointer transition-all ${
                     isActive
                       ? "bg-gradient-to-r from-primary-green to-primary-green-dark text-white shadow-lg"
                       : "text-gray-700 hover:bg-gray-100 hover:shadow-sm"
