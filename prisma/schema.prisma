@@ -56,6 +56,10 @@ model Message {
   text       String   @db.Text
   senderId   String
   receiverId String
+  // New fields for message state and categorization
+  status     MessageStatus @default(PENDING)
+  read       Boolean       @default(false)
+  tag        MessageTag    @default(PRICING)
   createdAt  DateTime @default(now())
   receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
   sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
@@ -70,4 +74,21 @@ enum AdminRole {
   SUPER_ADMIN
   ADMIN
   SUB_ADMIN
+}
+
+// Message related enums
+enum MessageStatus {
+  NEW
+  READ
+  REPLIED
+  PENDING
+  ARCHIVED
+  DELETED
+}
+
+enum MessageTag {
+  LEAD
+  SUPPORT
+  PRICING
+  FEEDBACK
 }

@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
 
-    const token = await signToken({ userId: user.id, email: user.email })
+    const token = signToken({ userId: user.id, email: user.email })
     if(!token){
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }

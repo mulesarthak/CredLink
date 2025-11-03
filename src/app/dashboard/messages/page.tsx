@@ -50,9 +50,7 @@ export default function MessagesPage() {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': 'user_id_here',
-          'authorization': `Bearer ${token}`,
-           // Replace with actual user ID
+          'Authorization': `Bearer ${token}`,
         },
         
       });
@@ -66,6 +64,21 @@ export default function MessagesPage() {
           sendersMap[s.id] = s;
         });
 
+        const statusMap: Record<string, MessageStatus> = {
+          NEW: 'New',
+          READ: 'Read',
+          REPLIED: 'Replied',
+          PENDING: 'Pending',
+          ARCHIVED: 'Archived',
+          DELETED: 'Deleted',
+        };
+        const tagMap: Record<string, Exclude<MessageTag, null>> = {
+          LEAD: 'Lead',
+          SUPPORT: 'Support',
+          PRICING: 'Pricing',
+          FEEDBACK: 'Feedback',
+        };
+
         const mapped: MessageItem[] = (data.messages || []).map((msg: any) => {
           const sender = sendersMap[msg.senderId] || {};
           return {
@@ -74,10 +87,10 @@ export default function MessagesPage() {
             email: sender.email || "",
             message: msg.text || msg.message || "",
             date: msg.createdAt || msg.date || new Date().toISOString(),
-            status: "New",
-            read: false,
+            status: statusMap[String(msg.status)] || "New",
+            read: typeof msg.read === 'boolean' ? msg.read : false,
             starred: false,
-            tag: null,
+            tag: tagMap[String(msg.tag)] || null,
             replies: [],
           } as MessageItem;
         });
