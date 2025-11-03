@@ -254,9 +254,6 @@ export function Header() {
             </div>
           </div>
         </div>
-
-        {/* BOTTOM SPACER */}
-        <div style={{ height: "8px", visibility: "hidden" }}></div>
       </header>
 
       {/* OUTSIDE CLICK HANDLER */}
