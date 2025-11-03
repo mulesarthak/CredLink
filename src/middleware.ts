@@ -11,7 +11,8 @@ export function middleware(request: NextRequest) {
     path === '/auth/login' ||
     path === '/auth/signup' ||
     path === '/pricing' ||
-    path.startsWith('/pricing/')
+    path.startsWith('/pricing/') ||
+    path === '/profile'
 
   // Check if user is authenticated
   const isAuthenticated = request.cookies.has('authToken') // Replace with your auth token name
