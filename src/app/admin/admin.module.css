@@ -1,0 +1,306 @@
+/* ==============================
+   ADMIN PANEL LAYOUT (FINAL)
+   ============================== */
+
+/* ----------- MAIN CONTAINER ----------- */
+.adminContainer {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(145deg, #f8faff 0%, #eef3ff 100%);
+  overflow: hidden;
+}
+
+/* ----------- FIXED SIDEBAR (DESKTOP) ----------- */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 18rem;
+  height: 100vh;
+  background: linear-gradient(to bottom right, #1e3a8a, #2563eb, #1d4ed8);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  transition: all 0.3s ease-in-out;
+}
+
+/* ----------- SIDEBAR HEADER ----------- */
+.sidebarHeader {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 5rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(to right, #1e40af, #2563eb);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 0.75rem;
+}
+
+.logoArea {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.logoIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logoIcon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: white;
+}
+
+.logoText {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* ----------- SIDEBAR NAVIGATION ----------- */
+.navMenu {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.navMenu::-webkit-scrollbar {
+  width: 6px;
+}
+.navMenu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+/* Normal Nav Item */
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+/* ----------- ACTIVE NAV ITEM ----------- */
+.activeNav {
+  background: #ffffff;
+  color: #1e40af !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+}
+.activeNav .navIcon {
+  color: #2563eb !important;
+}
+
+/* ----------- FOOTER LINKS ----------- */
+.navFooter {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 1rem;
+}
+.footerLink,
+.footerLogout {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: left;
+}
+.footerLogout:hover {
+  color: #f87171;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ----------- ADMIN INFO ----------- */
+.adminInfo {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.adminBadge {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(to bottom right, #2563eb, #4f46e5);
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+.adminName {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: white;
+}
+.adminRole {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Mobile close button in sidebar */
+.closeButton {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+/* ----------- MAIN CONTENT AREA ----------- */
+.mainArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 18rem;
+  background: linear-gradient(145deg, #f8faff 0%, #eef3ff 100%);
+  min-height: 100vh;
+  overflow: hidden;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Top Bar */
+.topBar {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Mobile menu button */
+.menuButton {
+  display: none;
+  background: none;
+  border: none;
+  color: #1e3a8a;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.menuButton svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Active Status */
+.activeStatus {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(to right, #dbeafe, #e0e7ff);
+  border: 1px solid rgba(147, 197, 253, 0.4);
+  border-radius: 9999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1e3a8a;
+}
+.statusDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: #2563eb;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  animation: pulse 1.2s infinite;
+}
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Page Content */
+.content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  height: calc(100vh - 4rem);
+}
+.constrained {
+  max-width: 90rem;
+  margin: 0 auto;
+}
+
+/* ==============================
+   RESPONSIVE (MOBILE)
+   ============================== */
+@media (max-width: 1024px) {
+  .menuButton {
+    display: block;
+  }
+  
+  .sidebar {
+    left: -18rem;
+  }
+  
+  .sidebar.sidebarOpen {
+    left: 0;
+  }
+  
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 50;
+  }
+  
+  .overlay.active {
+    display: block;
+  }
+  
+  .mainArea {
+    margin-left: 0;
+  }
+  
+  .closeButton {
+    display: block;
+    margin-left: auto;
+  }
+}

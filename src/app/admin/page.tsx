@@ -1,32 +1,35 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Loader2 } from "lucide-react"
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import styles from "./admin.module.css";
 
 export default function AdminPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
-    // Check if admin is authenticated, otherwise redirect to login
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/admin/auth/me')
+        const response = await fetch("/api/admin/auth/me");
         if (response.ok) {
-          router.push("/admin/dashboard")
+          router.push("/admin/dashboard");
         } else {
-          router.push("/admin/login")
+          router.push("/admin/login");
         }
       } catch (error) {
-        router.push("/admin/login")
+        router.push("/admin/login");
       }
-    }
-    checkAuth()
-  }, [router])
+    };
+    checkAuth();
+  }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Loader2 className="w-8 h-8 animate-spin text-primary-green" />
+    <div className={styles.container}>
+      <div className={styles.loaderWrapper}>
+        <Loader2 className={styles.spinner} />
+        <p className={styles.message}>Verifying admin access...</p>
+      </div>
     </div>
-  )
+  );
 }
