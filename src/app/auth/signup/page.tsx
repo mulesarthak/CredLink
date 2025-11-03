@@ -12,14 +12,14 @@ import { signupSchema } from "@/lib/validations/auth"
 import type { z } from "zod"
 //import { signInWithPhoneNumber } from "@/lib/firebase"
 //import { auth } from "@/lib/firebase"
-import { RecaptchaVerifier, type ConfirmationResult } from "firebase/auth"
+//import { RecaptchaVerifier, type ConfirmationResult } from "firebase/auth"
 
 // Augment window for reCAPTCHA handle (must be top-level)
-declare global {
-  interface Window {
-    recaptchaVerifier?: RecaptchaVerifier
-  }
-}
+// declare global {
+//   interface Window {
+//     recaptchaVerifier?: RecaptchaVerifier
+//   }
+// }
 
 type SignupForm = z.infer<typeof signupSchema>
 

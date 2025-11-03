@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Shield, Users, Settings, LogOut, BarChart3 } from "lucide-react"
+import { Loader2, Shield, Users, Settings, LogOut, BarChart3, Tag } from "lucide-react"
 import { toast } from "react-hot-toast"
 
 interface AdminData {
@@ -218,6 +218,17 @@ export default function AdminDashboardPage() {
             </div>
             <h3 className="font-bold text-lg mb-2 text-gray-900">Profiles</h3>
             <p className="text-sm text-gray-600">Review and approve profiles</p>
+          </div>
+
+          <div 
+            onClick={() => router.push('/admin/categories')}
+            className="group bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-2xl hover:scale-105 transition-all cursor-pointer"
+          >
+            <div className="w-14 h-14 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md mb-4 group-hover:scale-110 transition-transform">
+              <Tag className="w-7 h-7 text-white" />
+            </div>
+            <h3 className="font-bold text-lg mb-2 text-gray-900">Categories</h3>
+            <p className="text-sm text-gray-600">Manage professional categories</p>
           </div>
 
           <div className="group bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-2xl hover:scale-105 transition-all cursor-pointer">

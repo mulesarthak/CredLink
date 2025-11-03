@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-            const newMessage = await prisma.message.create({
+            const newMessage = await (prisma as any).message.create({
             data: {
                 text: message.trim(),
                 senderId: String(senderId),
