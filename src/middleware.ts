@@ -23,6 +23,20 @@ export function middleware(request: NextRequest) {
   const isApiRequest = path.startsWith('/api')
 
   // Public paths that don't require authentication
+  // Add any routes here that should be accessible without logging in (e.g. /pricing)
+  const isPublicPath =
+    path === '/auth/login' ||
+    path === '/auth/signup' ||
+    path === '/pricing' ||
+    path.startsWith('/pricing/') ||
+    path === '/profile'
+
+  // Check if user is authenticated
+  const isAuthenticated = request.cookies.has('authToken') // Replace with your auth token name
+
+  // Redirect authenticated users away from auth pages
+  if (isAuthenticated && isPublicPath) {
+    return NextResponse.redirect(new URL('/', request.url))
   const publicPaths = [
     '/',
     '/dashboard',
