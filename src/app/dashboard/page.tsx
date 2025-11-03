@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -147,6 +147,9 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
           </button>
         </div>
         
+        {/* Vertical spacing between button rows */}
+        <div className="h-2"></div>
+        
         <div className="grid grid-cols-2 gap-2 mb-4 px-8">
           <button className="bg-white/20 hover:bg-white/30 text-white text-xs py-2 px-2 rounded-lg transition-colors font-medium border border-white/30">
             Experience
@@ -167,6 +170,10 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
 const Dashboard = () => {
   const router = useRouter();
   const { user, isAuthenticated, logout, isLoading } = useAuth();
+  
+  // Filter state management
+  const [activeFilter, setActiveFilter] = useState<string>("All");
+  const filterOptions = ["All", "Personal", "Business", "Work"];
 
   // Auth is checked by the dashboard layout, no need to check here
 
@@ -236,8 +243,8 @@ const Dashboard = () => {
       {/* Top Spacing */}
       <div style={{ height: '60px', visibility: 'hidden' }}></div>
       
-      {/* Top Create Button with generous space */}
-      <div className="flex justify-center my-20">
+      {/* Top Create Button with balanced space */}
+      <div className="flex justify-center my-12">
         <motion.button
           whileHover={{ 
             scale: 1.05,
@@ -262,8 +269,44 @@ const Dashboard = () => {
       {/* Professional spacing */}
       <div className="h-8"></div>
 
+      {/* Filter Bar */}
+      <div className="flex justify-center mb-12 px-4">
+        <div className="flex flex-wrap justify-center gap-4 p-3 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/50 shadow-lg mx-4">
+          {/* Left invisible spacer for balanced spacing */}
+          <div className="w-6 h-0 invisible"></div>
+          
+          {filterOptions.map((filter) => (
+            <motion.button
+              key={filter}
+              onClick={() => {
+                setActiveFilter(filter);
+                // TODO: Implement filtering logic here when ready
+                // const filteredCards = cards.filter(card => filter === "All" || card.category === filter);
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`
+                px-8 py-4 rounded-xl font-medium text-base transition-all duration-300 min-w-[100px]
+                ${activeFilter === filter
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                  : 'bg-white text-blue-600 border border-blue-200 hover:border-blue-400 hover:bg-blue-50 hover:shadow-md'
+                }
+              `}
+            >
+              {filter}
+            </motion.button>
+          ))}
+          
+          {/* Right invisible spacer for balanced spacing */}
+          <div className="w-6 h-0 invisible"></div>
+        </div>
+      </div>
+
+      {/* Balanced spacing before cards */}
+      <div className="h-8"></div>
+
       {/* Cards Grid with wide spacing and room from header/sidebar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-14 justify-items-center mt-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-14 justify-items-center">
         {cards.map((card) => (
           <Link key={card.id} href={`/cards/${card.id}`}>
             <CardItem card={card} />

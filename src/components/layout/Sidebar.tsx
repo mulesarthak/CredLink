@@ -20,10 +20,10 @@ import { motion, AnimatePresence } from "framer-motion";
 interface SidebarProps {
   expanded: boolean;
   setExpanded: (v: boolean) => void;
-  mobileOpen?: boolean;
+    mobileOpen?: boolean; 
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = false }) => {
+const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -106,18 +106,22 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
 
       {/* Sidebar */}
       <motion.div
+        initial={{ 
+          width: isMobile ? 0 : (expanded ? 270 : 90),
+          x: isMobile ? -270 : 0
+        }}
         animate={{ 
-          width: isMobile ? (isMobileOpen ? "17rem" : "0rem") : (expanded ? "17rem" : "5.5rem")
+          width: isMobile ? 270 : (expanded ? 270 : 90),
+          x: isMobile ? (isMobileOpen ? 0 : -270) : 0
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className={`fixed left-0 top-0 h-screen flex flex-col justify-between bg-gradient-to-b from-[#0072EE] via-[#0052CC] to-[#0072EE] border-r border-blue-800/30 shadow-2xl overflow-hidden ${
+        className={`fixed left-0 top-0 h-screen flex flex-col justify-between bg-gradient-to-b from-[#0072EE] via-[#0052CC] to-[#0072EE] border-r border-blue-800/30 shadow-2xl ${
           isMobile ? 'z-40' : 'z-40'
         }`}
         style={{
           boxShadow: isMobile 
             ? '8px 0 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)'
-            : '4px 0 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1)',
-          transform: isMobile && !isMobileOpen ? 'translateX(-100%)' : 'translateX(0)'
+            : '4px 0 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1)'
         }}
       >
       {/* ---------- Top Section ---------- */}
@@ -142,13 +146,25 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
             )}
           </AnimatePresence>
 
-          {/* Toggle Button */}
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="p-2.5 hover:bg-white/20 text-white rounded-lg transition-colors duration-200"
-          >
-            {expanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-          </button>
+          {!isMobile && (
+            <motion.button
+              onClick={() => setExpanded(!expanded)}
+              className="p-2 hover:bg-white/20 hover:shadow-lg hover:shadow-white/25 text-white rounded-full transition-all duration-300 backdrop-blur-sm"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                boxShadow: '0 0 20px rgba(255,255,255,0.2)'
+              }}
+            >
+              <motion.div
+                animate={{ rotate: expanded ? 0 : 180 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="text-3xl"
+              >
+                {expanded ? <ChevronLeft /> : <ChevronRight />}
+              </motion.div>
+            </motion.button>
+          )}
         </div>
 
         {/* Top Partition Line */}
@@ -156,7 +172,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
         
         <p className="opacity-0 select-none text-sm">Spacer</p>
 
-        {/* Navigation */}
+        {/* 2-finger gap above Dashboard (1rem = 16px) */}
         <nav className="mt-8 flex flex-col gap-5 px-2">
           {menuItems.map((item, index) => {
             const isActive = pathname === item.path;
@@ -216,11 +232,11 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
       </div>
 
       {/* ---------- Bottom Section ---------- */}
-      <div className="mb-8 px-4">
-        {/* Divider */}
-        <div className="border-t border-white/30 mb-6 shadow-sm"></div>
+      <div className="mb-6"> {/* Added extra gap below Support (1.5rem) */}
+        {/* Faint Divider Above Settings */}
+        <div className="border-t border-white/30 mx-6 mb-3 shadow-sm"></div>
 
-        <nav className="flex flex-col gap-2 px-2">
+        <div className="flex flex-col gap-5 px-2">
           {bottomItems.map((item, index) => {
             const isActive = pathname === item.path;
             return (
@@ -228,7 +244,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
                 key={item.name}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
+                transition={{ duration: 0.3, delay: (menuItems.length + index) * 0.1 }}
               >
                 <Link href={item.path}>
                   <motion.div
@@ -275,7 +291,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
               </motion.div>
             );
           })}
-        </nav>
+        </div>
         
         <p className="opacity-0 select-none text-sm">Spacer</p>
       </div>
@@ -285,3 +301,4 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
 };
 
 export default Sidebar;
+ 
