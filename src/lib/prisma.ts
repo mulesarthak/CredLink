@@ -1,9 +1,18 @@
 import { PrismaClient } from '@prisma/client'
 
+// Ensure a single PrismaClient instance in dev to avoid exhausting the pool
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient()
+function createPrismaClient() {
+  return new PrismaClient({
+    log: ['warn', 'error'],
+  })
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+export const prisma = globalForPrisma.prisma ?? createPrismaClient()
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma
+}
