@@ -226,6 +226,30 @@ export function Header() {
                 )}
               </AnimatePresence>
             </div>
+           
+            <div className="flex items-center ml-auto">
+              <nav className="flex items-center space-x-4">
+                {isAuthenticated ? (
+                  <>
+                    <Link href="/dashboard" className="text-gray-700 hover:text-blue-600">
+                      Dashboard
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/auth/login" className="text-gray-700 hover:text-blue-600">
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/auth/signup"
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
+                    >
+                      Get Started
+                    </Link>
+                  </>
+                )}
+              </nav>
+            </div>
           </div>
         </div>
         
