@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { verifyUserToken, verifyAdminToken } from '@/lib/jwt'
+import { verifyToken } from '@/lib/jwt'
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
@@ -24,13 +24,14 @@ export function middleware(request: NextRequest) {
   
   const isAuthPath = path.startsWith('/auth')
   const isAdminPath = path.startsWith('/admin')
+  const isDashboardPath = path.startsWith('/dashboard')
   const isPricingPath = path === '/pricing' || path.startsWith('/pricing/')
   const isContactPath = path === '/contact' || path.startsWith('/contact/')
   const isDashboardContactPath = path === '/dashboardcontact' || path.startsWith('/dashboardcontact/')
   
   // Check if the current path is in the public paths array or matches public path patterns
   const isInPublicPaths = publicPaths.includes(path)
-  const isCombinedPublicPath = isInPublicPaths || isAuthPath || isAdminPath || isPricingPath || isContactPath || isDashboardContactPath
+  const isCombinedPublicPath = isInPublicPaths || isAuthPath || isAdminPath || isDashboardPath || isPricingPath || isContactPath || isDashboardContactPath
 
   // Get tokens from cookies
   const userToken = request.cookies.get('user_token')?.value
@@ -47,16 +48,24 @@ export function middleware(request: NextRequest) {
   let adminId: string | null = null
   
   if (userToken) {
-    const decoded = verifyUserToken(userToken)
-    if (decoded) {
-      userId = decoded.userId ?? null
+    try {
+      const decoded = verifyToken(userToken) as any
+      if (decoded) {
+        userId = decoded.userId ?? null
+      }
+    } catch (error) {
+      // Invalid token, ignore
     }
   }
   
   if (adminToken) {
-    const decoded = verifyAdminToken(adminToken)
-    if (decoded) {
-      adminId = decoded.adminId ?? null
+    try {
+      const decoded = verifyToken(adminToken) as any
+      if (decoded) {
+        adminId = decoded.adminId ?? null
+      }
+    } catch (error) {
+      // Invalid token, ignore
     }
   }
 
