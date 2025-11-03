@@ -120,141 +120,88 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
           transform: isMobile && !isMobileOpen ? 'translateX(-100%)' : 'translateX(0)'
         }}
       >
-        {/* ---------- Top Section ---------- */}
-        <div>
-          {/* Logo / Title */}
-          <div className={`flex items-center ${(isMobile || expanded) ? 'justify-between px-5' : 'justify-center px-2'} h-16 border-b border-white/20 mt-6`}>
-            <AnimatePresence mode="wait">
-              {(isMobile || expanded) && (
-                <motion.span
-                  key="logo"
-                  initial={{ opacity: 0, x: -15, scale: 0.9 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: -15, scale: 0.9 }}
-                  transition={{ duration: 0.3, delay: 0.1 }}
-                  className="font-extrabold text-3xl tracking-wide text-white"
-                  style={{
-                    textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  CredLink
-                </motion.span>
-              )}
-            </AnimatePresence>
-
-            <button
-              onClick={() => (isMobile ? setIsMobileOpen(!isMobileOpen) : setExpanded(!expanded))}
-              className="p-2.5 hover:bg-white/15 text-white rounded-lg transition-all duration-200 border border-white/20"
-            >
-              <motion.div
-                animate={{ rotate: (isMobile ? isMobileOpen : expanded) ? 0 : 180 }}
-                transition={{ duration: 0.3 }}
-                className="text-xl"
+      {/* ---------- Top Section ---------- */}
+      <div>
+        {/* Logo / Title */}
+        <div className={`flex items-center ${(isMobile || expanded) ? 'justify-between px-5' : 'justify-center px-2'} h-16 border-b border-white/20 mt-6`}>
+          <AnimatePresence mode="wait">
+            {(isMobile || expanded) && (
+              <motion.span
+                key="logo"
+                initial={{ opacity: 0, x: -15, scale: 0.9 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -15, scale: 0.9 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+                className="font-extrabold text-3xl tracking-wide text-white"
+                style={{
+                  textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.3)'
+                }}
               >
-                {(isMobile ? isMobileOpen : expanded) ? <ChevronLeft /> : <ChevronRight />}
-              </motion.div>
-            </button>
-          </div>
+                CredLink
+              </motion.span>
+            )}
+          </AnimatePresence>
+
+          {/* Toggle Button */}
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="p-2.5 hover:bg-white/20 text-white rounded-lg transition-colors duration-200"
+          >
+            {expanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+          </button>
+        </div>
 
           {/* Top Partition Line */}
           <div className="h-[1px] bg-white/30 mx-4 mt-0.5 shadow-sm"></div>
           
           <p className="opacity-0 select-none text-sm">Spacer</p>
 
-          {/* 2-finger gap above Dashboard (1rem = 16px) */}
-          <nav className="mt-8 flex flex-col gap-5 px-2">
-            {menuItems.map((item, index) => {
-              const isActive = pathname === item.path;
-              return (
-                <motion.div
-                  key={item.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  <Link href={item.path}>
-                    <motion.div
-                      whileHover={{ scale: 1.05, x: 6 }}
-                      whileTap={{ scale: 0.97 }}
-                      className={`flex items-center ${(isMobile || expanded) ? 'gap-5 px-4' : 'justify-center px-2'} py-3 rounded-lg cursor-pointer transition-all duration-300 ${
-                        isActive
-                          ? "text-white font-bold shadow-lg shadow-white/25 backdrop-blur-sm border border-white/30"
-                          : "text-white/90 hover:bg-white/15 hover:shadow-lg hover:shadow-white/20 hover:backdrop-blur-sm hover:border hover:border-white/20"
-                      }`}
-                      style={isActive ? { 
-                        textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.4)',
-                        boxShadow: '0 0 25px rgba(255,255,255,0.4), 0 0 50px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.2)'
-                      } : {}}
-                    >
-                      <motion.div 
-                        whileHover={{ rotate: 12, scale: 1.15 }} 
-                        className="text-[1.6rem] transition-all duration-300"
-                        style={isActive ? { 
-                          filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.9)) drop-shadow(0 0 8px rgba(255,255,255,0.7))' 
-                        } : { 
-                          filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' 
-                        }}
-                      >
-                        {item.icon}
-                      </motion.div>
-
-                      <AnimatePresence>
-                        {(isMobile || expanded) && (
-                          <motion.span
-                            key={item.name}
-                            initial={{ opacity: 0, x: -15, scale: 0.9 }}
-                            animate={{ opacity: 1, x: 0, scale: 1 }}
-                            exit={{ opacity: 0, x: -15, scale: 0.9 }}
-                            transition={{ duration: 0.3, delay: 0.1 }}
-                            className="text-lg font-semibold tracking-wide"
-                          >
-                            {item.name}
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* ---------- Bottom Section ---------- */}
-        <div className="mb-8 px-4">
-          {/* Divider */}
-          <div className="border-t border-gray-200 mb-6"></div>
-
-          <div className="flex flex-col gap-2">
-            {bottomItems.map((item) => {
-              const isActive = pathname === item.path;
-              return (
-                <Link key={item.name} href={item.path}>
+        {/* Navigation */}
+        <nav className="mt-8 flex flex-col gap-5 px-2">
+          {menuItems.map((item, index) => {
+            const isActive = pathname === item.path;
+            return (
+              <motion.div
+                key={item.name}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
+                <Link href={item.path}>
                   <motion.div
-                    whileHover={{ scale: 1.02, x: 4 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`flex items-center gap-4 px-4 py-3.5 rounded-xl cursor-pointer transition-all ${
+                    whileHover={{ scale: 1.05, x: 6 }}
+                    whileTap={{ scale: 0.97 }}
+                    className={`flex items-center ${(isMobile || expanded) ? 'gap-5 px-4' : 'justify-center px-2'} py-3 rounded-lg cursor-pointer transition-all duration-300 ${
                       isActive
-                        ? "bg-gradient-to-r from-primary-green to-primary-green-dark text-white shadow-lg"
-                        : "text-gray-700 hover:bg-gray-100 hover:shadow-sm"
+                        ? "text-white font-bold shadow-lg shadow-white/25 backdrop-blur-sm border border-white/30"
+                        : "text-white/90 hover:bg-white/15 hover:shadow-lg hover:shadow-white/20 hover:backdrop-blur-sm hover:border hover:border-white/20"
                     }`}
+                    style={isActive ? { 
+                      textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.4)',
+                      boxShadow: '0 0 25px rgba(255,255,255,0.4), 0 0 50px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.2)'
+                    } : {}}
                   >
                     <motion.div 
-                      whileHover={{ rotate: 8 }} 
-                      className={`text-2xl ${isActive ? 'text-white' : 'text-primary-green'}`}
+                      whileHover={{ rotate: 12, scale: 1.15 }} 
+                      className="text-[1.6rem] transition-all duration-300"
+                      style={isActive ? { 
+                        filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.9)) drop-shadow(0 0 8px rgba(255,255,255,0.7))' 
+                      } : { 
+                        filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' 
+                      }}
                     >
                       {item.icon}
                     </motion.div>
 
                     <AnimatePresence>
-                      {expanded && (
+                      {(isMobile || expanded) && (
                         <motion.span
                           key={item.name}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -10 }}
-                          transition={{ duration: 0.2 }}
-                          className="text-base font-semibold"
+                          initial={{ opacity: 0, x: -15, scale: 0.9 }}
+                          animate={{ opacity: 1, x: 0, scale: 1 }}
+                          exit={{ opacity: 0, x: -15, scale: 0.9 }}
+                          transition={{ duration: 0.3, delay: 0.1 }}
+                          className="text-lg font-semibold tracking-wide"
                         >
                           {item.name}
                         </motion.span>
@@ -262,11 +209,76 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
                     </AnimatePresence>
                   </motion.div>
                 </Link>
-              );
-            })}
-          </div>
-          <p className="opacity-0 select-none text-sm">Spacer</p>
-        </div>
+              </motion.div>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* ---------- Bottom Section ---------- */}
+      <div className="mb-8 px-4">
+        {/* Divider */}
+        <div className="border-t border-white/30 mb-6 shadow-sm"></div>
+
+        <nav className="flex flex-col gap-2 px-2">
+          {bottomItems.map((item, index) => {
+            const isActive = pathname === item.path;
+            return (
+              <motion.div
+                key={item.name}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
+                <Link href={item.path}>
+                  <motion.div
+                    whileHover={{ scale: 1.05, x: 6 }}
+                    whileTap={{ scale: 0.97 }}
+                    className={`flex items-center ${(isMobile || expanded) ? 'gap-5 px-4' : 'justify-center px-2'} py-3 rounded-lg cursor-pointer transition-all duration-300 ${
+                      isActive
+                        ? "text-white font-bold shadow-lg shadow-white/25 backdrop-blur-sm border border-white/30"
+                        : "text-white/90 hover:bg-white/15 hover:shadow-lg hover:shadow-white/20 hover:backdrop-blur-sm hover:border hover:border-white/20"
+                    }`}
+                    style={isActive ? { 
+                      textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.4)',
+                      boxShadow: '0 0 25px rgba(255,255,255,0.4), 0 0 50px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.2)'
+                    } : {}}
+                  >
+                    <motion.div 
+                      whileHover={{ rotate: 12, scale: 1.15 }} 
+                      className="text-[1.6rem] transition-all duration-300"
+                      style={isActive ? { 
+                        filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.9)) drop-shadow(0 0 8px rgba(255,255,255,0.7))' 
+                      } : { 
+                        filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' 
+                      }}
+                    >
+                      {item.icon}
+                    </motion.div>
+
+                    <AnimatePresence>
+                      {(isMobile || expanded) && (
+                        <motion.span
+                          key={item.name}
+                          initial={{ opacity: 0, x: -15, scale: 0.9 }}
+                          animate={{ opacity: 1, x: 0, scale: 1 }}
+                          exit={{ opacity: 0, x: -15, scale: 0.9 }}
+                          transition={{ duration: 0.3, delay: 0.1 }}
+                          className="text-lg font-semibold tracking-wide"
+                        >
+                          {item.name}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </nav>
+        
+        <p className="opacity-0 select-none text-sm">Spacer</p>
+      </div>
       </motion.div>
     </>
   );

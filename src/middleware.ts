@@ -16,26 +16,32 @@ function decodeJwtPayload(token: string): any | null {
     return null
   }
 }
-import { verifyToken } from '@/lib/jwt'
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
   const isApiRequest = path.startsWith('/api')
 
   // Public paths that don't require authentication
+  // Add any routes here that should be accessible without logging in (e.g. /pricing)
   const publicPaths = [
     '/',
     '/auth/login',
     '/auth/signup',
+    '/auth/verify-otp',
     '/features',
     '/how-it-works',
     '/pricing',
     '/contact',
+    '/dashboard/edit',
     '/search',
     '/faq',
     '/terms',
     '/privacy',
-    '/create-card'
+    '/create-card',
+    '/cards/:path*',
+    '/dashboard/messages',
+    '/api/message/receive',
+    '/api/message/send'
   ]
   
   const isAuthPath = path.startsWith('/auth')
@@ -46,8 +52,12 @@ export function middleware(request: NextRequest) {
   const isDashboardContactPath = path === '/dashboardcontact' || path.startsWith('/dashboardcontact/')
   
   // Check if the current path is in the public paths array or matches public path patterns
-  const isInPublicPaths = publicPaths.includes(path)
-  const isCombinedPublicPath = isInPublicPaths || isAuthPath || isAdminPath || isDashboardPath || isPricingPath || isContactPath || isDashboardContactPath
+  const isCombinedPublicPath = publicPaths.some(publicPath => {
+    if (publicPath.endsWith('*')) {
+      return path.startsWith(publicPath.slice(0, -1))
+    }
+    return publicPath === path
+  }) || isAuthPath || isAdminPath || isDashboardPath || isPricingPath || isContactPath || isDashboardContactPath
 
   // Get tokens from cookies
   const userToken = request.cookies.get('user_token')?.value
@@ -89,6 +99,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // Redirect unauthenticated users to login page (except for public paths)
   // For API requests, do not redirect; just pass through with enriched headers.
   if (!isApiRequest) {
     if (!isAuthenticated && !isCombinedPublicPath) {

@@ -180,9 +180,24 @@ export default function MessagesPage() {
   };
 
   
+  
 
   const deleteMessage = (id: string) => {
     setMessages(prev => prev.map(m => m.id === id ? { ...m, status: "Deleted" } : m));
+
+    const sendDeleteRequest = async () => {
+      try {
+        const response = await fetch(`/api/message/delete?id=${encodeURIComponent(id)}`, {
+          method: "DELETE",
+        });
+        if (!response.ok && response.status !== 404) {
+          throw new Error("Failed to delete message");
+        }
+      } catch (error) {
+        console.error("Error deleting message:", error);
+      }
+    };
+    sendDeleteRequest();
     if (detailId === id) setDetailId(null);
     if (replyId === id) setReplyId(null);
   };

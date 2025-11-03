@@ -21,6 +21,16 @@ export default function DashboardLayout({
   const [isLgUp, setIsLgUp] = useState(false);
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); // Adjust breakpoint as needed
+    };
+    
+    handleResize(); // Set initial value
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     // Check auth when dashboard layout mounts
     checkAuth();
     const mql = window.matchMedia("(min-width: 1024px)");
@@ -35,25 +45,14 @@ export default function DashboardLayout({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Handle mobile detection
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   return (
     <div className="h-screen overflow-hidden" style={{ backgroundColor: '#f8fafc' }}>
       {/* Sidebar */}
-      <Sidebar expanded={expanded} setExpanded={setExpanded} mobileOpen={mobileOpen} />
+      {(!isMobile || mobileOpen) && <Sidebar expanded={expanded} setExpanded={setExpanded} mobileOpen={mobileOpen} />}
 
       {/* Main Content */}
       <motion.div
-        animate={{ marginLeft: isLgUp ? (expanded ? 270 : 90) : 0 }}
+        animate={{ marginLeft: isMobile ? 0 : (isLgUp ? (expanded ? 270 : 90) : 0) }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="h-full flex flex-col"
         style={{ 
