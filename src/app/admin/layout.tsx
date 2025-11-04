@@ -10,6 +10,7 @@ import {
   Shield,
   Menu,
   X,
+  LifeBuoy ,
   ChevronRight,
   LogOut,
   Home,
@@ -29,6 +30,7 @@ const allNavigation = [
   { name: "Profiles", href: "/admin/profiles", icon: Users, permission: "MANAGE_PROFILES" },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3, permission: "VIEW_ANALYTICS" },
   { name: "Settings", href: "/admin/settings", icon: Settings, permission: "MANAGE_SETTINGS" },
+  { name: "Support", href: "/admin/support", icon: LifeBuoy , permission: null },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -38,7 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
 
-  const constrainedWidthPages = ["/admin/profiles"];
+  const constrainedWidthPages: string[] = [];
   const shouldConstrainWidth = constrainedWidthPages.some((page) =>
     pathname.startsWith(page)
   );
