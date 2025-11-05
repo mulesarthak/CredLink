@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Filter, Shield, Mail, Trash2, MoreHorizontal } from "lucide-react";
+import { Search, Filter, Shield, Edit, Trash2, MoreHorizontal, X, Eye, EyeOff } from "lucide-react";
 import styles from "./users.module.css";
 
 interface User {
@@ -9,6 +9,7 @@ interface User {
   email: string;
   fullName: string;
   phone: string | null;
+  status: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -25,6 +26,16 @@ export default function UsersPage() {
   });
 
   const [mobileActionId, setMobileActionId] = useState<string | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    fullName: "",
+    phone: "",
+    password: "",
+    confirmPassword: ""
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -70,6 +81,98 @@ export default function UsersPage() {
       console.error("Delete user error:", error);
       alert("Failed to delete user");
     }
+  };
+
+  const handleEditUser = (user: User) => {
+    setSelectedUser(user);
+    setEditFormData({
+      fullName: user.fullName,
+      phone: user.phone || "",
+      password: "",
+      confirmPassword: ""
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdateUser = async () => {
+    if (!selectedUser) return;
+    
+    if (editFormData.password && editFormData.password !== editFormData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      setUpdating(true);
+      const updateData: any = {
+        fullName: editFormData.fullName,
+        phone: editFormData.phone
+      };
+      
+      if (editFormData.password.trim()) {
+        updateData.password = editFormData.password;
+      }
+
+      const response = await fetch(`/api/users/${selectedUser.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(users.map(u => u.id === selectedUser.id ? { ...u, ...data.user } : u));
+        setShowEditModal(false);
+        setSelectedUser(null);
+        alert("User updated successfully");
+      } else {
+        const data = await response.json();
+        alert(data.error || "Failed to update user");
+      }
+    } catch (error) {
+      console.error("Update user error:", error);
+      alert("Failed to update user");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleBlockUnblockUser = async (userId: string, action: 'block' | 'unblock') => {
+    const confirmMessage = action === 'block' ? 
+      "Are you sure you want to block this user?" : 
+      "Are you sure you want to unblock this user?";
+    
+    if (!confirm(confirmMessage)) return;
+
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(users.map(u => u.id === userId ? { ...u, ...data.user } : u));
+        alert(`User ${action}ed successfully`);
+      } else {
+        const data = await response.json();
+        alert(data.error || `Failed to ${action} user`);
+      }
+    } catch (error) {
+      console.error(`${action} user error:`, error);
+      alert(`Failed to ${action} user`);
+    }
+  };
+
+  const getStatusBadge = (status: string | null) => {
+    const statusValue = status || "active";
+    const statusClass = statusValue === "blocked" ? styles.statusBlocked : styles.statusActive;
+    return (
+      <span className={`${styles.statusBadge} ${statusClass}`}>
+        {statusValue === "blocked" ? "Blocked" : "Active"}
+      </span>
+    );
   };
 
   const filteredUsers = users.filter((user) => {
@@ -206,9 +309,15 @@ export default function UsersPage() {
                     <div className={styles.actionMenu}>
                       <button 
                         className={styles.mobileActionBtn}
-                        onClick={() => {/* mail handler */}}
+                        onClick={() => handleEditUser(user)}
                       >
-                        <Mail size={16} /> Email
+                        <Edit size={16} /> Edit
+                      </button>
+                      <button 
+                        className={styles.mobileActionBtn}
+                        onClick={() => handleBlockUnblockUser(user.id, user.status === "blocked" ? "unblock" : "block")}
+                      >
+                        <Shield size={16} /> {user.status === "blocked" ? "Unblock" : "Block"}
                       </button>
                       <button 
                         className={`${styles.mobileActionBtn} ${styles.deleteActionBtn}`}
@@ -245,6 +354,7 @@ export default function UsersPage() {
                     <th>User</th>
                     <th>Email</th>
                     <th>Phone</th>
+                    <th>Status</th>
                     <th>Joined</th>
                     <th>Last Updated</th>
                     <th></th>
@@ -272,6 +382,7 @@ export default function UsersPage() {
                       </td>
                       <td>{user.email}</td>
                       <td>{user.phone || "N/A"}</td>
+                      <td>{getStatusBadge(user.status)}</td>
                       <td>
                         {new Date(user.createdAt).toLocaleDateString("en-US", {
                           month: "short",
@@ -287,8 +398,19 @@ export default function UsersPage() {
                         })}
                       </td>
                       <td className={styles.actionsCell}>
-                        <button className={styles.mailBtn} title="Send Email">
-                          <Mail />
+                        <button 
+                          onClick={() => handleEditUser(user)}
+                          className={styles.editBtn} 
+                          title="Edit User"
+                        >
+                          <Edit />
+                        </button>
+                        <button
+                          onClick={() => handleBlockUnblockUser(user.id, user.status === "blocked" ? "unblock" : "block")}
+                          className={user.status === "blocked" ? styles.unblockBtn : styles.blockBtn}
+                          title={user.status === "blocked" ? "Unblock User" : "Block User"}
+                        >
+                          <Shield />
                         </button>
                         <button
                           onClick={() => handleDeleteUser(user.id)}
@@ -305,6 +427,126 @@ export default function UsersPage() {
             </div>
           )}
         </div>
+
+        {/* Edit User Modal */}
+        {showEditModal && selectedUser && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modal}>
+              <div className={styles.modalHeader}>
+                <h2>Edit User</h2>
+                <button 
+                  onClick={() => setShowEditModal(false)}
+                  className={styles.closeBtn}
+                >
+                  <X />
+                </button>
+              </div>
+              
+              <div className={styles.modalBody}>
+                <div className={styles.userInfo}>
+                  <div className={styles.avatarLg}>
+                    {selectedUser.fullName
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()}
+                  </div>
+                  <div>
+                    <h3>{selectedUser.fullName}</h3>
+                    <p>{selectedUser.email}</p>
+                    <p>Status: {getStatusBadge(selectedUser.status)}</p>
+                  </div>
+                </div>
+
+                <form onSubmit={(e) => { e.preventDefault(); handleUpdateUser(); }}>
+                  <div className={styles.formGroup}>
+                    <label>Full Name</label>
+                    <input
+                      type="text"
+                      value={editFormData.fullName}
+                      onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value })}
+                      className={styles.formInput}
+                      required
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label>Phone</label>
+                    <input
+                      type="tel"
+                      value={editFormData.phone}
+                      onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                      className={styles.formInput}
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label>New Password (leave blank to keep current)</label>
+                    <div className={styles.passwordInput}>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={editFormData.password}
+                        onChange={(e) => setEditFormData({ ...editFormData, password: e.target.value })}
+                        className={styles.formInput}
+                        placeholder="Enter new password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className={styles.passwordToggle}
+                      >
+                        {showPassword ? <EyeOff /> : <Eye />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {editFormData.password && (
+                    <div className={styles.formGroup}>
+                      <label>Confirm New Password</label>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={editFormData.confirmPassword}
+                        onChange={(e) => setEditFormData({ ...editFormData, confirmPassword: e.target.value })}
+                        className={styles.formInput}
+                        placeholder="Confirm new password"
+                      />
+                    </div>
+                  )}
+
+                  <div className={styles.modalActions}>
+                    <div className={styles.statusActions}>
+                      <button
+                        type="button"
+                        onClick={() => handleBlockUnblockUser(selectedUser.id, selectedUser.status === "blocked" ? "unblock" : "block")}
+                        className={selectedUser.status === "blocked" ? styles.unblockBtn : styles.blockBtn}
+                      >
+                        <Shield /> {selectedUser.status === "blocked" ? "Unblock User" : "Block User"}
+                      </button>
+                    </div>
+                    
+                    <div className={styles.formActions}>
+                      <button
+                        type="button"
+                        onClick={() => setShowEditModal(false)}
+                        className={styles.cancelBtn}
+                        disabled={updating}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className={styles.saveBtn}
+                        disabled={updating}
+                      >
+                        {updating ? "Updating..." : "Save Changes"}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
