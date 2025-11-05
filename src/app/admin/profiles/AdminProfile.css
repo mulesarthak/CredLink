@@ -1,0 +1,153 @@
+.admin-profile-page {
+  padding: 0;
+}
+
+.profile-container {
+  width: 100%;
+  padding: 40px 32px 80px; /* Increased horizontal padding slightly */
+  box-sizing: border-box;
+}
+
+/* Restore vertical spacing between top-level sections */
+.profile-container > * + * {
+  margin-top: 2.5rem; /* 40px */
+}
+
+/* --- Profile Cards --- */
+.profile-card {
+  transition: all 0.3s ease;
+  border: 1px solid rgba(230, 230, 230, 0.8);
+  margin-bottom: 2rem;
+  padding: 2rem; /* Added inner padding around edges */
+  border-radius: 1rem;
+  background-color: #fff;
+}
+
+.profile-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Ensure internal elements have consistent spacing */
+.profile-card > * + * {
+  margin-top: 1.75rem;
+}
+
+/* Add internal breathing room in profile card info box */
+.profile-card .bg-gray-50 {
+  padding: 1.75rem !important; /* Increased padding inside gray boxes */
+}
+
+/* --- Stats Cards --- */
+.admin-profile-page .grid {
+  gap: 2.25rem; /* Slightly increased gap between cards */
+}
+
+/* Stats cards internal spacing */
+.admin-profile-page .grid .bg-white {
+  padding: 1.75rem !important; /* Increased internal padding */
+  border-radius: 1rem;
+}
+
+/* --- Header Section --- */
+.admin-profile-page .relative.rounded-2xl.shadow-xl {
+  margin-bottom: 2.5rem !important;
+  padding: 2.5rem !important; /* More padding so content doesn’t touch edges */
+}
+
+/* Fix for Bulk Approve & Export Data buttons */
+.admin-profile-page .relative.rounded-2xl.shadow-xl .flex button {
+  padding: 0.9rem 2rem !important; /* Taller buttons for better text fit */
+  font-size: 0.95rem !important;
+  line-height: 1.4 !important;
+}
+
+/* --- Search & Filter Section --- */
+.admin-profile-page .bg-white.rounded-xl.shadow-md {
+  margin-top: 2.5rem !important;
+  margin-bottom: 2.5rem !important;
+  padding: 2rem 2.5rem !important; /* Increased padding for more visual breathing */
+}
+
+.admin-profile-page .bg-white.rounded-xl.shadow-md input {
+  padding: 1rem 1rem 1rem 3rem !important; /* Larger click area */
+  font-size: 1rem;
+}
+
+.admin-profile-page .bg-white.rounded-xl.shadow-md select,
+.admin-profile-page .bg-white.rounded-xl.shadow-md button {
+  padding: 0.9rem 1.75rem !important;
+  font-size: 0.95rem !important;
+}
+
+/* Make search container wider */
+.admin-profile-page .bg-white.rounded-xl.shadow-md .flex-1 {
+  min-width: 380px !important;
+}
+
+/* --- Header & Stats --- */
+.admin-profile-page h1 {
+  margin-bottom: 0.5rem;
+}
+
+.admin-profile-page p {
+  line-height: 1.6;
+}
+
+/* --- Responsive Tweaks --- */
+@media (max-width: 1024px) {
+  .profile-container {
+    padding: 30px 24px 60px;
+  }
+
+  .profile-container > * + * {
+    margin-top: 2rem;
+  }
+
+  .profile-card {
+    margin-bottom: 1.75rem;
+    padding: 1.75rem;
+  }
+
+  .admin-profile-page .bg-white.rounded-xl.shadow-md {
+    padding: 1.75rem 2rem !important;
+  }
+
+  .admin-profile-page .relative.rounded-2xl.shadow-xl {
+    padding: 2rem !important;
+  }
+
+  .admin-profile-page .bg-white.rounded-xl.shadow-md .flex-1 {
+    min-width: 100% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-container {
+    padding: 20px 18px 40px;
+  }
+
+  .profile-container > * + * {
+    margin-top: 1.75rem;
+  }
+
+  .profile-card {
+    margin-bottom: 1.25rem;
+    padding: 1.5rem;
+  }
+
+  .profile-card .bg-gray-50 {
+    padding: 1.5rem !important;
+  }
+
+  .admin-profile-page .bg-white.rounded-xl.shadow-md {
+    padding: 1.5rem 1.75rem !important;
+  }
+
+  .admin-profile-page .relative.rounded-2xl.shadow-xl {
+    padding: 1.75rem !important;
+  }
+
+  .admin-profile-page .grid {
+    gap: 1.5rem;
+  }
+}

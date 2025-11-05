@@ -45,7 +45,7 @@ export default function SupportPage() {
         accentClass: "text-[#4F46E5]",
         cardVariant: "highlight",
         action: {
-          type: 
+          type: "link",
           label: "support@credlink.com",
           href: "mailto:support@credlink.com",
         },
@@ -60,18 +60,6 @@ export default function SupportPage() {
           type: "link",
           label: "+1 (415) 555-0134",
           href: "tel:+14155550134",
-        },
-      },
-      {
-        title: "Live Chat",
-        description:
-          "Connect instantly with our virtual assistant or route the conversation to a real human when needed.",
-        icon: MessageSquare,
-        accentClass: "text-[#4F46E5]",
-        cardVariant: "highlight",
-        action: {
-          type: "button",
-          label: "Start Chat",
         },
       },
     ],
@@ -208,7 +196,7 @@ export default function SupportPage() {
         </header>
 
         {/* Contact Options */}
-        <div className="grid gap-8 md:grid-cols-3 w-full max-w-5xl mx-auto">
+        <div className="grid gap-8 md:grid-cols-2 w-full max-w-4xl mx-auto">
           {contactOptions.map((option) => {
             const Icon = option.icon;
 

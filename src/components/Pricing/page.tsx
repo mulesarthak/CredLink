@@ -29,31 +29,6 @@ const PLANS: Plan[] = [
       "Email signature generator",
     ],
   },
-//   {
-//     id: "professional",
-//     title: "Professional",
-//     subtitle: "Customize, brand, and analyze your digital business cards",
-//     monthly: 6,
-//     featured: true,
-//     features: [
-//       "Additional card designs and styles",
-//       "Add videos, badges, and PDFs",
-//       "Access your card analytics",
-//       "Sync with Outlook and Google Contacts",
-//     ],
-//   },
-//   {
-//     id: "premium",
-//     title: "Premium",
-//     subtitle: "Scale across your team and integrate with business tools",
-//     monthly: 25,
-//     features: [
-//       "Digital business cards for entire team",
-//       "CRM integrations",
-//       "Admin-customized virtual backgrounds",
-//       "Team analytics and scanner",
-//     ],
-//   },
 ];
 
 export default function PricingPage() {
@@ -62,7 +37,6 @@ export default function PricingPage() {
   const priceFor = (monthly: number | null) => {
     if (monthly === null) return "Contact";
     if (annual) {
-      // show discounted monthly equivalent for annual (save up to 25%)
       const discounted = Math.round(monthly * 0.75 * 100) / 100;
       return `$${discounted}`;
     }
@@ -70,12 +44,9 @@ export default function PricingPage() {
   };
 
   const handlePrimaryAction = (planId: string) => {
-    // Minimal client action: navigate to sign-up or open modal in future
-    // For now log and show a basic alert for clarity
     const plan = PLANS.find((p) => p.id === planId);
     if (!plan) return;
     if (plan.monthly === null) {
-      // enterprise - contact
       alert("Thanks — our sales team will contact you about Enterprise plans.");
     } else if (plan.monthly === 0) {
       alert("Creating your free personal card...");
@@ -87,7 +58,7 @@ export default function PricingPage() {
   return (
     <section className="section" aria-labelledby="pricing-heading">
       <div className="container">
-  <div className="sectionHeader">
+        <div className="sectionHeader">
           <h2 id="pricing-heading" className="heading-2">
             Pricing Plans for Everyone
           </h2>
@@ -111,20 +82,17 @@ export default function PricingPage() {
               >
                 <div className={`knob ${annual ? "checked" : ""}`} />
               </div>
-              <span className="caption">Annually</span>
+              <span className="caption">Billed annually</span>
             </div>
           </div>
         </div>
 
-        <div className="pricingGrid">
-              style={{
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: "50vh", // optional: gives some vertical breathing space
-  }}
-            
-            
+        <div className="pricingGrid" style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "50vh",
+        }}>
           {PLANS.map((plan) => (
             <article
               key={plan.id}
@@ -148,7 +116,6 @@ export default function PricingPage() {
                   {plan.features.map((f, i) => (
                     <div key={i} className="featureItem">
                       <svg className="featureIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                        {/* Use currentColor so CSS can control stroke color (important for featured gradient cards) */}
                         <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="1.2" />
                         <path d="M7 12.5l2.5 2.5L17 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>

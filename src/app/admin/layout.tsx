@@ -1,128 +1,177 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { 
-  Users, 
-  Settings, 
-  BarChart3, 
-  Shield, 
-  DollarSign, 
-  Menu, 
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  Users,
+  Settings,
+  BarChart3,
+  Shield,
+  Menu,
   X,
+  LifeBuoy ,
+  ChevronRight,
   LogOut,
-  Home
-} from "lucide-react"
+  Home,
+} from "lucide-react";
+import styles from "./admin.module.css";
 
-const navigation = [
-  { name: "Dashboard", href: "/admin", icon: Home },
-  { name: "Users", href: "/admin/users", icon: Users },
-  { name: "Profiles", href: "/admin/profiles", icon: Shield },
-  { name: "Promotions", href: "/admin/promotions", icon: DollarSign },
-  { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
-]
+interface AdminData {
+  id: string;
+  role: string;
+  permissions: string[];
+}
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const pathname = usePathname()
+const allNavigation = [
+  { name: "Dashboard", href: "/admin", icon: Home, permission: null },
+  { name: "Users", href: "/admin/users", icon: Users, permission: "MANAGE_USERS" },
+  { name: "Manage Admins", href: "/admin/manage-admins", icon: Shield, permission: "MANAGE_ADMINS" },
+  { name: "Profiles", href: "/admin/profiles", icon: Users, permission: "MANAGE_PROFILES" },
+  { name: "Analytics", href: "/admin/analytics", icon: BarChart3, permission: "VIEW_ANALYTICS" },
+  { name: "Settings", href: "/admin/settings", icon: Settings, permission: "MANAGE_SETTINGS" },
+  { name: "Support", href: "/admin/support", icon: LifeBuoy , permission: null },
+];
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [admin, setAdmin] = useState<AdminData | null>(null);
+  const [navigation, setNavigation] = useState<typeof allNavigation>([]);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const constrainedWidthPages: string[] = [];
+  const shouldConstrainWidth = constrainedWidthPages.some((page) =>
+    pathname.startsWith(page)
+  );
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch("/api/admin/auth/me");
+      if (response.ok) {
+        const data = await response.json();
+        setAdmin(data.admin);
+
+        const filteredNav = allNavigation.filter((item) => {
+          if (!item.permission) return true;
+          if (data.admin.role === "SUPER_ADMIN") return true;
+          return data.admin.permissions.includes(item.permission);
+        });
+        setNavigation(filteredNav);
+      }
+    } catch (error) {
+      console.error("Auth check error:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/auth/logout", { method: "POST" });
+      router.push("/admin/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  if (pathname === "/admin/login") return <>{children}</>;
 
   return (
-    <div className="h-screen flex bg-gray-100">
+    <div className={styles.adminContainer}>
       {/* Sidebar */}
-      <div className={`${
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
-      } fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
-        <div className="flex items-center justify-between h-16 px-4 bg-gray-800">
-          <Link href="/admin" className="text-white text-xl font-bold">
-            CredLink Admin
+      <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ""}`}>
+        <div className={styles.sidebarHeader}>
+          <Link href="/admin" className={styles.logoArea}>
+            <div className={styles.logoIcon}>
+              <Shield />
+            </div>
+            <span className={styles.logoText}>CredLink Admin</span>
           </Link>
-          <button
+          
+          {/* Mobile close button */}
+          <button 
             onClick={() => setSidebarOpen(false)}
-            className="text-gray-400 hover:text-white lg:hidden"
+            className={styles.closeButton}
+            aria-label="Close menu"
           >
-            <X className="h-6 w-6" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        <nav className="mt-8">
-          <div className="px-4 space-y-2">
-            {navigation.map((item) => {
-              const Icon = item.icon
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`${
-                    isActive
-                      ? "bg-gray-800 text-white"
-                      : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                  } group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors`}
-                >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </Link>
-              )
-            })}
-          </div>
-
-          <div className="mt-8 pt-8 border-t border-gray-700">
-            <div className="px-4">
+        <nav className={styles.navMenu}>
+          {navigation.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
+            return (
               <Link
-                href="/"
-                className="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors"
+                key={item.name}
+                href={item.href}
+                className={`${styles.navItem} ${isActive ? styles.activeNav : ""}`}
               >
-                <Home className="mr-3 h-5 w-5" />
-                Back to Site
+                <Icon className={styles.navIcon} />
+                <span>{item.name}</span>
               </Link>
-              <button className="w-full text-left text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-                <LogOut className="mr-3 h-5 w-5" />
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </nav>
-      </div>
+            );
+          })}
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between h-16 px-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="text-gray-600 hover:text-gray-900 lg:hidden"
-            >
-              <Menu className="h-6 w-6" />
+          <div className={styles.navFooter}>
+            <Link href="/" className={styles.footerLink}>
+              <Home /> Back to Site
+            </Link>
+
+            <button onClick={handleLogout} className={styles.footerLogout}>
+              <LogOut /> Sign Out
             </button>
 
-            <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-600">
-                Admin Panel
+            {admin && (
+              <div className={styles.adminInfo}>
+                <div className={styles.adminBadge}>
+                  {admin.role === "SUPER_ADMIN"
+                    ? "SA"
+                    : admin.role === "ADMIN"
+                    ? "A"
+                    : "S"}
+                </div>
+                <div>
+                  <p className={styles.adminName}>Admin Panel</p>
+                  <p className={styles.adminRole}>{admin.role.replace("_", " ")}</p>
+                </div>
               </div>
-            </div>
+            )}
+          </div>
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <div className={styles.mainArea}>
+        <header className={styles.topBar}>
+          <button 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className={styles.menuButton}
+            aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+          >
+            {sidebarOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
+          </button>
+          
+          <div className={styles.activeStatus}>
+            <div className={styles.statusDot}></div>
+            <span>Admin Panel Active</span>
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className={`${styles.content} ${shouldConstrainWidth ? styles.constrained : ""}`}>
           {children}
         </main>
       </div>
 
-      {/* Sidebar backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {sidebarOpen && <div className={styles.overlay} onClick={() => setSidebarOpen(false)} />}
     </div>
-  )
+  );
 }
