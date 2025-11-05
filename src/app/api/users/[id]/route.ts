@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { verify } from 'jsonwebtoken'
+import { hash } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'your-secret-key'
@@ -25,6 +26,7 @@ export async function GET(
         email: true,
         fullName: true,
         phone: true,
+        status: true,
         createdAt: true,
         updatedAt: true
       }
@@ -65,14 +67,31 @@ export async function PATCH(
     }
 
     const body = await req.json()
-    const { fullName, phone } = body
+    const { fullName, phone, password, status, action } = body
+
+    // Prepare update data
+    const updateData: any = {}
+    
+    if (fullName) updateData.fullName = fullName
+    if (phone) updateData.phone = phone
+    
+    // Handle password change
+    if (password && password.trim()) {
+      updateData.password = await hash(password, 12)
+    }
+    
+    // Handle status changes (block/unblock)
+    if (action === 'block') {
+      updateData.status = 'blocked'
+    } else if (action === 'unblock') {
+      updateData.status = 'active'
+    } else if (status) {
+      updateData.status = status
+    }
 
     const updatedUser = await prisma.user.update({
       where: { id },
-      data: {
-        ...(fullName && { fullName }),
-        ...(phone && { phone })
-      }
+      data: updateData
     })
 
     return NextResponse.json({ 
@@ -81,7 +100,8 @@ export async function PATCH(
         id: updatedUser.id,
         email: updatedUser.email,
         fullName: updatedUser.fullName,
-        phone: updatedUser.phone
+        phone: updatedUser.phone,
+        status: updatedUser.status
       }
     })
   } catch (error) {
