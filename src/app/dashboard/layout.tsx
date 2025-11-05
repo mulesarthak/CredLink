@@ -16,6 +16,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const { isAuthenticated, checkAuth, isLoading } = useAuth();
   const [expanded, setExpanded] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLgUp, setIsLgUp] = useState(false);
 
@@ -34,8 +35,19 @@ export default function DashboardLayout({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Handle mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="h-screen overflow-hidden" style={{ backgroundColor: '#f8fafc' }}>
       {/* Sidebar */}
       <Sidebar expanded={expanded} setExpanded={setExpanded} mobileOpen={mobileOpen} />
 
@@ -43,7 +55,10 @@ export default function DashboardLayout({
       <motion.div
         animate={{ marginLeft: isLgUp ? (expanded ? 270 : 90) : 0 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="flex-1 flex flex-col"
+        className="h-full flex flex-col"
+        style={{ 
+          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
+        }}
       >
         {/* Header */}
         <div className="sticky top-0 z-30 bg-white shadow-sm">
@@ -62,7 +77,21 @@ export default function DashboardLayout({
         </div>
 
         {/* Main Page Area */}
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main 
+          className="flex-1 overflow-y-auto"
+          style={{ 
+            padding: '24px',
+            background: 'transparent'
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            {children}
+          </motion.div>
+        </main>
       </motion.div>
 
       {/* Backdrop for mobile sidebar */}

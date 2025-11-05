@@ -1,167 +1,271 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Search, Menu, X, User, LogOut } from "lucide-react"
-import { useAuth } from "@/lib/hooks/use-auth"
-import { toast } from "react-hot-toast"
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { ChevronDown, User, LogOut } from "lucide-react";
+import { useAuth } from "@/lib/hooks/use-auth";
+import { toast } from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function Header() {
-  const router = useRouter()
-  const { user, isAuthenticated, logout } = useAuth()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const router = useRouter();
+  const pathname = usePathname();
+  const { user, isAuthenticated, checkAuth, logout } = useAuth();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // Ensure auth check runs on mount so header always gets updated user info
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  // Dynamic page title based on current route
+  const getPageTitle = () => {
+    const path = pathname.split("/").filter(Boolean);
+    if (path.length === 0) return "Home";
+
+    const pageName = path[path.length - 1];
+    return pageName.charAt(0).toUpperCase() + pageName.slice(1);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+      router.push("/auth/login");
+      setIsDropdownOpen(false);
+    } catch (error) {
+      toast.error("Logout failed");
+    }
+  };
 
   return (
-    <header className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Link href="/" className="text-2xl font-bold text-blue-600">
-              CredLink
-            </Link>
-          </div>
+    <>
+      {/* HEADER WRAPPER */}
+      <header className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200/50 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Left Spacer (keeps alignment consistent) */}
+            <div style={{ width: "20px", visibility: "hidden" }}></div>
 
-          {/* Search Bar - Desktop */}
-          <div className="hidden md:flex flex-1 max-w-lg mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input
-                type="text"
-                placeholder="Search professionals, services, or locations..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                suppressHydrationWarning
-              />
+            {/* PAGE TITLE */}
+            <div className="flex-1">
+              <h1 className="text-xl font-bold text-gray-800 tracking-wide">
+                {getPageTitle()}
+              </h1>
             </div>
-          </div>
 
-          {/* Navigation - Desktop */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/search" className="text-gray-700 hover:text-blue-600">
-              Discover
-            </Link>
-            {isAuthenticated ? (
-              <>
-                <Link href="/dashboard" className="text-gray-700 hover:text-blue-600">
-                  Dashboard
-                </Link>
-                <Link href="/profile" className="text-gray-700 hover:text-blue-600">
-                  My Profile
-                </Link>
-                <div className="relative group">
-                  <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600" suppressHydrationWarning>
-                    <User className="h-4 w-4" />
-                    <span>Account</span>
-                  </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                    <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      Settings
-                    </Link>
-                    <button 
-                      onClick={async () => {
-                        await logout()
-                        toast.success('Logged out successfully')
-                        router.push('/')
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" 
-                      suppressHydrationWarning
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Sign Out
-                    </button>
+            {/* PROFILE DROPDOWN */}
+            <div className="relative">
+              <motion.button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "8px 16px",
+                  background:
+                    "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(147, 197, 253, 0.5)",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background =
+                    "linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(0, 0, 0, 0.15)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background =
+                    "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)";
+                  e.currentTarget.style.boxShadow =
+                    "0 2px 8px rgba(0, 0, 0, 0.1)";
+                }}
+              >
+                {/* USER AVATAR */}
+                <div
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "50%",
+                    background:
+                      "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                    border: "2px solid white",
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <User
+                    style={{ width: "16px", height: "16px", color: "white" }}
+                  />
+                </div>
+
+                {/* USER INFO */}
+                <div
+                  className="hidden sm:block"
+                  style={{
+                    textAlign: "left",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      color: "#374151",
+                      lineHeight: "1.2",
+                      marginBottom: "2px",
+                    }}
+                  >
+                    {user?.fullName || "User"}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#6b7280",
+                      lineHeight: "1.2",
+                    }}
+                  >
+                    {user?.email || "No email"}
                   </div>
                 </div>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/login" className="text-gray-700 hover:text-blue-600">
-                  Sign In
-                </Link>
-                <Link
-                  href="/auth/signup"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+
+                {/* DROPDOWN ICON */}
+                <motion.div
+                  animate={{ rotate: isDropdownOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  style={{ flexShrink: 0 }}
                 >
-                  Get Started
-                </Link>
-              </>
-            )}
-          </nav>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-blue-600"
-              suppressHydrationWarning
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Search */}
-        <div className="md:hidden pb-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <input
-              type="text"
-              placeholder="Search professionals..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              suppressHydrationWarning
-            />
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 py-4">
-            <nav className="flex flex-col space-y-4">
-              <Link href="/search" className="text-gray-700 hover:text-blue-600">
-                Discover
-              </Link>
-              {isAuthenticated ? (
-                <>
-                  <Link href="/dashboard" className="text-gray-700 hover:text-blue-600">
-                    Dashboard
-                  </Link>
-                  <Link href="/profile" className="text-gray-700 hover:text-blue-600">
-                    My Profile
-                  </Link>
-                  <Link href="/settings" className="text-gray-700 hover:text-blue-600">
-                    Settings
-                  </Link>
-                  <button 
-                    onClick={async () => {
-                      await logout()
-                      toast.success('Logged out successfully')
-                      router.push('/')
+                  <ChevronDown
+                    style={{
+                      width: "16px",
+                      height: "16px",
+                      color: "#6b7280",
                     }}
-                    className="text-left text-gray-700 hover:text-blue-600 flex items-center" 
-                    suppressHydrationWarning
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link href="/auth/login" className="text-gray-700 hover:text-blue-600">
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/auth/signup"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
-                  >
-                    Get Started
-                  </Link>
-                </>
-              )}
-            </nav>
-          </div>
-        )}
-      </div>
-    </header>
-  )
-}
+                  />
+                </motion.div>
+              </motion.button>
 
+              {/* DROPDOWN MENU */}
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    style={{
+                      position: "absolute",
+                      right: "0",
+                      marginTop: "8px",
+                      width: "220px",
+                      background: "rgba(255, 255, 255, 0.95)",
+                      backdropFilter: "blur(8px)",
+                      border: "1px solid rgba(229, 231, 235, 0.5)",
+                      borderRadius: "12px",
+                      boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+                      paddingTop: "10px",
+                      paddingBottom: "10px",
+                      zIndex: 50,
+                    }}
+                  >
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsDropdownOpen(false)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        padding: "12px 16px",
+                        margin: "6px 0",
+                        fontSize: "14px",
+                        color: "#374151",
+                        textDecoration: "none",
+                        transition: "all 0.2s ease",
+                        borderRadius: "8px",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#eff6ff";
+                        e.currentTarget.style.color = "#1d4ed8";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#374151";
+                      }}
+                    >
+                      <User
+                        style={{
+                          width: "16px",
+                          height: "16px",
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span>Account</span>
+                    </Link>
+
+                    <button
+                      onClick={handleLogout}
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        padding: "12px 16px",
+                        margin: "6px 0",
+                        fontSize: "14px",
+                        color: "#dc2626",
+                        backgroundColor: "transparent",
+                        border: "none",
+                        textAlign: "left",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        borderRadius: "8px",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#fef2f2";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                    >
+                      <LogOut
+                        style={{
+                          width: "16px",
+                          height: "16px",
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span>Logout</span>
+                    </button>
+                    <div style={{ height: "10px", visibility: "hidden" }}></div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        {/* BOTTOM SPACER */}
+        <div style={{ height: "8px", visibility: "hidden" }}></div>
+      </header>
+
+      {/* OUTSIDE CLICK HANDLER */}
+      {isDropdownOpen && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setIsDropdownOpen(false)}
+        />
+      )}
+    </>
+  );
+}

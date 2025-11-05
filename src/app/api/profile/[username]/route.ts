@@ -1,38 +1,76 @@
 import { NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
 
-// Dummy data for demonstration
-const profiles = [
-  {
-    username: "john",
-    name: "John Doe",
-    email: "john@example.com",
-    city: "New York",
-    company: "Tech Corp",
-    designation: "Full Stack Developer",
-    category: "Technology",
-    status: "published",
-    views: 1250,
-    joined: "2024-01-15"
-  },
-  {
-    username: "jane",
-    name: "Jane Smith",
-    email: "jane@example.com",
-    city: "Los Angeles",
-    company: "Marketing Pro",
-    designation: "Digital Marketing Expert",
-    category: "Marketing",
-    status: "draft",
-    views: 890,
-    joined: "2024-01-18"
-  }
-]
+export async function GET(
+  request: Request, 
+  { params }: { params: Promise<{ username: string }> }
+) {
+  try {
+    const { username } = await params
+    
+    // Find user by username
+    const user = await (prisma as any).user.findUnique({
+      where: { username },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        username: true,
+        firstName: true,
+        middleName: true,
+        lastName: true,
+        prefix: true,
+        suffix: true,
+        preferredName: true,
+        maidenName: true,
+        pronouns: true,
+        title: true,
+        company: true,
+        department: true,
+        affiliation: true,
+        headline: true,
+        accreditations: true,
+        emailLink: true,
+        phoneLink: true,
+        location: true,
+        cardName: true,
+        cardType: true,
+        selectedDesign: true,
+        selectedColor: true,
+        selectedFont: true,
+        profileImage: true,
+        bannerImage: true,
+        bio: true,
+        status: true,
+        views: true,
+        createdAt: true,
+        updatedAt: true,
+      }
+    })
 
-export async function GET(request: Request, { params }: { params: { username: string } }) {
-  const { username } = params
-  const profile = profiles.find(p => p.username === username)
-  if (!profile) {
-    return NextResponse.json({ error: "Profile not found" }, { status: 404 })
+    if (!user) {
+      return NextResponse.json({ 
+        ok: false, 
+        error: "Profile not found" 
+      }, { status: 404 })
+    }
+
+    // Optionally increment view count
+    await (prisma as any).user.update({
+      where: { username },
+      data: { views: { increment: 1 } }
+    })
+
+    return NextResponse.json({ 
+      ok: true, 
+      data: user 
+    })
+  } catch (error: any) {
+    console.error('Profile fetch error:', error)
+    return NextResponse.json({ 
+      ok: false, 
+      error: error.message || "Failed to fetch profile" 
+    }, { status: 500 })
   }
-  return NextResponse.json(profile)
 }

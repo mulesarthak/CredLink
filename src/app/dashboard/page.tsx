@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { FiEdit, FiBarChart2, FiZap, FiUser, FiPlus, FiLogOut } from "react-icons/fi";
+import Link from "next/link";
+import { FiPlus, FiMail, FiPhone, FiLinkedin, FiGlobe } from "react-icons/fi";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "react-hot-toast";
 import { Filter } from "lucide-react";
@@ -11,75 +12,48 @@ import { Filter } from "lucide-react";
 // ----------------- Card Type Definition -----------------
 interface Card {
   id: number;
+  name: string;
   title: string;
+  company: string;
+  location: string;
+  profileImage: string;
+  backgroundImage: string;
+  gradientTheme: "blue" | "purple" | "teal";
   views: string;
   boost: "Active" | "Inactive";
-  color: string;
-  location?: string;
-  category: string;
-  status: "review" | "completed";
-  verified: boolean;
-  reviews: number;
-
-  geometry: "wave" | "slope" | "swoosh";
+  type: "Personal" | "Business" | "Work";
 }
-
-// ----------------- Geometric Separator -----------------
-const GeometricSeparator: React.FC<{ shape: "wave" | "slope" | "swoosh" }> = ({ shape }) => {
-  switch (shape) {
-    case "slope":
-      return (
-        <svg
-          className="absolute bottom-0 left-0 w-full h-12 text-white"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          style={{ transform: "translateY(1px)" }}
-        >
-          <path d="M0,100 L50,60 L100,100 L100,100 Z" fill="var(--background-white)" />
-        </svg>
-      );
-    case "swoosh":
-      return (
-        <svg
-          className="absolute bottom-0 left-0 w-full h-12 text-white"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          style={{ transform: "translateY(1px)" }}
-        >
-          <path d="M0,80 Q50,0 100,80 L100,100 L0,100 Z" fill="var(--background-white)" />
-        </svg>
-      );
-    case "wave":
-    default:
-      return (
-        <svg
-          className="absolute bottom-0 left-0 w-full h-12 text-white"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          style={{ transform: "translateY(1px)" }}
-        >
-          <path d="M0,100 C25,50 75,50 100,100 L100,100 L0,100 Z" fill="var(--background-white)" />
-        </svg>
-      );
-  }
-};
 
 // ----------------- Card Component -----------------
 const CardItem: React.FC<{ card: Card }> = ({ card }) => {
-  const router = useRouter();
-
-  const headerStyle: React.CSSProperties = {
-  background: card.color,
-  position: "relative",
-  overflow: "hidden",
-};
-
-  const contentStyle = {
-    background: "var(--background-white)",
-    paddingTop: "3rem",
-    marginTop: "-3rem",
-    minHeight: "280px",
+  const getGradientClasses = (theme: "blue" | "purple" | "teal") => {
+    switch (theme) {
+      case "purple":
+        return {
+          main: "bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700",
+          header: "bg-gradient-to-br from-purple-400 to-purple-600",
+          shadow:
+            "0 20px 40px rgba(0, 0, 0, 0.15), 0 0 30px rgba(147, 51, 234, 0.2)",
+        };
+      case "teal":
+        return {
+          main: "bg-gradient-to-br from-teal-500 via-teal-600 to-teal-700",
+          header: "bg-gradient-to-br from-teal-400 to-teal-600",
+          shadow:
+            "0 20px 40px rgba(0, 0, 0, 0.15), 0 0 30px rgba(20, 184, 166, 0.2)",
+        };
+      case "blue":
+      default:
+        return {
+          main: "bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700",
+          header: "bg-gradient-to-br from-blue-400 to-blue-600",
+          shadow:
+            "0 20px 40px rgba(0, 0, 0, 0.15), 0 0 30px rgba(59, 130, 246, 0.2)",
+        };
+    }
   };
+
+  const gradientClasses = getGradientClasses(card.gradientTheme);
 
   return (
     <motion.div
@@ -87,85 +61,105 @@ const CardItem: React.FC<{ card: Card }> = ({ card }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
-      whileHover={{ scale: 1.05, y: -8, boxShadow: "var(--shadow-xl)" }}
-      className="w-[340px] max-w-sm bg-white shadow-card rounded-xl overflow-hidden border border-background-light-green transition-all duration-300 relative"
+      whileHover={{
+        scale: 1.02,
+        y: -4,
+        boxShadow: gradientClasses.shadow,
+      }}
+      className={`w-[340px] max-w-sm ${gradientClasses.main} shadow-lg rounded-2xl overflow-hidden transition-all duration-300 relative cursor-pointer`}
     >
+      {/* Card Type Tag */}
+      <div className="absolute top-3 left-3 z-20">
+        <span className="bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 rounded-lg text-xs text-white font-medium">
+          {card.type}
+        </span>
+      </div>
+
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
+      </div>
+
       {/* Header */}
-      <div style={headerStyle} className="w-full h-40 flex items-center justify-center p-4 shine">
-        <GeometricSeparator shape={card.geometry} />
-        <div className="text-white text-xl font-bold tracking-tight z-10">
-          {card.title.split("'")[0]}
+      <div
+        className={`relative h-32 ${gradientClasses.header} flex items-center justify-center overflow-hidden`}
+      >
+        <div className={`absolute inset-0 ${gradientClasses.header}`}></div>
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-60"
+          style={{
+            backgroundImage: `url(${card.backgroundImage})`,
+            filter: "blur(0.5px)",
+          }}
+        ></div>
+
+        <div className="relative z-10 w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+          <img
+            src={card.profileImage}
+            alt={card.name}
+            className="w-16 h-16 rounded-full object-cover border-2 border-white"
+          />
         </div>
       </div>
 
       {/* Content */}
-      <div style={contentStyle} className="p-5 flex flex-col justify-between">
-  <div className="grow">
-          <h3 className="card-title text-center text-xl font-bold text-text-primary mb-1">
+      <div className="p-6 text-white relative z-10">
+        <div className="text-center mb-4">
+          <h3 className="text-xl font-bold mb-1">{card.name}</h3>
+          <p className="text-white/90 text-sm font-medium mb-1">
             {card.title}
-          </h3>
-          <p className="text-center text-sm description-small mb-6 text-text-secondary">
-            Last Updated: 2 days ago
           </p>
-
-          {/* Stats */}
-          <div className="flex justify-around items-center text-sm text-text-secondary mb-8 pt-2 border-t border-background-light-green">
-            <div className="flex flex-col items-center">
-              <p className="font-extrabold text-2xl text-text-primary">{card.views}</p>
-              <p className="text-xs">Views</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <p
-                className={`font-bold text-lg ${
-                  card.boost === "Active" ? "text-success-green" : "text-text-light"
-                }`}
-              >
-                {card.boost}
-              </p>
-              <p className="text-xs">Boost Status</p>
-            </div>
-          </div>
+          <p className="text-white/80 text-xs">{card.company}</p>
+          <p className="text-white/80 text-xs mt-1">{card.location}</p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-4 pb-6">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl bg-background-light-green text-primary-green-dark font-medium hover:bg-(--primary-green-light) transition-all"
-            onClick={() => router.push(`/dashboard/edit/${card.id}`)}
-            suppressHydrationWarning
-          >
-            <FiEdit size={16} /> Edit
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl bg-(--primary-green-dark) text-white font-medium hover:bg-(--primary-green) transition-all"
-            suppressHydrationWarning
-          >
-            <FiBarChart2 size={16} /> Analytics
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className={`flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl font-medium transition-all ${
-              card.boost === "Active"
-                ? "bg-background-light-green text-primary-green-dark border border-primary-green-light hover:bg-background-mint"
-                : "bg-background-mint text-primary-green-dark hover:bg-(--primary-green-light)"
-            }`}
-            suppressHydrationWarning
-          >
-            <FiZap size={16} /> {card.boost === "Active" ? "Manage" : "Boost"}
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl bg-background-mint text-primary-green-dark font-medium hover:bg-(--primary-green-light) transition-all"
-            suppressHydrationWarning
-          >
-            <FiUser size={16} /> View Profile
-          </motion.button>
+        <div className="flex justify-center gap-4 mb-6">
+          {[FiMail, FiPhone, FiLinkedin, FiGlobe].map((Icon, index) => (
+            <div
+              key={index}
+              className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors border border-white/30"
+            >
+              <Icon className="w-4 h-4 text-white" />
+            </div>
+          ))}
         </div>
+
+        <p className="text-center text-white/90 text-xs leading-relaxed mb-6">
+          A modern digital visiting card for{" "}
+          {card.title.toLowerCase()} showcasing professional details,
+          social links, and portfolio
+        </p>
+
+        {/* Services / Portfolio / Links */}
+        <div className="grid grid-cols-3 gap-2 mb-6 px-2">
+          {["Services", "Portfolio", "Links"].map((btn, i) => (
+            <button
+              key={i}
+              className="bg-white/20 hover:bg-white/30 text-white text-xs py-2 px-2 rounded-lg transition-colors font-medium border border-white/30"
+            >
+              {btn}
+            </button>
+          ))}
+        </div>
+
+        {/* Small gap container */}
+        <div className="h-3"></div>
+
+        {/* Experience / Review */}
+        <div className="grid grid-cols-2 gap-2 mb-4 px-8">
+          {["Experience", "Review"].map((btn, i) => (
+            <button
+              key={i}
+              className="bg-white/20 hover:bg-white/30 text-white text-xs py-2 px-2 rounded-lg transition-colors font-medium border border-white/30"
+            >
+              {btn}
+            </button>
+          ))}
+        </div>
+
+        {/* Small empty container for spacing */}
+        <div className="h-4"></div>
       </div>
     </motion.div>
   );
@@ -179,28 +173,54 @@ const Dashboard = () => {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filterMode, setFilterMode] = useState<"none" | "review" | "verified">("none");
 
-  // Auth is checked by the dashboard layout, no need to check here
-const SearchCard = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value.toLowerCase();
-    const filteredCards = cards.filter(card => {
-      const matchesTitle = card.title.toLowerCase().includes(query);
-      const matchesLocation = (card.location ?? '').toLowerCase().includes(query);
-      const matchesCategory = (card.category ?? '').toLowerCase().includes(query);
-      return matchesTitle || matchesLocation || matchesCategory;
-    });
-    setSearchResults(filteredCards);
-  }
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success('Logged out successfully');
-      router.push('/auth/login');
-    } catch (error) {
-      toast.error('Logout failed');
-    }
-  };
+  const cards: Card[] = [
+    {
+      id: 1,
+      name: "Josh Hazelwood",
+      title: "Software Designer",
+      company: "BoostNow LLP",
+      location: "California, USA",
+      profileImage:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
+      backgroundImage:
+        "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&h=200&fit=crop",
+      gradientTheme: "blue",
+      views: "234",
+      boost: "Active",
+      type: "Work",
+    },
+    {
+      id: 2,
+      name: "Sarah Chen",
+      title: "UX Designer",
+      company: "Design Studio",
+      location: "New York, USA",
+      profileImage:
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face",
+      backgroundImage:
+        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=200&fit=crop",
+      gradientTheme: "purple",
+      views: "180",
+      boost: "Inactive",
+      type: "Personal",
+    },
+    {
+      id: 3,
+      name: "Alex Rodriguez",
+      title: "Product Manager",
+      company: "Tech Innovations",
+      location: "San Francisco, USA",
+      profileImage:
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face",
+      backgroundImage:
+        "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=200&fit=crop",
+      gradientTheme: "teal",
+      views: "302",
+      boost: "Active",
+      type: "Business",
+    },
+  ];
 
-  // Show loading state while checking authentication
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -212,152 +232,37 @@ const SearchCard = (e: React.ChangeEvent<HTMLInputElement>) => {
     );
   }
 
-  const cards: Card[] = [
-    {
-      id: 1,
-      title: "Arnav's Business Card",
-      views: "234",
-      boost: "Active",
-      color: "var(--gradient-primary)",
-      geometry: "wave",
-      location: "New York",
-      category: "Business",
-      status: "completed",
-      verified: true,
-      reviews: 28,
-    },
-    {
-      id: 2,
-      title: "Portfolio Profile",
-      views: "180",
-      boost: "Inactive",
-      color: "var(--gradient-secondary)",
-      geometry: "slope",
-      location: "Pune",
-      category: "Design",
-      status: "review",
-      verified: false,
-      reviews: 9,
-    },
-    {
-      id: 3,
-      title: "Networking Card",
-      views: "302",
-      boost: "Active",
-      color: "var(--gradient-accent)",
-      geometry: "swoosh",
-      location: "Delhi",
-      category: "Networking",
-      status: "completed",
-      verified: true,
-      reviews: 54,
-    },
-  ];
-
   return (
-  <div className="min-h-screen bg-background px-8 sm:px-14 py-14 lg:ml-64 transition-all duration-300">
-      {/* Top Bar with User Info and Logout */}
-      {isAuthenticated && user && (
-        <div className="flex justify-between items-center mb-8 px-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-linear-to-br from-primary-green to-primary-green-dark flex items-center justify-center text-white font-bold">
-              {user.fullName?.charAt(0) || user.email.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <p className="font-semibold text-text-primary">{user.fullName || 'User'}</p>
-              <p className="text-sm text-text-secondary">{user.email}</p>
-            </div>
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-md"
-          >
-            <FiLogOut /> Logout
-          </motion.button>
-        </div>
-      )}
-      
-      {/* Top area: search at top-right, create button centered below */}
-      <div className="relative my-8">
-        {/* Search at top-right */}
-        <div className="absolute right-0 top-0 flex items-center gap-2">
-          <input
-            type="text"
-            onChange={SearchCard}
-            placeholder="Search by title, location, category..."
-            className="border rounded-md px-3 py-2 w-64"
-            aria-label="Search cards"
-          />
-          <button
-            type="button"
-            onClick={() => setFiltersOpen((v) => !v)}
-            className="p-2 rounded-md border hover:bg-gray-50"
-            aria-label="Open filters"
-            title="Filters"
-          >
-            <Filter className="w-4 h-4" />
-          </button>
-
-          {filtersOpen && (
-            <div className="absolute right-0 top-10 z-20 bg-white border rounded-lg shadow-lg p-3 w-64">
-              <p className="text-sm font-semibold mb-2">Filter by</p>
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="radio"
-                    name="filterMode"
-                    checked={filterMode === "review"}
-                    onChange={() => setFilterMode("review")}
-                  />
-                  <span>Review</span>
-                </label>
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="radio"
-                    name="filterMode"
-                    checked={filterMode === "verified"}
-                    onChange={() => setFilterMode("verified")}
-                  />
-                  <span>Verified</span>
-                </label>
-              </div>
-              <button
-                type="button"
-                className="mt-3 text-xs text-primary-green-dark hover:underline"
-                onClick={() => setFilterMode("none")}
-              >
-                Clear filters
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Centered Create Button */}
-        <div className="flex justify-center mt-6">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => router.push("/dashboard/create")}
-            className="relative flex items-center justify-center gap-3 btn btn-large btn-primary shadow-xl hover:shadow-colored transition-all text-xl font-bold px-14 py-6"
-            suppressHydrationWarning
-          >
-            <FiPlus className="text-2xl" /> Create New Card
-          </motion.button>
-        </div>
+    <div className="min-h-screen bg-[var(--background)] px-8 sm:px-14 py-8 lg:ml-64 transition-all duration-300">
+      {/* Create New Card Button */}
+      <div className="flex justify-center my-6">
+        <motion.button
+          whileHover={{
+            scale: 1.05,
+            boxShadow:
+              "0 20px 40px rgba(59, 130, 246, 0.4), 0 0 30px rgba(59, 130, 246, 0.3)",
+          }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => router.push("/dashboard/create")}
+          className="relative flex items-center justify-center gap-3 px-12 py-5 text-lg font-medium text-white rounded-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group min-w-[280px]"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out"></div>
+          <FiPlus className="text-xl relative z-10" />
+          <span className="relative z-10">Create New Card</span>
+        </motion.button>
       </div>
-      {/* Cards Grid with wide spacing and room from header/sidebar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-14 justify-items-center mt-12">
-        {(() => {
-          const baseList = searchResults.length > 0 ? searchResults : cards;
-          const afterFilters = baseList.filter((c) => {
-            if (filterMode === "review") return c.status === "review";
-            if (filterMode === "verified") return !!c.verified;
-            return true; // none -> no filtering
-          });
-          return afterFilters.map((card) => <CardItem key={card.id} card={card} />);
-        })()}
+
+      {/* Invisible container for vertical spacing */}
+      <div className="h-10"></div>
+
+      {/* Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-14 justify-items-center mt-4">
+        {cards.map((card) => (
+          <Link key={card.id} href={`/cards/${card.id}`}>
+            <CardItem card={card} />
+          </Link>
+        ))}
       </div>
     </div>
   );

@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { use, useEffect, useMemo, useState } from "react";
 import { Search, Trash2, X, MoreVertical } from "lucide-react";
+import { ca } from "zod/v4/locales";
+import { send } from "process";
 
 type MessageStatus = "New" | "Read" | "Replied" | "Pending" | "Archived" | "Deleted";
 type MessageTag = "Lead" | "Support" | "Pricing" | "Feedback" | null;
@@ -16,6 +18,7 @@ interface MessageItem {
   read: boolean;
   starred: boolean;
   tag: MessageTag;
+  senderId: string; // Store the original sender's ID for replies
   replies?: {
     text: string;
     date: string;
@@ -24,6 +27,7 @@ interface MessageItem {
 
 export default function MessagesPage() {
   const [isMobile, setIsMobile] = useState(false);
+  const [messages, setMessages] = useState<MessageItem[]>([]);
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 640px)");
     const onChange = () => setIsMobile(mql.matches);
@@ -35,6 +39,72 @@ export default function MessagesPage() {
       (mql.removeEventListener ? mql.removeEventListener("change", onChange) : mql.removeListener(onChange));
     };
   }, []);
+  useEffect(() => {
+    fetchMessages();
+
+  }, []);
+  const fetchMessages = async () => {
+    try{
+      const token = localStorage.getItem('token');
+      console.log('token', token);
+      const response = await fetch('/api/message/receive', { 
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        
+      });
+      if (response.ok) {
+        const data = await response.json();
+
+        // Map API response (messages + senders) into the UI MessageItem shape
+        // API: { messages: [{ id, text, senderId, receiverId, createdAt }], senders: [{ id, fullName, email }] }
+        const sendersMap: Record<string, { id: string; fullName?: string; email?: string }> = {};
+        (data.senders || []).forEach((s: any) => {
+          sendersMap[s.id] = s;
+        });
+
+        const statusMap: Record<string, MessageStatus> = {
+          NEW: 'New',
+          READ: 'Read',
+          REPLIED: 'Replied',
+          PENDING: 'Pending',
+          ARCHIVED: 'Archived',
+          DELETED: 'Deleted',
+        };
+        const tagMap: Record<string, Exclude<MessageTag, null>> = {
+          LEAD: 'Lead',
+          SUPPORT: 'Support',
+          PRICING: 'Pricing',
+          FEEDBACK: 'Feedback',
+        };
+
+        const mapped: MessageItem[] = (data.messages || []).map((msg: any) => {
+          const sender = sendersMap[msg.senderId] || {};
+          return {
+            id: msg.id,
+            name: sender.fullName || "Unknown",
+            email: sender.email || "",
+            message: msg.text || msg.message || "",
+            date: msg.createdAt || msg.date || new Date().toISOString(),
+            status: statusMap[String(msg.status)] || "New",
+            read: typeof msg.read === 'boolean' ? msg.read : false,
+            starred: false,
+            tag: tagMap[String(msg.tag)] || null,
+            senderId: msg.senderId, // Store senderId for replies
+            replies: [],
+          } as MessageItem;
+        });
+
+        setMessages(mapped);
+      }
+      console.log(response);
+    }catch(err){
+      console.error('Error fetching messages:', err);
+    }
+  };
+
   const formatDate = (date: string) => {
     const d = new Date(date);
     return new Intl.DateTimeFormat(undefined, {
@@ -46,41 +116,41 @@ export default function MessagesPage() {
     }).format(d);
   };
 
-  const [messages, setMessages] = useState<MessageItem[]>([
-    {
-      id: "msg_001",
-      name: "Aarav Patel",
-      email: "aarav@example.com",
-      message: "Interested in your premium plan. Can we schedule a call?",
-      date: "2025-10-30T10:12:00",
-      status: "New",
-      read: false,
-      starred: true,
-      tag: "Lead",
-    },
-    {
-      id: "msg_002",
-      name: "Isha Gupta",
-      email: "isha.g@example.com",
-      message: "Loved the demo card. How do I embed it on my website?",
-      date: "2025-10-30T09:02:00",
-      status: "Replied",
-      read: true,
-      starred: false,
-      tag: "Support",
-    },
-    {
-      id: "msg_003",
-      name: "Rahul Verma",
-      email: "rahul.v@example.com",
-      message: "Can you share pricing for teams of 10?",
-      date: "2025-10-29T18:44:00",
-      status: "Pending",
-      read: false,
-      starred: false,
-      tag: "Pricing",
-    },
-  ]);
+  // const [messages, setMessages] = useState<MessageItem[]>([
+  //   {
+  //     id: "msg_001",
+  //     name: "Aarav Patel",
+  //     email: "aarav@example.com",
+  //     message: "Interested in your premium plan. Can we schedule a call?",
+  //     date: "2025-10-30T10:12:00",
+  //     status: "New",
+  //     read: false,
+  //     starred: true,
+  //     tag: "Lead",
+  //   },
+  //   {
+  //     id: "msg_002",
+  //     name: "Isha Gupta",
+  //     email: "isha.g@example.com",
+  //     message: "Loved the demo card. How do I embed it on my website?",
+  //     date: "2025-10-30T09:02:00",
+  //     status: "Replied",
+  //     read: true,
+  //     starred: false,
+  //     tag: "Support",
+  //   },
+  //   {
+  //     id: "msg_003",
+  //     name: "Rahul Verma",
+  //     email: "rahul.v@example.com",
+  //     message: "Can you share pricing for teams of 10?",
+  //     date: "2025-10-29T18:44:00",
+  //     status: "Pending",
+  //     read: false,
+  //     starred: false,
+  //     tag: "Pricing",
+  //   },
+  // ]);
 
   const [activeFilter, setActiveFilter] = useState<"All" | "Unread" | "Replied" | "Pending" | "Archived" | "Deleted">("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -125,29 +195,78 @@ export default function MessagesPage() {
   };
 
   
+  
 
   const deleteMessage = (id: string) => {
     setMessages(prev => prev.map(m => m.id === id ? { ...m, status: "Deleted" } : m));
+
+    const sendDeleteRequest = async () => {
+      try {
+        const response = await fetch(`/api/message/delete?id=${encodeURIComponent(id)}`, {
+          method: "DELETE",
+        });
+        if (!response.ok && response.status !== 404) {
+          throw new Error("Failed to delete message");
+        }
+      } catch (error) {
+        console.error("Error deleting message:", error);
+      }
+    };
+    sendDeleteRequest();
     if (detailId === id) setDetailId(null);
     if (replyId === id) setReplyId(null);
   };
 
-  const sendReply = () => {
+  const sendReply = async () => {
     if (!replyId || !replyText.trim()) return;
-    setMessages(prev => prev.map(m => m.id === replyId ? { 
-      ...m, 
-      status: "Replied", 
-      read: true,
-      replies: [
-        ...(m.replies || []),
-        {
-          text: replyText,
-          date: new Date().toISOString()
-        }
-      ]
-    } : m));
-    setReplyId(null);
-    setReplyText("");
+    
+    const originalMessage = messages.find(m => m.id === replyId);
+    if (!originalMessage) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/message/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          message: replyText.trim(),
+          receiverId: originalMessage.senderId, // Send reply back to original sender
+          status: 'REPLIED',
+          tag: originalMessage.tag?.toUpperCase() || 'SUPPORT',
+          read: false,
+        }),
+      });
+
+      if (response.ok) {
+        // Update local state to reflect the reply
+        setMessages(prev => prev.map(m => m.id === replyId ? { 
+          ...m, 
+          status: "Replied", 
+          read: true,
+          replies: [
+            ...(m.replies || []),
+            {
+              text: replyText,
+              date: new Date().toISOString()
+            }
+          ]
+        } : m));
+        setReplyId(null);
+        setReplyText("");
+        // Optionally refetch messages to sync with backend
+        // fetchMessages();
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to send reply:', errorData);
+        alert('Failed to send reply. Please try again.');
+      }
+    } catch (err) {
+      console.error('Error sending reply:', err);
+      alert('Error sending reply. Please check your connection.');
+    }
   };
 
   const getStatusBadge = (status: MessageStatus) => {

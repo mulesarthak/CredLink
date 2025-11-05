@@ -1,0 +1,493 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8faff, #eef3ff);
+  padding: 3rem 0;
+}
+
+.wrapper {
+  max-width: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  padding: 0 2rem;
+}
+
+/* Loader */
+.loadingScreen {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8fafc;
+}
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  color: #2563eb;
+  animation: spin 1s linear infinite;
+}
+
+/* Header */
+.headerCard {
+  position: relative;
+  background: linear-gradient(to right, #2563eb, #3b82f6, #1d4ed8);
+  border-radius: 1.5rem;
+  color: white;
+  padding: 2rem;
+  overflow: hidden;
+}
+.headerOverlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1), transparent);
+}
+.headerContent {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.headerIcon {
+  width: 4rem;
+  height: 4rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+.title {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.6rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 500;
+}
+.logoutBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Info Cards */
+.infoGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+.profileCard {
+  background: white;
+  border-radius: 1.5rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+}
+.profileTop {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+}
+.profileName {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+.profileEmail {
+  color: #475569;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.activeDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: #2563eb;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+.avatar {
+  width: 5rem;
+  height: 5rem;
+  background: linear-gradient(to bottom right, #2563eb, #1d4ed8);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.roleBadge {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.roleSuper {
+  background: linear-gradient(to right, #2563eb, #3b82f6);
+  color: white;
+}
+.roleAdmin {
+  background: #10b981;
+  color: white;
+}
+.roleSub {
+  background: #d1fae5;
+  color: #059669;
+}
+.roleDefault {
+  background: #e5e7eb;
+  color: #374151;
+}
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+}
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+.statValueGreen {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+.statLabel {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+/* Permissions */
+.permCard {
+  background: linear-gradient(to bottom right, #eff6ff, #e0e7ff);
+  border-radius: 1.5rem;
+  border: 1px solid #bfdbfe;
+  padding: 1.5rem;
+}
+.permHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.permIcon {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(to bottom right, #3b82f6, #6366f1);
+  border-radius: 0.75rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.permTitle {
+  font-weight: 700;
+  color: #111827;
+}
+.permSubtitle {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+.permList {
+  max-height: 12rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.permItem {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #374151;
+}
+.permDot {
+  width: 0.4rem;
+  height: 0.4rem;
+  background: #10b981;
+  border-radius: 50%;
+}
+.morePerm {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+/* Quick Actions */
+.actionsSection {
+  margin-top: 2rem;
+}
+.actionsTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+.actionsSubtitle {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+.actionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+.actionCard {
+  background: white;
+  border-radius: 1.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.actionCard:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+.actionIcon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 0.75rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+.purple {
+  background: linear-gradient(to bottom right, #8b5cf6, #ec4899);
+}
+.blue {
+  background: linear-gradient(to bottom right, #3b82f6, #06b6d4);
+}
+.orange {
+  background: linear-gradient(to bottom right, #f97316, #dc2626);
+}
+.green {
+  background: linear-gradient(to bottom right, #22c55e, #059669);
+}
+.actionName {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #111827;
+}
+.actionDesc {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* Animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* ============================= */
+/* ✅ RESPONSIVE DESIGN (Mobile + Tablet) */
+/* ============================= */
+
+@media (max-width: 1024px) {
+  .wrapper {
+    padding: 0 1rem;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .actionsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .headerCard {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem 0;
+  }
+
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .headerLeft {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .headerIcon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .logoutBtn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .profileCard,
+  .permCard {
+    padding: 1rem;
+  }
+
+  .profileTop {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .avatar {
+    align-self: flex-end;
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .statValue,
+  .statValueGreen {
+    font-size: 1.2rem;
+  }
+
+  .statLabel {
+    font-size: 0.75rem;
+  }
+
+  .actionsSection {
+    margin-top: 1rem;
+  }
+
+  .actionsTitle {
+    font-size: 1.25rem;
+  }
+
+  .actionsSubtitle {
+    font-size: 0.85rem;
+  }
+
+  .actionsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .actionCard {
+    padding: 1rem;
+  }
+
+  .actionIcon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .actionName {
+    font-size: 0.95rem;
+  }
+
+  .actionDesc {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .headerIcon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+
+  .logoutBtn {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .profileName {
+    font-size: 1.2rem;
+  }
+
+  .profileEmail {
+    font-size: 0.8rem;
+  }
+
+  .roleBadge {
+    font-size: 0.75rem;
+  }
+
+  .statValue,
+  .statValueGreen {
+    font-size: 1rem;
+  }
+
+  .actionsTitle {
+    font-size: 1.1rem;
+  }
+
+  .actionsSubtitle {
+    font-size: 0.8rem;
+  }
+
+  .actionCard {
+    border-radius: 1rem;
+  }
+}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Mail, Eye, EyeOff, Loader2, Check } from "lucide-react"
@@ -10,16 +10,14 @@ import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { signupSchema } from "@/lib/validations/auth"
 import type { z } from "zod"
-//import { signInWithPhoneNumber } from "@/lib/firebase"
-//import { auth } from "@/lib/firebase"
-import { RecaptchaVerifier, type ConfirmationResult } from "firebase/auth"
+import { auth, RecaptchaVerifier, signInWithPhoneNumber } from "@/lib/firebase"
 
 // Augment window for reCAPTCHA handle (must be top-level)
-declare global {
-  interface Window {
-    recaptchaVerifier?: RecaptchaVerifier
-  }
-}
+// declare global {
+//   interface Window {
+//     recaptchaVerifier?: RecaptchaVerifier
+//   }
+// }
 
 type SignupForm = z.infer<typeof signupSchema>
 
@@ -68,19 +66,29 @@ export default function SignupPage() {
       setValue('email', '')
     }
   }
-/*
-  const sendOtp = async () => {
+
+  const recaptchaRef = useRef<RecaptchaVerifier | null>(null)
+
+  useEffect(() => {
+    return () => {
+      try { recaptchaRef.current?.clear() } catch {}
+      recaptchaRef.current = null
+    }
+  }, [])
+
+  const sendOtp = async (rawPhone?: string) => {
     try {
+      const input = rawPhone ?? watch('phone')
+      const normalized = (input || '').replace(/\D/g, '')
+      const phoneNumber = input?.startsWith('+') ? input : (normalized.length === 10 ? `+91${normalized}` : `+${normalized}`)
       const verifier = setupRecaptcha()
-      const phoneNumber = "+91" + identifier
       const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, verifier)
-      // Persist verificationId for the verify page
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('verificationId', confirmationResult.verificationId)
         sessionStorage.setItem('otpPhone', phoneNumber)
       }
       toast.success('OTP sent!')
-      router.push(`/auth/verify-otp?phone=${encodeURIComponent(identifier)}`)
+      router.push(`/auth/verify-otp?phone=${encodeURIComponent(input || '')}`)
     } catch (error: any) {
       console.error(error)
       toast.error(error?.message || 'Failed to send OTP')
@@ -90,17 +98,21 @@ export default function SignupPage() {
   // OTP verification happens on /auth/verify-otp page using verificationId
   
   const setupRecaptcha = () => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-        size: "invisible",
-      })
-    }
-    return window.recaptchaVerifier
+    if (recaptchaRef.current) return recaptchaRef.current
+    const container = typeof document !== 'undefined' ? document.getElementById('recaptcha-container-signup') : null
+    if (!container) throw new Error('reCAPTCHA container missing')
+    recaptchaRef.current = new RecaptchaVerifier(auth, 'recaptcha-container-signup', { size: 'invisible' })
+    return recaptchaRef.current
   }
-*/
+
   const onSubmit = async (data: SignupForm) => {
-    if (identifierType === 'phone') {
-      //await sendOtp()
+    if (data.phone) {
+      try {
+        setLoading(true)
+        await sendOtp(data.phone)
+      } finally {
+        setLoading(false)
+      }
       return
     }
     
@@ -176,8 +188,10 @@ export default function SignupPage() {
           </p>
         </div>
 
-        {/* Invisible reCAPTCHA container for Firebase phone auth */}
-        <div id="recaptcha-container" className="hidden" />
+        <div
+          id="recaptcha-container-signup"
+          style={{ position: 'fixed', top: -1000, left: -1000, width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
+        />
 
         <form
           className="auth-form"

@@ -73,7 +73,10 @@ export default function LoginPage() {
         setError(data?.error || 'Login failed. Please try again.')
         return
       }
-      
+      const data = await res.json().catch(() => ({}))
+      if (data?.token) {
+        localStorage.setItem('token', data.token)
+      }
       // On success, go to dashboard
       window.location.href = '/dashboard'
     } catch {
