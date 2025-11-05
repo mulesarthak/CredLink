@@ -45,7 +45,7 @@ export default function SupportPage() {
         accentClass: "text-[#4F46E5]",
         cardVariant: "highlight",
         action: {
-          type: "link",
+          type: 
           label: "support@credlink.com",
           href: "mailto:support@credlink.com",
         },
