@@ -318,17 +318,26 @@ const CardDetailsPage = () => {
   };
 
   const shareProfile = async () => {
+    console.log('Navigator share available:', !!navigator.share);
     if (navigator.share) {
+      console.log("Attempting to share...");
       try {
-        await navigator.share({
-          title: `${mockUserData.name}'s Digital Card`,
-          text: `Check out ${mockUserData.name}'s digital business card`,
-          url: mockUserData.cardUrl,
+        // For WhatsApp, combine title and text into one message
+        const shareText = `${mockUserData.name}'s Digital Card\n\nCheck out ${mockUserData.name}'s digital business card\n\n${mockUserData.cardUrl}`;
+        
+        const response = await navigator.share({
+          text: shareText,
         });
+        console.log('Share successful:', response);
       } catch (err) {
         console.error('Error sharing:', err);
+        // Fallback to copy if user cancels
+        if (err instanceof Error && err.name !== 'AbortError') {
+          copyToClipboard(mockUserData.cardUrl);
+        }
       }
     } else {
+      // Fallback for browsers that don't support Web Share API
       copyToClipboard(mockUserData.cardUrl);
     }
   };
