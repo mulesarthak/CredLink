@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { verify } from 'jsonwebtoken'
 import { prisma } from '@/lib/prisma'
-import { uploadToCloudinary } from '@/lib/cloudinary'
+import { uploadToCloudinary, deleteFromCloudinary } from '@/lib/cloudinary'
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key'
 
@@ -25,6 +25,12 @@ export async function POST(request: NextRequest) {
       email: string
       fullName: string
     }
+
+    // Get current user to check for existing profile image
+    const currentUser = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { profileImage: true } as any
+    })
 
     // Get form data
     const formData = await request.formData()
@@ -55,11 +61,43 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Delete old profile image from Cloudinary if it exists
+    const oldProfileImage = (currentUser as any)?.profileImage
+    if (oldProfileImage && typeof oldProfileImage === 'string') {
+      try {
+        // Extract public_id from Cloudinary URL
+        // URL format: https://res.cloudinary.com/cloud_name/image/upload/v123456/credlink/profile-images/filename.ext
+        const urlParts = oldProfileImage.split('/')
+        const uploadIndex = urlParts.findIndex(part => part === 'upload')
+        
+        if (uploadIndex !== -1 && uploadIndex + 2 < urlParts.length) {
+          // Skip version number (v123456) if present
+          const startIndex = urlParts[uploadIndex + 1].startsWith('v') ? uploadIndex + 2 : uploadIndex + 1
+          const pathParts = urlParts.slice(startIndex)
+          const fileWithExt = pathParts[pathParts.length - 1]
+          const fileName = fileWithExt.split('.')[0]
+          const folderPath = pathParts.slice(0, -1).join('/')
+          const publicId = folderPath ? `${folderPath}/${fileName}` : fileName
+          
+          console.log('🔍 Upload API: Extracted public ID:', publicId)
+          
+          console.log('🗑️ Upload API: Deleting old profile image:', publicId)
+          await deleteFromCloudinary(publicId)
+          console.log('✅ Upload API: Old profile image deleted successfully')
+        } else {
+          console.warn('⚠️ Upload API: Could not extract public ID from URL:', oldProfileImage)
+        }
+      } catch (deleteError) {
+        console.warn('⚠️ Upload API: Failed to delete old profile image:', deleteError)
+        // Continue with upload even if deletion fails
+      }
+    }
+
     // Convert file to buffer
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    // Upload to Cloudinary
+    // Upload new image to Cloudinary
     const uploadResult = await uploadToCloudinary(buffer, {
       folder: 'credlink/profile-images',
       public_id: `profile_${decoded.userId}_${Date.now()}`,

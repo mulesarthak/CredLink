@@ -123,6 +123,35 @@ const AccountSettingsPage = () => {
     console.log('Change Phone Number clicked!');
   };
 
+  const handleRemovePhoto = async () => {
+    try {
+      const response = await fetch('/api/profile/delete-image', {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('✅ Profile image removed successfully');
+        setAccountPhoto(null);
+        
+        // Refresh auth state to update header and other components
+        setTimeout(async () => {
+          console.log('🔄 Settings: Refreshing auth state after image removal...');
+          await checkAuth();
+          console.log('✅ Settings: Auth state refreshed');
+        }, 500);
+      } else {
+        console.error('❌ Remove failed:', data.error);
+        alert('Failed to remove image: ' + data.error);
+      }
+    } catch (error) {
+      console.error('❌ Remove error:', error);
+      alert('Failed to remove image. Please try again.');
+    }
+  };
+
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
   };
@@ -415,22 +444,44 @@ const AccountSettingsPage = () => {
                 style={{ display: 'none' }}
                 id="account-photo-upload"
               />
-              <label htmlFor="account-photo-upload" style={{
-                padding: '15px 30px',
-                fontSize: '1em',
-                background: 'rgba(255, 255, 255, 0.2)',
-                border: '1px solid rgba(255, 255, 255, 0.4)',
-                borderRadius: '10px',
-                cursor: 'pointer',
-                color: 'white',
-                fontWeight: '600',
-                boxShadow: '0 4px 15px rgba(255, 255, 255, 0.1)',
-                transition: 'all 0.3s ease',
-                display: 'inline-block',
-                backdropFilter: 'blur(10px)'
-              }}>
-                + Upload Photo
-              </label>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <label htmlFor="account-photo-upload" style={{
+                  padding: '15px 30px',
+                  fontSize: '1em',
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  border: '1px solid rgba(255, 255, 255, 0.4)',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  color: 'white',
+                  fontWeight: '600',
+                  boxShadow: '0 4px 15px rgba(255, 255, 255, 0.1)',
+                  transition: 'all 0.3s ease',
+                  display: 'inline-block',
+                  backdropFilter: 'blur(10px)'
+                }}>
+                  + Upload Photo
+                </label>
+                {accountPhoto && (
+                  <button
+                    onClick={handleRemovePhoto}
+                    style={{
+                      padding: '15px 30px',
+                      fontSize: '1em',
+                      background: 'rgba(255, 0, 0, 0.2)',
+                      border: '1px solid rgba(255, 0, 0, 0.4)',
+                      borderRadius: '10px',
+                      cursor: 'pointer',
+                      color: 'white',
+                      fontWeight: '600',
+                      boxShadow: '0 4px 15px rgba(255, 0, 0, 0.1)',
+                      transition: 'all 0.3s ease',
+                      backdropFilter: 'blur(10px)'
+                    }}
+                  >
+                    Remove Photo
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
