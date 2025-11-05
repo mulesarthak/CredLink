@@ -22,7 +22,6 @@ export function middleware(request: NextRequest) {
   const isApiRequest = path.startsWith('/api')
 
   // Public paths that don't require authentication
-  // Add any routes here that should be accessible without logging in (e.g. /pricing)
   const publicPaths = [
     '/',
     '/auth/login',
@@ -99,7 +98,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Redirect unauthenticated users to login page (except for public paths)
   // For API requests, do not redirect; just pass through with enriched headers.
   if (!isApiRequest) {
     if (!isAuthenticated && !isCombinedPublicPath) {

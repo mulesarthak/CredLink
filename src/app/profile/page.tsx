@@ -14,7 +14,7 @@ export default function ProfilePage() {
 
   const displayUser = user
     ? {
-        name: user.name || "Josh Hazelwood",
+        name: (user as any).fullName || (user as any).name || "Josh Hazelwood",
         email: user.email || "josh@boostnow.com",
         jobTitle: (user as any)?.jobTitle || "Software Designer",
         company: (user as any)?.company || "BoostNow LLP",
@@ -50,13 +50,9 @@ export default function ProfilePage() {
     >
       {/* ✅ Logo at top-left */}
       <div className="absolute top-6 left-6">
-        <Image
-          src="/logo.jpg" // place your logo in /public folder
-          alt="BoostNow Logo"
-          width={140}
-          height={40}
-          className="object-contain"
-        />
+        <div className="w-[140px] h-[40px] bg-blue-600 rounded-lg flex items-center justify-center">
+          <span className="text-white font-bold text-lg">CredLink</span>
+        </div>
       </div>
 
       <div className="w-full max-w-md">
@@ -84,7 +80,7 @@ export default function ProfilePage() {
                   <span className="text-gray-600 text-2xl font-bold">
                     {displayUser.name
                       .split(" ")
-                      .map((n) => n[0])
+                      .map((n: string) => n[0])
                       .join("")}
                   </span>
                 </div>
