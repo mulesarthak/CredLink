@@ -18,23 +18,22 @@ import {
 import { useRouter } from 'next/navigation';
 
 export default function AdminAnalyticsPage() {
-  // Mock Data
-  const trafficData = [
-    { name: "Mon", visits: 120 },
-    { name: "Tue", visits: 180 },
-    { name: "Wed", visits: 160 },
-    { name: "Thu", visits: 240 },
-    { name: "Fri", visits: 300 },
-    { name: "Sat", visits: 260 },
-    { name: "Sun", visits: 200 },
-  ];
-
-  const engagementData = [
-    { name: "Designers", value: 400 },
-    { name: "Developers", value: 350 },
-    { name: "Consultants", value: 300 },
-    { name: "Photographers", value: 250 },
-  ];
+  // State for analytics data
+  const [analyticsData, setAnalyticsData] = useState({
+    trafficData: [],
+    engagementData: [],
+    stats: {
+      totalVisits: 0,
+      profileViews: 0,
+      totalSearches: 0,
+      newUsers: 0,
+      totalUsers: 0,
+      totalMessages: 0,
+      newMessagesThisWeek: 0
+    }
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const COLORS = ["#2563eb", "#3b82f6", "#60a5fa", "#facc15"];
 
@@ -47,6 +46,27 @@ export default function AdminAnalyticsPage() {
 
   const [isMobile, setIsMobile] = useState(false);
 
+  // Fetch analytics data from API
+  const fetchAnalyticsData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch('/api/admin/analytics');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch analytics data');
+      }
+      
+      const data = await response.json();
+      setAnalyticsData(data);
+    } catch (err) {
+      console.error('Analytics fetch error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch analytics data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -54,6 +74,10 @@ export default function AdminAnalyticsPage() {
     
     checkMobile();
     window.addEventListener('resize', checkMobile);
+    
+    // Fetch analytics data on component mount
+    fetchAnalyticsData();
+    
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -140,73 +164,78 @@ export default function AdminAnalyticsPage() {
 
       {/* OVERVIEW CARDS */}
       <section className={styles.statsGrid}>
-        {[
-          { title: "Total Visits", value: "12,540", trend: "+12.4%" },
-          { title: "Profile Views", value: "8,340", trend: "+8.7%" },
-          { title: "Total Searches", value: "4,950", trend: "-3.1%" },
-          { title: "New Users", value: "1,230", trend: "+5.2%" },
-          { title: "Active Users", value: "830", trend: "+4.8%" },
-          { title: "Boosted Profiles", value: "120", trend: "+2.3%" },
-          { title: "Messages Sent", value: "740", trend: "+6.1%" },
-          { title: "Verified Profiles", value: "310", trend: "+9.4%" },
-        ].map((card, i) => (
-          <div key={i} className={styles.card}>
-            <h3>{card.title}</h3>
-            <p className={styles.metric}>{card.value}</p>
-            <span
-              className={
-                card.trend.includes("-")
-                  ? styles.trendDown
-                  : styles.trendUp
-              }
-            >
-              {card.trend}
-            </span>
-          </div>
-        ))}
+        {loading ? (
+          <div className={styles.loadingMessage}>Loading analytics data...</div>
+        ) : error ? (
+          <div className={styles.errorMessage}>Error: {error}</div>
+        ) : (
+          [
+            { title: "Total Visits", value: analyticsData.stats.totalVisits?.toLocaleString() || "0", key: "totalVisits" },
+            { title: "Profile Views", value: analyticsData.stats.profileViews?.toLocaleString() || "0", key: "profileViews" },
+            { title: "Total Users", value: analyticsData.stats.totalUsers?.toLocaleString() || "0", key: "totalUsers" },
+            { title: "New Users (7d)", value: analyticsData.stats.newUsers?.toLocaleString() || "0", key: "newUsers" },
+            { title: "Total Messages", value: analyticsData.stats.totalMessages?.toLocaleString() || "0", key: "totalMessages" },
+            { title: "New Messages (7d)", value: analyticsData.stats.newMessagesThisWeek?.toLocaleString() || "0", key: "newMessagesThisWeek" },
+            { title: "Total Searches", value: analyticsData.stats.totalSearches?.toLocaleString() || "0", key: "totalSearches" },
+            { title: "Active Profiles", value: analyticsData.stats.totalUsers?.toLocaleString() || "0", key: "activeProfiles" },
+          ].map((card, i) => (
+            <div key={i} className={styles.card}>
+              <h3>{card.title}</h3>
+              <p className={styles.metric}>{card.value}</p>
+            </div>
+          ))
+        )}
       </section>
 
       {/* CHARTS */}
       <section className={styles.chartsContainer}>
         <div className={styles.chartBox}>
-          <h2>Traffic Over Time</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={trafficData}>
-              <XAxis dataKey="name" stroke="#8884d8" />
-              <YAxis />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="visits"
-                stroke="#2563eb"
-                strokeWidth={3}
-                dot={{ r: 5 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <h2>User Registrations (Last 7 Days)</h2>
+          {loading ? (
+            <div className={styles.loadingChart}>Loading chart data...</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={analyticsData.trafficData}>
+                <XAxis dataKey="name" stroke="#8884d8" />
+                <YAxis />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="visits"
+                  stroke="#2563eb"
+                  strokeWidth={3}
+                  dot={{ r: 5 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         <div className={styles.chartBox}>
-          <h2>Category Engagement</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={engagementData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={90}
-                fill="#8884d8"
-                label
-              >
-                {engagementData.map((entry, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+          <h2>User Distribution</h2>
+          {loading ? (
+            <div className={styles.loadingChart}>Loading chart data...</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={analyticsData.engagementData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={90}
+                  fill="#8884d8"
+                  label
+                >
+                  {analyticsData.engagementData.map((entry, index) => (
+                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </section>
 
