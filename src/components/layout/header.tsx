@@ -19,6 +19,16 @@ export function Header() {
     checkAuth();
   }, [checkAuth]);
 
+  // Debug: Log user data to see if profileImage is being received
+  useEffect(() => {
+    console.log('🔍 Header: Current user data:', user);
+    if (user?.profileImage) {
+      console.log('✅ Header: Profile image URL:', user.profileImage);
+    } else {
+      console.log('❌ Header: No profile image found');
+    }
+  }, [user]);
+
   // Dynamic page title based on current route
   const getPageTitle = () => {
     const path = pathname.split("/").filter(Boolean);
@@ -93,19 +103,34 @@ export function Header() {
                     width: "36px",
                     height: "36px",
                     borderRadius: "50%",
-                    background:
-                      "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                    background: user?.profileImage 
+                      ? "transparent"
+                      : "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
                     border: "2px solid white",
                     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     flexShrink: 0,
+                    overflow: "hidden",
                   }}
                 >
-                  <User
-                    style={{ width: "16px", height: "16px", color: "white" }}
-                  />
+                  {user?.profileImage ? (
+                    <img
+                      src={user.profileImage}
+                      alt="Profile"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  ) : (
+                    <User
+                      style={{ width: "16px", height: "16px", color: "white" }}
+                    />
+                  )}
                 </div>
 
                 {/* USER INFO */}

@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/lib/hooks/use-auth';
 
 const AccountSettingsPage = () => {
+  const { checkAuth } = useAuth();
   const [accountPhoto, setAccountPhoto] = useState<string | null>(null);
   const [name, setName] = useState<string>('Yaasnick');
   const [email, setEmail] = useState<string>('yaasnick01@gmail.com');
@@ -15,15 +17,77 @@ const AccountSettingsPage = () => {
   const [deleteReasons, setDeleteReasons] = useState<string[]>([]);
   const [deletePassword, setDeletePassword] = useState<string>('');
 
-  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Fetch user profile data on component mount
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch('/api/profile', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const user = data.user;
+          
+          // Update state with real user data
+          setName(user.fullName || '');
+          setEmail(user.email || '');
+          setPhoneNumber(user.phone || '');
+          setAccountPhoto(user.profileImage || null);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      
+      // Show preview immediately
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target && typeof e.target.result === 'string') {
           setAccountPhoto(e.target.result);
         }
       };
-      reader.readAsDataURL(event.target.files[0]);
+      reader.readAsDataURL(file);
+
+      // Upload to Cloudinary
+      try {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const response = await fetch('/api/profile/upload-image', {
+          method: 'POST',
+          credentials: 'include',
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log('✅ Image uploaded successfully:', data.imageUrl);
+          // Update the preview with the Cloudinary URL for consistency
+          setAccountPhoto(data.imageUrl);
+          
+          // Small delay to ensure database is updated, then refresh auth state
+          setTimeout(async () => {
+            console.log('🔄 Settings: Refreshing auth state after image upload...');
+            await checkAuth();
+            console.log('✅ Settings: Auth state refreshed');
+          }, 500);
+        } else {
+          console.error('❌ Upload failed:', data.error);
+          alert('Failed to upload image: ' + data.error);
+        }
+      } catch (error) {
+        console.error('❌ Upload error:', error);
+        alert('Failed to upload image. Please try again.');
+      }
     }
   };
 
@@ -57,6 +121,35 @@ const AccountSettingsPage = () => {
 
   const handleChangePhoneNumberClick = () => {
     console.log('Change Phone Number clicked!');
+  };
+
+  const handleRemovePhoto = async () => {
+    try {
+      const response = await fetch('/api/profile/delete-image', {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('✅ Profile image removed successfully');
+        setAccountPhoto(null);
+        
+        // Refresh auth state to update header and other components
+        setTimeout(async () => {
+          console.log('🔄 Settings: Refreshing auth state after image removal...');
+          await checkAuth();
+          console.log('✅ Settings: Auth state refreshed');
+        }, 500);
+      } else {
+        console.error('❌ Remove failed:', data.error);
+        alert('Failed to remove image: ' + data.error);
+      }
+    } catch (error) {
+      console.error('❌ Remove error:', error);
+      alert('Failed to remove image. Please try again.');
+    }
   };
 
   const handleLogoutClick = () => {
@@ -212,7 +305,7 @@ const AccountSettingsPage = () => {
             width: '80px',
             height: '80px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #ffffff 0%, #e6f2ff 100%)',
+            background: accountPhoto ? 'transparent' : 'linear-gradient(135deg, #ffffff 0%, #e6f2ff 100%)',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -221,9 +314,14 @@ const AccountSettingsPage = () => {
             fontWeight: 'bold',
             marginRight: '25px',
             boxShadow: '0 4px 15px rgba(255, 255, 255, 0.3)',
-            border: '3px solid rgba(255, 255, 255, 0.3)'
+            border: '3px solid rgba(255, 255, 255, 0.3)',
+            overflow: 'hidden'
           }}>
-            Y
+            {accountPhoto ? (
+              <img src={accountPhoto} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              name.charAt(0).toUpperCase() || 'U'
+            )}
           </div>
           <div>
             <div style={{
@@ -231,12 +329,12 @@ const AccountSettingsPage = () => {
               fontWeight: '700',
               color: '#ffffff',
               marginBottom: '5px'
-            }}>Yaasnick</div>
+            }}>{name || 'User'}</div>
             <div style={{
               color: 'rgba(255, 255, 255, 0.8)',
               fontSize: '1em',
               letterSpacing: '0.5px'
-            }}>yaasnick01@gmail.com</div>
+            }}>{email || 'No email'}</div>
           </div>
         </div>
 
@@ -346,22 +444,44 @@ const AccountSettingsPage = () => {
                 style={{ display: 'none' }}
                 id="account-photo-upload"
               />
-              <label htmlFor="account-photo-upload" style={{
-                padding: '15px 30px',
-                fontSize: '1em',
-                background: 'rgba(255, 255, 255, 0.2)',
-                border: '1px solid rgba(255, 255, 255, 0.4)',
-                borderRadius: '10px',
-                cursor: 'pointer',
-                color: 'white',
-                fontWeight: '600',
-                boxShadow: '0 4px 15px rgba(255, 255, 255, 0.1)',
-                transition: 'all 0.3s ease',
-                display: 'inline-block',
-                backdropFilter: 'blur(10px)'
-              }}>
-                + Upload Photo
-              </label>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <label htmlFor="account-photo-upload" style={{
+                  padding: '15px 30px',
+                  fontSize: '1em',
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  border: '1px solid rgba(255, 255, 255, 0.4)',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  color: 'white',
+                  fontWeight: '600',
+                  boxShadow: '0 4px 15px rgba(255, 255, 255, 0.1)',
+                  transition: 'all 0.3s ease',
+                  display: 'inline-block',
+                  backdropFilter: 'blur(10px)'
+                }}>
+                  + Upload Photo
+                </label>
+                {accountPhoto && (
+                  <button
+                    onClick={handleRemovePhoto}
+                    style={{
+                      padding: '15px 30px',
+                      fontSize: '1em',
+                      background: 'rgba(255, 0, 0, 0.2)',
+                      border: '1px solid rgba(255, 0, 0, 0.4)',
+                      borderRadius: '10px',
+                      cursor: 'pointer',
+                      color: 'white',
+                      fontWeight: '600',
+                      boxShadow: '0 4px 15px rgba(255, 0, 0, 0.1)',
+                      transition: 'all 0.3s ease',
+                      backdropFilter: 'blur(10px)'
+                    }}
+                  >
+                    Remove Photo
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 

@@ -5,6 +5,7 @@ interface User {
   email: string
   fullName: string
   phone?: string | null
+  profileImage?: string | null
 }
 
 interface AuthState {
