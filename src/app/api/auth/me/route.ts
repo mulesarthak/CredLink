@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import { verify } from 'jsonwebtoken'
 import { prisma } from '@/lib/prisma'
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'your-secret-key'
+const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key'
 
 export async function GET() {
   try {
@@ -32,9 +32,10 @@ export async function GET() {
         email: true,
         fullName: true,
         phone: true,
+        profileImage: true,
         createdAt: true,
         updatedAt: true
-      }
+      } as any
     })
 
     if (!user) {
@@ -44,6 +45,7 @@ export async function GET() {
       )
     }
 
+    console.log('🔍 Auth API: Returning user data:', user);
     return NextResponse.json({ user })
   } catch (error) {
     console.error('Get current user error:', error)

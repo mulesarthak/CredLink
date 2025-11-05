@@ -50,13 +50,9 @@ export default function ProfilePage() {
     >
       {/* ✅ Logo at top-left */}
       <div className="absolute top-6 left-6">
-        <Image
-          src="/logo.jpg" // place your logo in /public folder
-          alt="BoostNow Logo"
-          width={140}
-          height={40}
-          className="object-contain"
-        />
+        <div className="w-[140px] h-[40px] bg-blue-600 rounded-lg flex items-center justify-center">
+          <span className="text-white font-bold text-lg">CredLink</span>
+        </div>
       </div>
 
       <div className="w-full max-w-md">
