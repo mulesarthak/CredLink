@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { verifyUserToken, verifyAdminToken } from '@/lib/jwt'
+//import { verifyToken, verifyToken } from '@/lib/jwt'
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
