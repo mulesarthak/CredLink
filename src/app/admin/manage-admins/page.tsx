@@ -253,7 +253,7 @@ export default function ManageAdminsPage() {
               <tr key={admin.id}>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 8, background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 8, background: 'linear-gradient(135deg, #1e3a8a, #2563eb, #1d4ed8)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
                       {admin.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
                     </div>
                     <div>

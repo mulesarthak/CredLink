@@ -53,39 +53,7 @@ export function Header() {
       {/* HEADER WRAPPER */}
       <header className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center h-16 relative">
-            {/* LEFT AREA */}
-            <div
-              className="flex-1"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                height: "100%",
-                paddingLeft: "32px",
-              }}
-            >
-              {/* ✅ Conditionally render title OR hamburger */}
-              {isLgUp ? (
-                <h1
-                  className="text-xl font-bold text-gray-800 tracking-wide"
-                  style={{ margin: 0, lineHeight: "1" }}
-                >
-                  {getPageTitle()}
-                </h1>
-              ) : (
-                // ✅ Hamburger icon for mobile (you can wire this to open sidebar if needed)
-                <button
-                  className="p-2 rounded-md hover:bg-gray-100 transition"
-                  onClick={() => {
-                    const sidebarToggle = document.querySelector("#sidebar-toggle");
-                    sidebarToggle?.dispatchEvent(new Event("click"));
-                  }}
-                >
-                  <Menu className="w-6 h-6 text-gray-700" />
-                </button>
-              )}
-            </div>
-
+          <div className="flex justify-end items-center h-16 relative">
             {/* RIGHT SIDE - Profile */}
             <div
               style={{

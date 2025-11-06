@@ -1,266 +1,226 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import styles from "./analytics.module.css";
+import React, { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
   LineChart,
   Line,
   XAxis,
   YAxis,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
+  CartesianGrid,
+  Legend,
   ResponsiveContainer,
 } from "recharts";
-import { useRouter } from 'next/navigation';
+import { Download, BarChart3, Users, Link2, MapPin, Clock } from "lucide-react";
+import styles from "./analytics.module.css";
 
-export default function AdminAnalyticsPage() {
-  // State for analytics data
-  const [analyticsData, setAnalyticsData] = useState({
-    trafficData: [],
-    engagementData: [],
-    stats: {
-      totalVisits: 0,
-      profileViews: 0,
-      totalSearches: 0,
-      newUsers: 0,
-      totalUsers: 0,
-      totalMessages: 0,
-      newMessagesThisWeek: 0
-    }
+export default function AnalyticsPage() {
+  const [overview, setOverview] = useState<any>(null);
+  const [categoryData, setCategoryData] = useState<any[]>([]);
+  const [engagementData, setEngagementData] = useState<any[]>([]);
+  const [activityData, setActivityData] = useState<any[]>([]);
+  const [filters, setFilters] = useState({
+    city: "all",
+    category: "all",
+    fromDate: "",
+    toDate: "",
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const COLORS = ["#2563eb", "#3b82f6", "#60a5fa", "#facc15"];
-
-  const [filters, setFilters] = useState({
-    category: "All",
-    location: "All",
-    dateRange: "Last 7 Days",
-    sortBy: "Views",
-  });
-
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Fetch analytics data from API
-  const fetchAnalyticsData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch('/api/admin/analytics');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch analytics data');
-      }
-      
-      const data = await response.json();
-      setAnalyticsData(data);
-    } catch (err) {
-      console.error('Analytics fetch error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch analytics data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // ===== Fetch Overview Metrics =====
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    // Fetch analytics data on component mount
-    fetchAnalyticsData();
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+    const fetchAll = async () => {
+      try {
+        setLoading(true);
+        const [overviewRes, catRes, engRes, actRes] = await Promise.all([
+          fetch("/api/admin/analytics/overview"),
+          fetch("/api/admin/analytics/category-distribution"),
+          fetch(`/api/admin/analytics/engagement-trend?city=${filters.city}&category=${filters.category}`),
+          fetch("/api/admin/analytics/activity-summary"),
+        ]);
 
-  const handleExport = async () => {
-    try {
-      const response = await fetch('/api/admin/analytics/export');
-      
-      if (!response.ok) {
-        throw new Error('Export failed');
+        const overviewJson = await overviewRes.json();
+        const categoryJson = await catRes.json();
+        const engagementJson = await engRes.json();
+        const activityJson = await actRes.json();
+
+        setOverview(overviewJson);
+        setCategoryData(categoryJson);
+        setEngagementData(engagementJson);
+        setActivityData(activityJson);
+      } catch (err) {
+        console.error("Error loading analytics:", err);
+      } finally {
+        setLoading(false);
       }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'analytics-export.csv';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Export error:', error);
-      alert('Failed to export analytics data');
-    }
+    };
+    fetchAll();
+  }, [filters]);
+
+  // ===== Export Handlers =====
+  const exportCSV = () => {
+    const csvContent = [
+      ["Date", "New Users", "Connections", "Top City", "Top Category"],
+      ...activityData.map((r) => [r.date, r.newUsers, r.connections, r.topCity, r.topCategory]),
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "analytics_report.csv";
+    a.click();
   };
+
+  const exportPDF = () => window.print();
+
+  const COLORS = ["#2563eb", "#3b82f6", "#93c5fd", "#1d4ed8", "#60a5fa"];
+
+  if (loading) return <div className="flex justify-center items-center min-h-screen text-lg">Loading analytics...</div>;
 
   return (
     <div className={styles.analyticsContainer}>
-      {/* HEADER */}
-      <header className={styles.header}>
+      {/* ===== HEADER ===== */}
+      <div className={styles.header}>
         <div>
           <h1 className={styles.title}>
-            Platform <span>Analytics Dashboard</span>
+            Platform <span>Analytics</span>
           </h1>
           <p className={styles.subtitle}>
-            View traffic, profile engagement, and behavior trends across the
-            platform.
+            Visualize user growth, connections, and engagement trends across categories and cities.
           </p>
         </div>
-        <button className={styles.ctaButton} onClick={handleExport}>Export Report</button>
-      </header>
+        <button className={styles.ctaButton} onClick={exportPDF}>
+          <Download size={18} className="inline mr-2" /> Export as PDF
+        </button>
+      </div>
 
-      {/* FILTERS */}
-      <section className={styles.filtersSection}>
-        <select
-          value={filters.category}
-          onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-        >
-          <option>All Categories</option>
-          <option>Developers</option>
-          <option>Designers</option>
-          <option>Consultants</option>
+      {/* ===== FILTERS ===== */}
+      <div className={styles.filtersSection}>
+        <select value={filters.city} onChange={(e) => setFilters({ ...filters, city: e.target.value })}>
+          <option value="all">All Cities</option>
+          <option value="Nagpur">Nagpur</option>
+          <option value="Pune">Pune</option>
+          <option value="Delhi">Delhi</option>
         </select>
 
-        <select
-          value={filters.location}
-          onChange={(e) => setFilters({ ...filters, location: e.target.value })}
-        >
-          <option>All Locations</option>
-          <option>Mumbai</option>
-          <option>Pune</option>
-          <option>Delhi</option>
+        <select value={filters.category} onChange={(e) => setFilters({ ...filters, category: e.target.value })}>
+          <option value="all">All Categories</option>
+          <option value="Doctor">Doctor</option>
+          <option value="Designer">Designer</option>
+          <option value="Developer">Developer</option>
+          <option value="Artist">Artist</option>
         </select>
 
-        <select
-          value={filters.dateRange}
-          onChange={(e) => setFilters({ ...filters, dateRange: e.target.value })}
-        >
-          <option>Last 7 Days</option>
-          <option>Last 30 Days</option>
-          <option>This Year</option>
-        </select>
+        <input
+          type="date"
+          value={filters.fromDate}
+          onChange={(e) => setFilters({ ...filters, fromDate: e.target.value })}
+        />
+        <input
+          type="date"
+          value={filters.toDate}
+          onChange={(e) => setFilters({ ...filters, toDate: e.target.value })}
+        />
 
-        <select
-          value={filters.sortBy}
-          onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
-        >
-          <option>Views</option>
-          <option>Clicks</option>
-          <option>Messages</option>
-          <option>Conversions</option>
-        </select>
-      </section>
+        <button className={styles.ctaButton} onClick={exportCSV}>
+          <Download size={18} className="inline mr-2" /> Export CSV
+        </button>
+      </div>
 
-      {/* OVERVIEW CARDS */}
-      <section className={styles.statsGrid}>
-        {loading ? (
-          <div className={styles.loadingMessage}>Loading analytics data...</div>
-        ) : error ? (
-          <div className={styles.errorMessage}>Error: {error}</div>
-        ) : (
-          [
-            { title: "Total Visits", value: analyticsData.stats.totalVisits?.toLocaleString() || "0", key: "totalVisits" },
-            { title: "Profile Views", value: analyticsData.stats.profileViews?.toLocaleString() || "0", key: "profileViews" },
-            { title: "Total Users", value: analyticsData.stats.totalUsers?.toLocaleString() || "0", key: "totalUsers" },
-            { title: "New Users (7d)", value: analyticsData.stats.newUsers?.toLocaleString() || "0", key: "newUsers" },
-            { title: "Total Messages", value: analyticsData.stats.totalMessages?.toLocaleString() || "0", key: "totalMessages" },
-            { title: "New Messages (7d)", value: analyticsData.stats.newMessagesThisWeek?.toLocaleString() || "0", key: "newMessagesThisWeek" },
-            { title: "Total Searches", value: analyticsData.stats.totalSearches?.toLocaleString() || "0", key: "totalSearches" },
-            { title: "Active Profiles", value: analyticsData.stats.totalUsers?.toLocaleString() || "0", key: "activeProfiles" },
-          ].map((card, i) => (
-            <div key={i} className={styles.card}>
-              <h3>{card.title}</h3>
-              <p className={styles.metric}>{card.value}</p>
-            </div>
-          ))
-        )}
-      </section>
+      {/* ===== METRIC CARDS ===== */}
+      <div className={styles.statsGrid}>
+        <div className={styles.card}>
+          <Users className="text-blue-600" size={28} />
+          <h3>Total Users</h3>
+          <p className={styles.metric}>{overview?.totalUsers || 0}</p>
+        </div>
 
-      {/* CHARTS */}
-      <section className={styles.chartsContainer}>
+        <div className={styles.card}>
+          <Link2 className="text-blue-600" size={28} />
+          <h3>Total Connections</h3>
+          <p className={styles.metric}>{overview?.totalConnections || 0}</p>
+        </div>
+
+        <div className={styles.card}>
+          <MapPin className="text-blue-600" size={28} />
+          <h3>Active Cities</h3>
+          <p className={styles.metric}>{overview?.activeCities || 0}</p>
+        </div>
+
+        <div className={styles.card}>
+          <Clock className="text-blue-600" size={28} />
+          <h3>New Users (This Month)</h3>
+          <p className={styles.metric}>{overview?.newUsersThisMonth || 0}</p>
+        </div>
+      </div>
+
+      {/* ===== GRAPHS ===== */}
+      <div className={styles.chartsContainer}>
         <div className={styles.chartBox}>
-          <h2>User Registrations (Last 7 Days)</h2>
-          {loading ? (
-            <div className={styles.loadingChart}>Loading chart data...</div>
-          ) : (
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={analyticsData.trafficData}>
-                <XAxis dataKey="name" stroke="#8884d8" />
-                <YAxis />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="visits"
-                  stroke="#2563eb"
-                  strokeWidth={3}
-                  dot={{ r: 5 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          )}
+          <h2>Profile Distribution by Category</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie data={categoryData} dataKey="count" nameKey="category" outerRadius={100} label>
+                {categoryData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
 
         <div className={styles.chartBox}>
-          <h2>User Distribution</h2>
-          {loading ? (
-            <div className={styles.loadingChart}>Loading chart data...</div>
-          ) : (
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={analyticsData.engagementData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={90}
-                  fill="#8884d8"
-                  label
-                >
-                  {analyticsData.engagementData.map((entry, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          )}
+          <h2>Engagement Trend (Last 30 Days)</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={engagementData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="views" stroke="#2563eb" name="Profile Views" />
+              <Line type="monotone" dataKey="shares" stroke="#22c55e" name="Connections" />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
-      </section>
+      </div>
 
-      {/* USER BEHAVIOR INSIGHTS */}
-      <section className={styles.insightSection}>
-        <h2>User Behavior Insights</h2>
-        <ul>
-          <li>
-            <strong>Most Viewed Profiles:</strong> Top 10 profiles with the
-            highest visibility.
-          </li>
-          <li>
-            <strong>Most Searched Keywords:</strong> e.g. “Web Developer
-            Mumbai”, “UI Designer Pune”.
-          </li>
-          <li>
-            <strong>Most Engaged Categories:</strong> Developers, Designers, and
-            Consultants.
-          </li>
-          <li>
-            <strong>Conversion Funnel:</strong> Search → View Profile → Message
-            Sent (38% conversion rate).
-          </li>
-        </ul>
-      </section>
+      {/* ===== ACTIVITY TABLE ===== */}
+      <div className={styles.insightSection}>
+        <h2>Activity Summary</h2>
+        <table className="w-full border-collapse text-left">
+          <thead>
+            <tr className="border-b text-gray-600">
+              <th className="py-2">Date</th>
+              <th>New Users</th>
+              <th>Connections</th>
+              <th>Top City</th>
+              <th>Top Category</th>
+            </tr>
+          </thead>
+          <tbody>
+            {activityData.map((row, i) => (
+              <tr key={i} className="border-b hover:bg-gray-50">
+                <td className="py-2">{row.date}</td>
+                <td>{row.newUsers}</td>
+                <td>{row.connections}</td>
+                <td>{row.topCity}</td>
+                <td>{row.topCategory}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
