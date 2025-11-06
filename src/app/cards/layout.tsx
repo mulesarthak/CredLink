@@ -1,9 +1,10 @@
-"use client";
+
+ "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
-//import { Header } from "@/components/layout/header";
+import { Header } from "@/components/layout/header";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/hooks/use-auth";
 
@@ -13,40 +14,64 @@ export default function CardsLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { checkAuth, isLoading } = useAuth();
-  const [expanded, setExpanded] = useState(true);
+  const { isAuthenticated, checkAuth, isLoading } = useAuth();
+  const [isLgUp, setIsLgUp] = useState(false);
 
   useEffect(() => {
-    // Check auth when cards section loads
-    let mounted = true;
-    if (mounted) {
-      checkAuth();
-    }
+    // ✅ Check auth when cards layout mounts
+    checkAuth();
+
+    // ✅ Detect screen size for sidebar handling
+    const mql = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => setIsLgUp(mql.matches);
+    onChange();
+
+    // Add/remove listener (for compatibility)
+    // @ts-ignore
+    (mql.addEventListener ? mql.addEventListener("change", onChange) : mql.addListener(onChange));
     return () => {
-      mounted = false;
+      // @ts-ignore
+      (mql.removeEventListener ? mql.removeEventListener("change", onChange) : mql.removeListener(onChange));
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="h-screen overflow-hidden" style={{ backgroundColor: "#f8fafc" }}>
       {/* Sidebar */}
-      <Sidebar expanded={expanded} setExpanded={setExpanded} />
+      <Sidebar />
 
       {/* Main Content */}
-      <motion.div
-        animate={{ marginLeft: expanded ? 270 : 90 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="flex-1 flex flex-col"
+      <div
+        className="h-full flex flex-col"
+        style={{
+          marginLeft: isLgUp ? "18rem" : "0", // matches sidebar width
+          background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+          transition: "margin-left 0.3s ease-in-out",
+        }}
       >
-        {/* Header */}
-     { /*  <div className="sticky top-0 z-30 bg-white shadow-sm">
+        {/* Header (same behavior for all screens) */}
+        <div className="sticky top-0 z-30 bg-white shadow-sm">
           <Header />
-        </div>*/}
+        </div>
 
         {/* Main Page Area */}
-        <main className="flex-1 overflow-y-auto">{children}</main>
-      </motion.div>
+        <main
+          className="flex-1 overflow-y-auto"
+          style={{
+            padding: "24px",
+            background: "transparent",
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            {children}
+          </motion.div>
+        </main>
+      </div>
     </div>
   );
 }
