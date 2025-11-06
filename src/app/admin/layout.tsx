@@ -14,6 +14,7 @@ import {
   ChevronRight,
   LogOut,
   Home,
+  Layers,
 } from "lucide-react";
 import styles from "./admin.module.css";
 
@@ -27,6 +28,7 @@ const allNavigation = [
   { name: "Dashboard", href: "/admin", icon: Home, permission: null },
   { name: "Users", href: "/admin/users", icon: Users, permission: "MANAGE_USERS" },
   { name: "Manage Admins", href: "/admin/manage-admins", icon: Shield, permission: "MANAGE_ADMINS" },
+  { name: "Manage Category", href: "/admin/categories", icon: Layers, permission: "MANAGE_CATEGORY" },
   { name: "Profiles", href: "/admin/profiles", icon: Users, permission: "MANAGE_PROFILES" },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3, permission: "VIEW_ANALYTICS" },
   { name: "Settings", href: "/admin/settings", icon: Settings, permission: "MANAGE_SETTINGS" },
@@ -36,7 +38,7 @@ const allNavigation = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [admin, setAdmin] = useState<AdminData | null>(null);
-  const [navigation, setNavigation] = useState<typeof allNavigation>([]);
+  const [navigation, setNavigation] = useState<typeof allNavigation>(allNavigation);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -62,9 +64,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           return data.admin.permissions.includes(item.permission);
         });
         setNavigation(filteredNav);
+      } else {
+        setNavigation(allNavigation);
       }
     } catch (error) {
       console.error("Auth check error:", error);
+      setNavigation(allNavigation);
     }
   };
 

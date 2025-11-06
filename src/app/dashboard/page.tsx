@@ -243,7 +243,7 @@ const Dashboard = () => {
               "0 20px 40px rgba(59, 130, 246, 0.4), 0 0 30px rgba(59, 130, 246, 0.3)",
           }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => router.push("/dashboard/create")}
+          onClick={() => router.push("/dashboard/createcard")}
           className="relative flex items-center justify-center gap-3 px-12 py-5 text-lg font-medium text-white rounded-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group min-w-[280px]"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>

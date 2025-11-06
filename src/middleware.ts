@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// NOTE: Middleware runs on the Edge runtime. Avoid Node-only libraries here (like jsonwebtoken).
-// We'll decode JWT payloads locally (without verification) just to forward IDs via headers.
-// API route handlers must still VERIFY tokens server-side for real auth decisions.
+// Decode JWT payload (without verification)
 function decodeJwtPayload(token: string): any | null {
   try {
     const base64Url = token.split('.')[1]
@@ -21,7 +19,6 @@ export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
   const isApiRequest = path.startsWith('/api')
 
-  // Public paths that don't require authentication
   const publicPaths = [
     '/',
     '/auth/login',
@@ -31,6 +28,7 @@ export function middleware(request: NextRequest) {
     '/how-it-works',
     '/pricing',
     '/contact',
+    '/support',
     '/dashboard/edit',
     '/search',
     '/faq',
@@ -49,8 +47,7 @@ export function middleware(request: NextRequest) {
   const isPricingPath = path === '/pricing' || path.startsWith('/pricing/')
   const isContactPath = path === '/contact' || path.startsWith('/contact/')
   const isDashboardContactPath = path === '/dashboardcontact' || path.startsWith('/dashboardcontact/')
-  
-  // Check if the current path is in the public paths array or matches public path patterns
+
   const isCombinedPublicPath = publicPaths.some(publicPath => {
     if (publicPath.endsWith('*')) {
       return path.startsWith(publicPath.slice(0, -1))
@@ -58,7 +55,6 @@ export function middleware(request: NextRequest) {
     return publicPath === path
   }) || isAuthPath || isAdminPath || isDashboardPath || isPricingPath || isContactPath || isDashboardContactPath
 
-  // Get tokens from cookies
   const userToken = request.cookies.get('user_token')?.value
   const adminToken = request.cookies.get('admin_token')?.value
   const authHeader = request.headers.get('authorization') || request.headers.get('Authorization')
@@ -66,13 +62,11 @@ export function middleware(request: NextRequest) {
     ? authHeader.substring('Bearer '.length).trim()
     : undefined
   
-  // Check if user is authenticated (check for custom user_token or admin_token)
   const isAuthenticated = request.cookies.has('user_token') || 
                           request.cookies.has('admin_token') ||
                           request.cookies.has('next-auth.session-token') || 
                           request.cookies.has('__Secure-next-auth.session-token')
 
-  // Extract user ID from JWT and add to request headers
   let userId: string | null = null
   let adminId: string | null = null
   
@@ -90,7 +84,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // If Authorization: Bearer <token> is provided, prefer it for user ID extraction
   if (!userId && bearerToken) {
     const decoded = decodeJwtPayload(bearerToken)
     if (decoded) {
@@ -98,14 +91,17 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // For API requests, do not redirect; just pass through with enriched headers.
+  // Redirect logic
   if (!isApiRequest) {
     if (!isAuthenticated && !isCombinedPublicPath) {
       return NextResponse.redirect(new URL('/auth/login', request.url))
     }
+    if (isAuthenticated && path.startsWith('/auth')) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
   }
 
-  // Clone the request headers and add user/admin ID
+  // Add user/admin IDs to headers
   const requestHeaders = new Headers(request.headers)
   if (userId !== null) {
     requestHeaders.set('x-user-id', userId)
@@ -114,7 +110,6 @@ export function middleware(request: NextRequest) {
     requestHeaders.set('x-admin-id', adminId)
   }
 
-  // Return response with modified headers
   return NextResponse.next({
     request: {
       headers: requestHeaders,
@@ -122,8 +117,6 @@ export function middleware(request: NextRequest) {
   })
 }
 
-// Configure the paths that should be protected
 export const config = {
-  // Include API so we can enrich requests (e.g., forward x-user-id) while still skipping redirects for API.
   matcher: ['/api/:path*', '/((?!_next/static|_next/image|favicon.ico).*?)'],
 }
