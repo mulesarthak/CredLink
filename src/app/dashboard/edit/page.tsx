@@ -22,7 +22,8 @@ interface DigitalCardProps {
   phone?: string;
   linkedin?: string;
   website?: string;
-  themeColor: string; 
+  themeColor1: string; // Changed to themeColor1
+  themeColor2: string; // New prop for second color
   fontFamily: string; 
 }
 
@@ -43,7 +44,8 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   phone = "",
   linkedin = "",
   website = "",
-  themeColor, 
+  themeColor1, 
+  themeColor2, 
   fontFamily, 
 }) => {
   const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
@@ -79,7 +81,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   const renderItem = (title: string, subtitle?: string) => (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 28, height: 28, borderRadius: 8, background: themeColor, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: themeColor1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
         <div>
           <div style={{ fontWeight: 700, color: '#111827' }}>{title}</div>
           {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
@@ -127,11 +129,11 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)",
       fontFamily: fontFamily, 
       position: "relative",
-      background: themeColor,
+      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
     }}>
       {/* Header */}
       <div style={{
-        background: themeColor, 
+        background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, 
         padding: "22px",
         color: "white",
         position: "relative",
@@ -212,7 +214,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       </div>
 
       {/* Body */}
-      <div style={{ padding: "20px 20px 16px", background: themeColor, color: "#FFFFFF", textAlign: "center" }}>
+      <div style={{ padding: "20px 20px 16px", background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, color: "#FFFFFF", textAlign: "center" }}>
         <p style={{ fontSize: "13px", lineHeight: 1.6, margin: 0, color: "#FFFFFF", opacity: 1 }}>
           {about}
         </p>
@@ -253,7 +255,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
             onClick={(e) => e.stopPropagation()}
             style={{ width: isMobile ? '100%' : 520, height: isMobile ? '100%' : 'auto', maxHeight: isMobile ? '100%' : '80vh', background: '#fff', borderRadius: isMobile ? 0 : 16, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }}
           >
-            <div style={{ background: themeColor, color: '#fff', padding: isMobile ? '16px' : '18px', textAlign: 'center' }}>
+            <div style={{ background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, color: '#fff', padding: isMobile ? '16px' : '18px', textAlign: 'center' }}>
               <div style={{ fontSize: 20, fontWeight: 800 }}>{activePanel}</div>
             </div>
             <button onClick={() => setActivePanel(null)} aria-label="Close" style={{ position: 'absolute', top: 10, right: 10, width: 36, height: 36, borderRadius: 9999, border: 'none', background: 'rgba(0,0,0,0.6)', color: '#fff', cursor: 'pointer', zIndex: 10 }}>×</button>
@@ -281,7 +283,8 @@ interface ExtraField {
 
 const EditPage = () => {
   const [activeTab, setActiveTab] = useState('Display');
-  const [selectedColor, setSelectedColor] = useState('#145dfd');
+  const [selectedColor1, setSelectedColor1] = useState('#145dfd');
+  const [selectedColor2, setSelectedColor2] = useState('#00c0fd'); // New state for second color
   const [firstName, setFirstName] = useState('Yaasnick');
   const [email, setEmail] = useState('yaasnick01@gmail.com');
   const [phone, setPhone] = useState('+91 75584 24907');
@@ -345,78 +348,157 @@ const EditPage = () => {
     return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
   };
 
-  const initialRgb = hexToRgb(selectedColor);
-  const [rValue, setRValue] = useState(initialRgb.r);
-  const [gValue, setGValue] = useState(initialRgb.g);
-  const [bValue, setBValue] = useState(initialRgb.b);
-  const [hexValue, setHexValue] = useState(selectedColor);
+  const initialRgb1 = hexToRgb(selectedColor1);
+  const [rValue1, setRValue1] = useState(initialRgb1.r);
+  const [gValue1, setGValue1] = useState(initialRgb1.g);
+  const [bValue1, setBValue1] = useState(initialRgb1.b);
+  const [hexValue1, setHexValue1] = useState(selectedColor1);
+
+  const initialRgb2 = hexToRgb(selectedColor2); // New state for second color
+  const [rValue2, setRValue2] = useState(initialRgb2.r);
+  const [gValue2, setGValue2] = useState(initialRgb2.g);
+  const [bValue2, setBValue2] = useState(initialRgb2.b);
+  const [hexValue2, setHexValue2] = useState(selectedColor2);
 
   React.useEffect(() => {
-    const newRgb = hexToRgb(selectedColor);
-    setRValue(newRgb.r);
-    setGValue(newRgb.g);
-    setBValue(newRgb.b);
-    setHexValue(selectedColor);
-  }, [selectedColor]);
+    const newRgb1 = hexToRgb(selectedColor1);
+    if (newRgb1) {
+      setRValue1(newRgb1.r);
+      setGValue1(newRgb1.g);
+      setBValue1(newRgb1.b);
+      setHexValue1(selectedColor1);
+    }
+  }, [selectedColor1]);
 
-  const handleRChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  React.useEffect(() => { // New useEffect for second color
+    const newRgb2 = hexToRgb(selectedColor2);
+    if (newRgb2) {
+      setRValue2(newRgb2.r);
+      setGValue2(newRgb2.g);
+      setBValue2(newRgb2.b);
+      setHexValue2(selectedColor2);
+    }
+  }, [selectedColor2]);
+
+  const handleRChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const r = Number(e.target.value);
     if (!isNaN(r) && r >= 0 && r <= 255) {
-      setRValue(r);
-      const newHex = rgbToHex(r, gValue, bValue);
-      setHexValue(newHex);
-      setSelectedColor(newHex);
+      setRValue1(r);
+      const newHex = rgbToHex(r, gValue1, bValue1);
+      setHexValue1(newHex);
+      setSelectedColor1(newHex);
     }
   };
 
-  const handleGChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const g = Number(e.target.value);
     if (!isNaN(g) && g >= 0 && g <= 255) {
-      setGValue(g);
-      const newHex = rgbToHex(rValue, g, bValue);
-      setHexValue(newHex);
-      setSelectedColor(newHex);
+      setGValue1(g);
+      const newHex = rgbToHex(rValue1, g, bValue1);
+      setHexValue1(newHex);
+      setSelectedColor1(newHex);
     }
   };
 
-  const handleBChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const b = Number(e.target.value);
     if (!isNaN(b) && b >= 0 && b <= 255) {
-      setBValue(b);
-      const newHex = rgbToHex(rValue, gValue, b);
-      setHexValue(newHex);
-      setSelectedColor(newHex);
+      setBValue1(b);
+      const newHex = rgbToHex(rValue1, gValue1, b);
+      setHexValue1(newHex);
+      setSelectedColor1(newHex);
     }
   };
 
-  const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHexChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     let hex = e.target.value.toUpperCase();
     if (!hex.startsWith('#')) {
         hex = '#' + hex;
     }
     
     if (/^#([0-9A-F]{3}){1,2}$/i.test(hex)) {
-        setHexValue(hex);
+        setHexValue1(hex);
         const newRgb = hexToRgb(hex);
         if(newRgb) {
-            setRValue(newRgb.r);
-            setGValue(newRgb.g);
-            setBValue(newRgb.b);
-            setSelectedColor(hex);
+            setRValue1(newRgb.r);
+            setGValue1(newRgb.g);
+            setBValue1(newRgb.b);
+            setSelectedColor1(hex);
         }
     } else {
-         setHexValue(hex); // Allow user to type
+         setHexValue1(hex); // Allow user to type
     }
   };
 
-  const handleColorInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleColorInputChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const hex = e.target.value.toUpperCase();
-    setHexValue(hex);
+    setHexValue1(hex);
     const newRgb = hexToRgb(hex);
-    setRValue(newRgb.r);
-    setGValue(newRgb.g);
-    setBValue(newRgb.b);
-    setSelectedColor(hex);
+    setRValue1(newRgb.r);
+    setGValue1(newRgb.g);
+    setBValue1(newRgb.b);
+    setSelectedColor1(hex);
+  };
+
+  // New handlers for second color
+  const handleRChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const r = Number(e.target.value);
+    if (!isNaN(r) && r >= 0 && r <= 255) {
+      setRValue2(r);
+      const newHex = rgbToHex(r, gValue2, bValue2);
+      setHexValue2(newHex);
+      setSelectedColor2(newHex);
+    }
+  };
+
+  const handleGChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const g = Number(e.target.value);
+    if (!isNaN(g) && g >= 0 && g <= 255) {
+      setGValue2(g);
+      const newHex = rgbToHex(rValue2, g, bValue2);
+      setHexValue2(newHex);
+      setSelectedColor2(newHex);
+    }
+  };
+
+  const handleBChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const b = Number(e.target.value);
+    if (!isNaN(b) && b >= 0 && b <= 255) {
+      setBValue2(b);
+      const newHex = rgbToHex(rValue2, gValue2, b);
+      setHexValue2(newHex);
+      setSelectedColor2(newHex);
+    }
+  };
+
+  const handleHexChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let hex = e.target.value.toUpperCase();
+    if (!hex.startsWith('#')) {
+        hex = '#' + hex;
+    }
+    
+    if (/^#([0-9A-F]{3}){1,2}$/i.test(hex)) {
+        setHexValue2(hex);
+        const newRgb = hexToRgb(hex);
+        if(newRgb) {
+            setRValue2(newRgb.r);
+            setGValue2(newRgb.g);
+            setBValue2(newRgb.b);
+            setSelectedColor2(hex);
+        }
+    } else {
+         setHexValue2(hex); // Allow user to type
+    }
+  };
+
+  const handleColorInputChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const hex = e.target.value.toUpperCase();
+    setHexValue2(hex);
+    const newRgb = hexToRgb(hex);
+    setRValue2(newRgb.r);
+    setGValue2(newRgb.g);
+    setBValue2(newRgb.b);
+    setSelectedColor2(hex);
   };
 
   // --- NEW HANDLER FUNCTIONS for "Add Field" ---
@@ -459,7 +541,7 @@ const EditPage = () => {
                     key={design}
                     onClick={() => setSelectedDesign(design)}
                     style={{
-                      border: design === selectedDesign ? `2px solid ${selectedColor}` : '1px solid #ddd',
+                      border: design === selectedDesign ? `2px solid ${selectedColor1}` : '1px solid #ddd',
                       borderRadius: '10px',
                       padding: '10px',
                       width: 'calc(50% - 5px)',
@@ -490,7 +572,7 @@ const EditPage = () => {
                       width: '100%',
                       maxWidth: '80px',
                       height: '50px',
-                      backgroundColor: index === 0 ? selectedColor : '#dcdcdc',
+                      backgroundColor: index === 0 ? `linear-gradient(135deg, ${selectedColor1} 0%, ${selectedColor2} 100%)` : '#dcdcdc',
                       borderRadius: '5px',
                       marginBottom: '10px',
                       margin: '0 auto 10px auto',
@@ -531,7 +613,7 @@ const EditPage = () => {
             
             <div style={{ marginBottom: '30px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#333' }}>
-                Cover Image <span style={{ backgroundColor: '#145dfd', color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '3px 6px', borderRadius: '5px', marginLeft: '8px' }}>PRO</span>
+                Cover Image <span style={{ backgroundColor: selectedColor1, color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '3px 6px', borderRadius: '5px', marginLeft: '8px' }}>PRO</span>
               </h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '15px' }}>
                 <input
@@ -572,7 +654,7 @@ const EditPage = () => {
             
             <div style={{ marginBottom: '30px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#333' }}>
-                Profile Photo <span style={{ backgroundColor: '#145dfd', color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '3px 6px', borderRadius: '5px', marginLeft: '8px' }}>PRO</span>
+                Profile Photo <span style={{ backgroundColor: selectedColor1, color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '3px 6px', borderRadius: '5px', marginLeft: '8px' }}>PRO</span>
               </h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '15px' }}>
                 <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#eee', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
@@ -621,96 +703,193 @@ const EditPage = () => {
 
             <div style={{ marginBottom: '40px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#333' }}>
-                Color <span style={{ backgroundColor: '#145dfd', color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '3px 6px', borderRadius: '5px', marginLeft: '8px' }}>PRO</span>
+                Color <span style={{ backgroundColor: selectedColor1, color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '3px 6px', borderRadius: '5px', marginLeft: '8px' }}>PRO</span>
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <input
-                    type="color"
-                    value={hexValue}
-                    onChange={handleColorInputChange}
-                    style={{ width: '50px', height: '30px', border: 'none', padding: '0' }}
-                  />
-                  <span style={{ fontSize: '14px', color: '#555' }}>Select Color</span>
+                {/* Color 1 */}
+                <div style={{ marginBottom: '15px'}}>
+                  <h4 style={{fontSize: '16px', marginBottom: '10px', color: '#333'}}>Color 1</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                    <input
+                      type="color"
+                      value={hexValue1}
+                      onChange={handleColorInputChange1}
+                      style={{ width: '50px', height: '30px', border: 'none', padding: '0' }}
+                    />
+                    <span style={{ fontSize: '14px', color: '#555' }}>Select Color 1</span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>R:</label>
+                      <input
+                        type="number"
+                        value={rValue1}
+                        onChange={handleRChange1}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>G:</label>
+                      <input
+                        type="number"
+                        value={gValue1}
+                        onChange={handleGChange1}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>B:</label>
+                      <input
+                        type="number"
+                        value={bValue1}
+                        onChange={handleBChange1}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ fontSize: '14px', color: '#555' }}>Hex:</label>
+                    <input
+                      type="text"
+                      value={hexValue1}
+                      onChange={handleHexChange1}
+                      maxLength={7}
+                      style={{
+                        flex: '1',
+                        padding: '8px',
+                        fontSize: '14px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        boxSizing: 'border-box',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
-                    <label style={{ fontSize: '14px', color: '#555' }}>R:</label>
+                {/* Color 2 */}
+                <div style={{ marginBottom: '15px'}}>
+                  <h4 style={{fontSize: '16px', marginBottom: '10px', color: '#333'}}>Color 2</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                     <input
-                      type="number"
-                      value={rValue}
-                      onChange={handleRChange}
-                      min="0"
-                      max="255"
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '14px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        boxSizing: 'border-box',
-                        outline: 'none',
-                      }}
+                      type="color"
+                      value={hexValue2}
+                      onChange={handleColorInputChange2}
+                      style={{ width: '50px', height: '30px', border: 'none', padding: '0' }}
                     />
+                    <span style={{ fontSize: '14px', color: '#555' }}>Select Color 2</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
-                    <label style={{ fontSize: '14px', color: '#555' }}>G:</label>
-                    <input
-                      type="number"
-                      value={gValue}
-                      onChange={handleGChange}
-                      min="0"
-                      max="255"
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '14px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        boxSizing: 'border-box',
-                        outline: 'none',
-                      }}
-                    />
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
-                    <label style={{ fontSize: '14px', color: '#555' }}>B:</label>
-                    <input
-                      type="number"
-                      value={bValue}
-                      onChange={handleBChange}
-                      min="0"
-                      max="255"
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '14px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        boxSizing: 'border-box',
-                        outline: 'none',
-                      }}
-                    />
-                  </div>
-                </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <label style={{ fontSize: '14px', color: '#555' }}>Hex:</label>
-                  <input
-                    type="text"
-                    value={hexValue}
-                    onChange={handleHexChange}
-                    maxLength={7}
-                    style={{
-                      flex: '1',
-                      padding: '8px',
-                      fontSize: '14px',
-                      border: '1px solid #ddd',
-                      borderRadius: '8px',
-                      boxSizing: 'border-box',
-                      outline: 'none',
-                    }}
-                  />
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>R:</label>
+                      <input
+                        type="number"
+                        value={rValue2}
+                        onChange={handleRChange2}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>G:</label>
+                      <input
+                        type="number"
+                        value={gValue2}
+                        onChange={handleGChange2}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>B:</label>
+                      <input
+                        type="number"
+                        value={bValue2}
+                        onChange={handleBChange2}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ fontSize: '14px', color: '#555' }}>Hex:</label>
+                    <input
+                      type="text"
+                      value={hexValue2}
+                      onChange={handleHexChange2}
+                      maxLength={7}
+                      style={{
+                        flex: '1',
+                        padding: '8px',
+                        fontSize: '14px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        boxSizing: 'border-box',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -753,7 +932,7 @@ const EditPage = () => {
                     top: '50%',
                     transform: 'translateY(-50%)',
                     pointerEvents: 'none',
-                    color: selectedColor
+                    color: selectedColor1
                   }}
                 >
                   <polyline points="6 9 12 15 18 9"></polyline>
@@ -772,15 +951,8 @@ const EditPage = () => {
               { label: 'Middle Name', value: middleName, setter: setMiddleName },
               { label: 'Last Name', value: lastName, setter: setLastName },
               { label: 'Suffix', value: suffix, setter: setSuffix },
-              { label: 'Accreditations', value: accreditations, setter: setAccreditations },
-              { label: 'Preferred Name', value: preferredName, setter: setPreferredName },
-              { label: 'Maiden Name', value: maidenName, setter: setMaidenName },
-              { label: 'Pronouns', value: pronouns, setter: setPronouns },
-              { label: 'Affiliation', value: affiliation, setter: setAffiliation },
               { label: 'Title', value: title, setter: setTitle },
-              { label: 'Department', value: department, setter: setDepartment },
               { label: 'Company', value: company, setter: setCompany },
-              { label: 'Headline', value: headline, setter: setHeadline },
               { label: 'Location', value: cardLocation, setter: setCardLocation }
             ].map(field => (
               <div key={field.label} style={{ marginBottom: '15px' }}>
@@ -879,7 +1051,7 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     Email
                   </span>
                   <span style={{ cursor: 'pointer', color: '#888' }}>
@@ -927,7 +1099,7 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                     Phone
                   </span>
                   <span style={{ cursor: 'pointer', color: '#888' }}>
@@ -997,7 +1169,7 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     Services
                   </span>
                   <span style={{ cursor: 'pointer', color: '#888' }}>
@@ -1029,7 +1201,7 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                     Portfolio
                   </span>
                   <span style={{ cursor: 'pointer', color: '#888' }}>
@@ -1061,7 +1233,7 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     Skills
                   </span>
                   <span style={{ cursor: 'pointer', color: '#888' }}>
@@ -1093,7 +1265,7 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
                     Experience
                   </span>
                   <span style={{ cursor: 'pointer', color: '#888' }}>
@@ -1125,7 +1297,7 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                     Review
                   </span>
                   <span style={{ cursor: 'pointer', color: '#888' }}>
@@ -1157,7 +1329,7 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill={selectedColor}><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill={selectedColor1}><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
                     LinkedIn
                   </span>
                   <span style={{ cursor: 'pointer', color: '#888' }}>
@@ -1188,7 +1360,7 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10"/>
                       <line x1="2" y1="12" x2="22" y2="12"/>
                       <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
@@ -1232,7 +1404,7 @@ const EditPage = () => {
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                     </span>
                     <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                       {field.name}
                     </span>
                     <span onClick={() => handleDeleteField(field.id)} style={{ cursor: 'pointer', color: '#888' }}>
@@ -1264,8 +1436,8 @@ const EditPage = () => {
                 onClick={() => setIsModalOpen(true)}
                 style={{
                   backgroundColor: 'transparent',
-                  border: `1px dashed ${selectedColor}`,
-                  color: selectedColor,
+                  border: `1px dashed ${selectedColor1}`,
+                  color: selectedColor1,
                   borderRadius: '8px',
                   padding: '10px 15px',
                   fontSize: '14px',
@@ -1344,6 +1516,7 @@ const EditPage = () => {
               >
                 <option value="Personal">Personal</option>
                 <option value="Professional">Professional</option>
+                <option value="Business">Business</option>
               </select>
             </div>
           </div>
@@ -1418,7 +1591,8 @@ const EditPage = () => {
               phone={phone}
               linkedin={linkedin}
               website={website}
-              themeColor={selectedColor}
+              themeColor1={selectedColor1}
+              themeColor2={selectedColor2}
               fontFamily={selectedFont}
             />
         </div>
@@ -1447,8 +1621,8 @@ const EditPage = () => {
                   border: 'none',
                   backgroundColor: 'transparent',
                   cursor: 'pointer',
-                  borderBottom: activeTab === tab ? `2px solid ${selectedColor}` : 'none',
-                  color: activeTab === tab ? selectedColor : '#777',
+                  borderBottom: activeTab === tab ? `2px solid ${selectedColor1}` : 'none',
+                  color: activeTab === tab ? selectedColor1 : '#777',
                   outline: 'none',
                   marginRight: '10px',
                   whiteSpace: 'nowrap'
@@ -1478,7 +1652,7 @@ const EditPage = () => {
               Cancel
             </button>
             <button style={{
-              backgroundColor: selectedColor,
+              backgroundColor: selectedColor1,
               border: 'none',
               borderRadius: '8px',
               padding: '10px 20px',
@@ -1582,7 +1756,7 @@ const EditPage = () => {
               <button
                 onClick={handleAddField}
                 style={{
-                  backgroundColor: selectedColor,
+                  backgroundColor: selectedColor1,
                   border: 'none',
                   borderRadius: '8px',
                   padding: '8px 15px',
