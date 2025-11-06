@@ -24,7 +24,7 @@ if (typeof document !== 'undefined') {
   styleSheet.textContent = flipCardStyles;
   document.head.appendChild(styleSheet);
 }
-import { Search, Filter, Download, Plus, ChevronDown, MoreHorizontal, Phone, Mail, MessageCircle, Calendar, TrendingUp, Users, Activity, Zap, Star, Clock, MapPin } from 'lucide-react';
+import { Search, Filter, Download, Plus, ChevronDown, MoreHorizontal, Phone, Mail, MessageCircle, Calendar, TrendingUp, Users, Activity, Zap, Star, Clock, MapPin, Send, X } from 'lucide-react';
 
 interface Contact {
   id: number;
@@ -183,16 +183,56 @@ export default function DashboardContactPage() {
   const [contactsList, setContactsList] = useState<Contact[]>(contactsData);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [messageModal, setMessageModal] = useState<{isOpen: boolean, contact: Contact | null}>({isOpen: false, contact: null});
+  const [messageText, setMessageText] = useState('');
   const filterRef = useRef<HTMLDivElement>(null);
+
+  // Handle direct message - open message modal
+  const handleDirectMessage = (contact: Contact) => {
+    setMessageModal({isOpen: true, contact});
+    setMessageText('');
+  };
+
+  // Close message modal
+  const handleCloseMessageModal = () => {
+    setMessageModal({isOpen: false, contact: null});
+    setMessageText('');
+  };
+
+  // Send message and navigate to inbox
+  const handleSendMessage = () => {
+    if (!messageText.trim() || !messageModal.contact) return;
+    
+    // Store the conversation data for inbox page
+    const conversationData = {
+      contact: messageModal.contact,
+      initialMessage: messageText,
+      timestamp: new Date().toISOString()
+    };
+    
+    sessionStorage.setItem('newConversation', JSON.stringify(conversationData));
+    
+    // Close modal
+    handleCloseMessageModal();
+    
+    // Navigate to inbox page
+    window.location.href = '/dashboard/inbox';
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+      const target = event.target as Element;
+      
+      // Check if click is inside filter button or dropdown
+      const isFilterButton = filterRef.current && filterRef.current.contains(target);
+      const isFilterDropdown = target.closest('[data-filter-dropdown]');
+      
+      if (!isFilterButton && !isFilterDropdown && isFilterOpen) {
         setIsFilterOpen(false);
       }
+      
       // Close action dropdown when clicking outside
-      const target = event.target as Element;
       if (!target.closest('.relative')) {
         setOpenDropdown(null);
       }
@@ -202,7 +242,7 @@ export default function DashboardContactPage() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [isFilterOpen]);
 
   // Handle showing contact info
   const handleContactInfo = (contactId: number, type: 'phone' | 'email') => {
@@ -275,170 +315,114 @@ export default function DashboardContactPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="w-full">
         {/* Hero Section */}
-        <div className="relative bg-white overflow-hidden" style={{padding: '40px 32px'}}>
+        <div className="relative bg-white px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12" style={{overflow: 'visible'}}>
           {/* Background Pattern */}
           <div className="absolute inset-0 bg-black/10"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent"></div>
+          <div className="absolute inset-0 bg-white"></div>
           
           {/* Decorative Elements */}
           <div className="absolute top-0 left-1/4 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl"></div>
           
-          <div className="relative px-6 py-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="relative group w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg border border-white/30 cursor-pointer transition-all duration-300 hover:scale-105">
-                      <div className="w-12 h-12 bg-gradient-to-br from-white to-purple-100 rounded-xl flex items-center justify-center shadow-inner">
-                        <span className="text-purple-600 text-lg font-bold">SM</span>
-                      </div>
-                      
-                      {/* Hover Tooltip */}
-                     
-                    </div>
-                    <div>
-                      <h1 className="text-4xl font-bold text-gray-900 mb-2 tracking-tight">
-                        My Professional  
-                        <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Connections</span>
-                      </h1>
-                      <p className="text-gray-600 text-lg">Manage and grow your connections</p>
-                    </div>
-                  </div>
-                  
-                  
-                </div>
+          <div className="relative max-w-7xl mx-auto" style={{overflow: 'visible'}}>
+            {/* Header Section - Mobile First */}
+            <div className="flex flex-col space-y-6 lg:flex-row lg:items-center lg:justify-between lg:space-y-0" style={{overflow: 'visible'}}>
+              <div className="flex-1">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 tracking-tight">
+                  My Professional{' '}
+                  <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Connections</span>
+                </h1>
+                <p className="text-gray-600 text-base sm:text-lg">Manage and grow your connections</p>
               </div>
               
-              <div className="flex items-center gap-4">
-                <div className="hidden md:flex flex-col items-center text-center">
-                  <div className="text-3xl font-bold text-gray-900">{contactsList.length}</div>
-                  <div className="text-gray-600 text-sm">Total Contacts</div>
+              {/* Stats and Controls - Mobile Responsive */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 lg:gap-6" style={{overflow: 'visible'}}>
+                <div className="flex flex-col items-center text-center bg-gray-50 px-4 py-2 rounded-lg">
+                 
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  
-                  {/* View Toggle */}
-                  <div className="relative flex items-center bg-gradient-to-r from-slate-100 via-white to-slate-100 rounded-full p-2.5 shadow-lg border-2 border-slate-200/60 backdrop-blur-sm min-w-[200px]">
-                    <div 
-                      className={`absolute top-0.5 bottom-0.5 bg-gradient-to-r from-purple-500 via-purple-600 to-indigo-600 rounded-full shadow-xl transition-all duration-500 ease-out transform ${
-                        viewMode === 'table' ? 'left-2.5 right-1/2 scale-100' : 'left-1/2 right-2.5 scale-100'
-                      }`}
-                      style={{
-                        boxShadow: '0 8px 25px -5px rgba(147, 51, 234, 0.4), 0 4px 6px -2px rgba(147, 51, 234, 0.1)'
-                      }}
-                    />
-                    <button 
-                      onClick={() => setViewMode('table')}
-                      className={`relative z-10 px-12 py-7 text-lg font-bold transition-all duration-500 rounded-full transform min-w-[120px] ${
-                        viewMode === 'table' 
-                          ? 'text-white scale-105' 
-                          : 'text-slate-600 hover:text-slate-800 hover:scale-102'
-                      }`}
-                    >
-                      <span className="flex items-center justify-center gap-2.5">
-                        Table
-                      </span>
-                    </button>
-                    <button 
-                      onClick={() => setViewMode('cards')}
-                      className={`relative z-10 px-12 py-7 text-lg font-bold transition-all duration-500 rounded-full transform min-w-[120px] ${
-                        viewMode === 'cards' 
-                          ? 'text-white scale-105' 
-                          : 'text-slate-600 hover:text-slate-800 hover:scale-102'
-                      }`}
-                    >
-                      <span className="flex items-center justify-center gap-2.5">
-                        Cards
-                      </span>
-                    </button>
-                  </div>
-                  
-                  <div className="relative" ref={filterRef}>
-                    <button 
-                      onClick={() => setIsFilterOpen(!isFilterOpen)}
-                      className="flex items-center gap-2 px-6 py-3 "
-                    >
-                      <Filter className="w-8 h-10" />
-                      {/* <span className="hidden sm:inline">Filters</span> */}
-                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`} />
-                    </button>
-
-                    {/* Filter Dropdown */}
-                    {isFilterOpen && (
-                      <div className="fixed top-20 right-8 w-72 h-50 bg-white shadow-2xl border border-gray-200 overflow-hidden" style={{zIndex: 99999, borderRadius: '5px'}}>
-                        <div className="p-6 h-50 flex flex-col">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center">Sort Options</h3>
-                          
-                          {/* Sort Options */}
-                          <div className="flex-1" style={{display: 'center', flexDirection: 'column', gap: '20px'}}>
-                            {[
-                              { value: 'name', label: 'Sort by A to Z' },
-                              { value: 'date', label: 'Sort by Date' },
-                              { value: 'recent', label: 'Sort by Recent' }
-                            ].map((option) => (
-                              <label key={option.value} className="flex items-center cursor-pointer rounded-xl hover:bg-gray-50 transition-colors" style={{padding: '10px', gap: '10px'}}>
-                                <input
-                                  type="radio"
-                                  name="sortOption"
-                                  value={option.value}
-                                  checked={selectedSortOption === option.value}
-                                  onChange={(e) => setSelectedSortOption(e.target.value)}
-                                  className="w-5 h-5 text-purple-600 border-gray-300 focus:ring-purple-500"
-                                />
-                                <div className="flex items-center" style={{gap: '12px'}}>
-                                  <span className="text-sm font-medium text-gray-700">{option.label}</span>
-                                </div>
-                              </label>
-                            ))}
-                          </div>
-
-                          {/* Apply Button */}
-                          <button 
-                            onClick={() => {
-                              setSortBy(selectedSortOption);
-                              setIsFilterOpen(false);
-                            }}
-                            className=" w-72 bg-purple-600 text-white py-4  font-semibold hover:bg-purple-700 transition-colors duration-200 mt-2"
-                          >
-                            Apply Filter
-                          </button>
-                        </div>
+                <div className="flex flex-col gap-4 w-full sm:w-auto" style={{overflow: 'visible'}}>
+                  {/* Mobile: Filter first, then Toggle */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+                    {/* Filter - Mobile First - Hide when virtual card sidebar is open */}
+                    {!isSidebarOpen && (
+                      <div className="relative order-1 sm:order-2 w-full sm:w-auto" ref={filterRef} style={{zIndex: 10000}}>
+                        <button 
+                          onClick={() => setIsFilterOpen(!isFilterOpen)}
+                          className="flex items-center justify-center sm:justify-start gap-2 px-4 sm:px-6 py-3 hover:bg-gray-50 rounded-lg transition-colors w-full sm:w-auto bg-white border border-gray-200 shadow-sm"
+                        >
+                          <Filter className="w-5 h-5 sm:w-6 sm:w-6" />
+                          <span className="text-sm font-medium">Filters</span>
+                          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`} />
+                        </button>
                       </div>
                     )}
+                    
+                    {/* View Toggle - Mobile Second */}
+                    <div className="relative flex items-center bg-white rounded-xl p-1.5 shadow-lg border border-gray-200 w-full sm:w-auto order-2 sm:order-1" style={{minWidth: '320px', height: '40px'}}>
+                      <div 
+                        className={`absolute top-1.5 bottom-1.5 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg transition-all duration-300 ease-out ${
+                          viewMode === 'table' ? 'left-1.5 right-1/2' : 'left-1/2 right-1.5'
+                        }`}
+                      />
+                      <button 
+                        onClick={() => setViewMode('table')}
+                        className={`relative z-10 flex-1 px-6 py-4 text-sm font-semibold transition-all duration-300 rounded-lg ${
+                          viewMode === 'table' 
+                            ? 'text-white' 
+                            : 'text-gray-600 hover:text-gray-800'
+                        }`}
+                      >
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 6h18m-9 8h9" />
+                          </svg>
+                          Table View
+                        </span>
+                      </button>
+                      <button 
+                        onClick={() => setViewMode('cards')}
+                        className={`relative z-10 flex-1 px-6 py-4 text-sm font-semibold transition-all duration-300 rounded-lg ${
+                          viewMode === 'cards' 
+                            ? 'text-white' 
+                            : 'text-gray-600 hover:text-gray-800'
+                        }`}
+                      >
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z" />
+                          </svg>
+                          Cards View
+                        </span>
+                      </button>
+                    </div>
                   </div>
-                  
                 </div>
               </div>
             </div>
             
             {/* Search Bar */}
-            <div className="mt-12 mb-8">
+            <div className="mt-6 sm:mt-8 lg:mt-12">
               <div className="max-w-4xl mx-auto">
-                <div className="bg-gray-50 rounded-3xl p-8 border border-gray-200 shadow-2xl">
+                <div className="bg-gray-50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-lg sm:shadow-2xl">
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none" style={{paddingLeft: '20px'}}>
-                      <Search className="h-6 w-6 text-gray-500" />
+                    <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4 sm:pl-5">
+                     
                     </div>
                     <input
                       type="text"
                       placeholder="Search your professional network..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="block w-full py-5 bg-white border-2 border-gray-200 rounded-2xl text-gray-900 placeholder-gray-500 text-xl font-medium focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-400 transition-all duration-300"
-                      style={{paddingLeft: '60px', paddingRight: '80px'}}
+                      className="block w-full py-3 sm:py-4 lg:py-5 pl-12 sm:pl-14 lg:pl-16 pr-4 sm:pr-20 lg:pr-24 bg-white border-2 border-gray-200 rounded-xl sm:rounded-2xl text-gray-900 placeholder-gray-500 text-base sm:text-lg lg:text-xl font-medium focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300"
                     />
                     {searchTerm && (
-                      <div className="absolute inset-y-0 right-0 pr-6 flex items-center">
-                        <span className="bg-purple-100 text-purple-800 px-4 py-2 rounded-xl text-sm font-semibold border border-purple-200">
+                      <div className="absolute inset-y-0 right-0 pr-3 sm:pr-4 lg:pr-6 flex items-center">
+                        <span className="bg-purple-100 text-purple-800 px-2 sm:px-3 lg:px-4 py-1 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold border border-purple-200">
                           {sortedContacts.length} found
                         </span>
                       </div>
                     )}
                   </div>
-                  
-                  {/* Search suggestions or quick filters could go here */}
-                  
                 </div>
               </div>
             </div>
@@ -446,7 +430,7 @@ export default function DashboardContactPage() {
         </div>
 
         {/* Smart Insights Panel */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200" style={{marginTop: '40px'}}>
           <div className="px-8 py-6">
             
             
@@ -493,14 +477,14 @@ export default function DashboardContactPage() {
                        
                       </div>
                     </th>
-                    <th className="text-left text-gray-500 uppercase tracking-wider" style={{padding: '20px 24px', fontSize: '14px', fontWeight: '600'}}>
-                      LOCATION
-                    </th>
-                    <th className="text-left text-gray-500 uppercase tracking-wider" style={{padding: '20px 24px', fontSize: '14px', fontWeight: '600'}}>
-                      <div className="flex items-center gap-2">
+                    <th className="text-gray-900" style={{padding: '20px 24px', fontSize: '16px', fontWeight: '500'}}>
+                      <div className="flex items-center gap-3">
                         DATE 
                         
                       </div>
+                    </th>
+                    <th className="text-gray-900" style={{padding: '20px 24px', fontSize: '16px', fontWeight: '500'}}>
+                      
                     </th>
                     <th className="w-8"></th>
                   </tr>
@@ -510,15 +494,17 @@ export default function DashboardContactPage() {
                   <tr key={contact.id} className="hover:bg-gray-50 transition-colors">
                     <td style={{padding: '20px 24px'}}>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                          <span className="text-gray-600 font-medium" style={{fontSize: '14px'}}>
-                            {getInitials(contact.name)}
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-blue-600 font-semibold" style={{fontSize: '14px'}}>
+                            {sortedContacts.indexOf(contact) + 1}
                           </span>
                         </div>
-                        <button 
-                          onClick={() => handleContactClick(contact)}
-                          className="font-medium text-gray-900 hover:text-purple-600 transition-colors cursor-pointer" 
-                          style={{fontSize: '16px'}}
+                        <button
+                          onClick={() => {
+                            setSelectedContact(contact);
+                            setIsSidebarOpen(true);
+                          }}
+                          className="text-left hover:text-blue-600 transition-colors"
                         >
                           {contact.name}
                         </button>
@@ -530,11 +516,16 @@ export default function DashboardContactPage() {
                     <td style={{padding: '20px 24px'}}>
                       <span className="text-gray-600" style={{fontSize: '15px'}}>{contact.company}</span>
                     </td>
-                    <td style={{padding: '20px 24px'}}>
-                      <span className="text-gray-600" style={{fontSize: '15px'}}>{contact.location || 'Not specified'}</span>
+                    <td className="text-gray-900" style={{padding: '20px 24px', fontSize: '16px', fontWeight: '500'}}>
+                      <span>{contact.dateAdded}</span>
                     </td>
-                    <td style={{padding: '20px 24px'}}>
-                      <span className="text-gray-600" style={{fontSize: '15px'}}>{formatDate(contact.dateAdded)}</span>
+                    <td className="text-gray-900" style={{padding: '20px 24px', fontSize: '16px', fontWeight: '500'}}>
+                      <button
+                        onClick={() => handleDirectMessage(contact)}
+                        className="inline-flex items-center gap-1 px-3 py-1 text-blue-700 text-sm font-medium hover:text-blue-900 transition-colors"
+                      >
+                        Message
+                      </button>
                     </td>
                     <td style={{padding: '20px 24px'}}>
                       <div className="relative">
@@ -572,25 +563,26 @@ export default function DashboardContactPage() {
             <div className="divide-y divide-gray-200">
               {sortedContacts.map((contact) => (
                 <div key={contact.id} className="p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-gray-600 font-medium text-sm">
-                          {getInitials(contact.name)}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-blue-600 font-semibold text-sm">
+                          {sortedContacts.indexOf(contact) + 1}
                         </span>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <button 
-                          onClick={() => handleContactClick(contact)}
-                          className="font-medium text-gray-900 hover:text-purple-600 transition-colors cursor-pointer text-left block truncate"
-                        >
-                          {contact.name}
-                        </button>
-                        <p className="text-sm text-gray-600 truncate">{contact.title}</p>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{contact.name}</h3>
+                        <p className="text-sm text-gray-600">{contact.title}</p>
                         <p className="text-sm text-gray-500 truncate">{contact.company}</p>
-                        <div className="flex items-center gap-4 mt-1">
-                          <span className="text-xs text-gray-500">{contact.location || 'Not specified'}</span>
-                          <span className="text-xs text-gray-500">{formatDate(contact.dateAdded)}</span>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs text-gray-500">{contact.dateAdded}</span>
+                          <button
+                            onClick={() => handleDirectMessage(contact)}
+                            className="inline-flex items-center gap-1 px-2 py-0.5  text-blue-700 rounded-full text-xs font-medium  transition-colors"
+                          >
+                            
+                            Message
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -605,35 +597,16 @@ export default function DashboardContactPage() {
                         
                         {openDropdown === contact.id && (
                           <div className="absolute right-0 top-8 w-48 bg-white shadow-lg border border-gray-200 rounded-lg py-2 z-10">
-                            <button 
-                              onClick={() => {
-                                setShowContactInfo(prev => ({
-                                  ...prev,
-                                  [contact.id]: { type: prev[contact.id]?.type === 'phone' ? null : 'phone' }
-                                }));
-                                setOpenDropdown(null);
-                              }}
-                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                            >
-                              View Phone
-                            </button>
-                            <button 
-                              onClick={() => {
-                                setShowContactInfo(prev => ({
-                                  ...prev,
-                                  [contact.id]: { type: prev[contact.id]?.type === 'email' ? null : 'email' }
-                                }));
-                                setOpenDropdown(null);
-                              }}
-                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                            >
-                              View Email
-                            </button>
+                            
+                            
                             <button 
                               onClick={() => handleDeleteConnection(contact.id)}
-                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                             >
-                              Delete
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              Delete Connection
                             </button>
                           </div>
                         )}
@@ -669,8 +642,8 @@ export default function DashboardContactPage() {
         ) : (
           /* Cards View */
           <div className="bg-gray-50 min-h-screen">
-            <div className="px-8 py-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
                 {sortedContacts.map((contact) => (
                   <div
                     key={contact.id}
@@ -679,13 +652,13 @@ export default function DashboardContactPage() {
                     onMouseLeave={() => setHoveredCard(null)}
                   >
                     {/* Card Container with 3D Flip Effect */}
-                    <div className="relative w-full h-64 perspective-1000">
+                    <div className="relative w-full h-48 sm:h-56 lg:h-64 perspective-1000">
                       <div className={`absolute inset-0 w-full h-full transition-transform duration-700 transform-style-preserve-3d ${
                         hoveredCard === contact.id ? 'rotate-y-180' : ''
                       }`}>
                         
                         {/* Front of Card */}
-                        <div className={`absolute inset-0 w-full h-full backface-hidden rounded-2xl shadow-lg border p-6 transition-all duration-300 group hover:shadow-xl hover:scale-105 ${
+                        <div className={`absolute inset-0 w-full h-full backface-hidden rounded-xl sm:rounded-2xl shadow-lg border p-3 sm:p-4 lg:p-6 transition-all duration-300 group hover:shadow-xl hover:scale-105 ${
                           contact.id % 4 === 1 ? 'bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200 hover:from-purple-100 hover:to-blue-100 hover:border-purple-300' :
                           contact.id % 4 === 2 ? 'bg-gradient-to-br from-green-50 to-teal-50 border-green-200 hover:from-green-100 hover:to-teal-100 hover:border-green-300' :
                           contact.id % 4 === 3 ? 'bg-gradient-to-br from-orange-50 to-red-50 border-orange-200 hover:from-orange-100 hover:to-red-100 hover:border-orange-300' :
@@ -704,16 +677,16 @@ export default function DashboardContactPage() {
                           
                           <div className="flex flex-col h-full justify-center items-center text-center relative z-10">
                             {/* Name and Title */}
-                            <h3 className="font-semibold text-gray-900 text-2xl mb-3 group-hover:text-gray-800 transition-colors duration-300">{contact.name}</h3>
-                            <p className="text-lg text-gray-600 mb-2 group-hover:text-gray-700 transition-colors duration-300">{contact.title}</p>
-                            <p className="text-base text-gray-500 mb-6 group-hover:text-gray-600 transition-colors duration-300">{contact.company}</p>
+                            <h3 className="font-semibold text-gray-900 text-sm sm:text-base lg:text-xl xl:text-2xl mb-1 sm:mb-2 lg:mb-3 group-hover:text-gray-800 transition-colors duration-300 px-1">{contact.name}</h3>
+                            <p className="text-xs sm:text-sm lg:text-base xl:text-lg text-gray-600 mb-1 sm:mb-2 group-hover:text-gray-700 transition-colors duration-300 px-1">{contact.title}</p>
+                            <p className="text-xs sm:text-sm lg:text-base text-gray-500 mb-2 sm:mb-4 lg:mb-6 group-hover:text-gray-600 transition-colors duration-300 px-1">{contact.company}</p>
 
                             {/* Tags */}
-                            <div className="flex flex-wrap gap-2 justify-center">
+                            <div className="flex flex-wrap gap-1 sm:gap-2 justify-center">
                               {contact.tags.slice(0, 2).map((tag, index) => (
                                 <span
                                   key={index}
-                                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium transition-all duration-300 group-hover:scale-110 ${getTagColor(tag)}`}
+                                  className={`inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 group-hover:scale-110 ${getTagColor(tag)}`}
                                 >
                                   {tag}
                                 </span>
@@ -761,8 +734,11 @@ export default function DashboardContactPage() {
                               >
                                 <Mail className="w-5 h-5" />
                               </button>
-                              <button className="absolute bottom-4 right-0 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all duration-200 flex items-center justify-center">
-                                <MessageCircle className="w-5 h-5" />
+                              <button 
+                                onClick={() => handleDirectMessage(contact)}
+                                className="absolute bottom-4 right-0 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all duration-200 flex items-center justify-center"
+                              >
+                                <Send className="w-5 h-5" />
                               </button>
                             </div>
                           </div>
@@ -888,30 +864,32 @@ export default function DashboardContactPage() {
 
                 {/* Description */}
                 <div className="text-center" style={{ marginBottom: '32px', padding: '0 16px' }}>
-                  <p className="text-sm opacity-90 leading-relaxed">
+                  <p className="text-sm opacity-90 leading-relaxed ">
                     A modern digital visiting card for {selectedContact.title.toLowerCase()} showcasing professional details, social links, and portfolio
                   </p>
                 </div>
 
                 {/* Action Buttons */}
-                <div style={{ padding: '0 24px 24px 24px' }}>
-                  <div className="grid grid-cols-3 gap-3" style={{ marginBottom: '16px' }}>
-                    <button className="bg-white/90 backdrop-blur-sm text-black py-3 px-3 rounded-sm font-semibold hover:bg-white/30 transition-all text-sm text-center">
+                <div className="px-4 sm:px-6 pb-4 sm:pb-6">
+                  {/* Primary Action Buttons */}
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-8 sm:mb-12">
+                    <button className="bg-white/90 backdrop-blur-sm text-black py-2 sm:py-3 px-2 sm:px-3 rounded text-xs sm:text-sm font-semibold hover:bg-white/30 transition-all text-center">
                       Services
                     </button>
-                    <button className="bg-white/90 backdrop-blur-sm text-black py-3 px-3 rounded-sm font-semibold hover:bg-white/30 transition-all text-sm text-center">
+                    <button className="bg-white/90 backdrop-blur-sm text-black py-2 sm:py-3 px-2 sm:px-3 rounded text-xs sm:text-sm font-semibold hover:bg-white/30 transition-all text-center">
                       Portfolio
                     </button>
-                    <button className="bg-white/90 backdrop-blur-sm text-black py-3 px-3 rounded-sm font-semibold hover:bg-white/30 transition-all text-sm text-center">
+                    <button className="bg-white/90 backdrop-blur-sm text-black py-2 sm:py-3 px-2 sm:px-3 rounded text-xs sm:text-sm font-semibold hover:bg-white/30 transition-all text-center">
                       Links
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4" style={{ padding: '0 8px' }}>
-                    <button className="bg-white/90 backdrop-blur-sm text-black py-3 px-4 rounded-sm font-semibold hover:bg-white/30 transition-all text-sm text-center">
+                  {/* Secondary Action Buttons - Separated */}
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-white/20">
+                    <button className="bg-white/80 backdrop-blur-sm text-black py-2 sm:py-3 px-3 sm:px-4 rounded text-xs sm:text-sm font-semibold hover:bg-white/40 transition-all text-center shadow-sm">
                       Experience
                     </button>
-                    <button className="bg-white/90 backdrop-blur-sm text-black py-3 px-4 rounded-sm font-semibold hover:bg-white/30 transition-all text-sm text-center">
+                    <button className="bg-white/80 backdrop-blur-sm text-black py-2 sm:py-3 px-3 sm:px-4 rounded text-xs sm:text-sm font-semibold hover:bg-white/40 transition-all text-center shadow-sm">
                       Review
                     </button>
                   </div>
@@ -919,6 +897,137 @@ export default function DashboardContactPage() {
               </div>
             </div>
             </>
+        )}
+
+        {/* Filter Dropdown Portal - Hide when virtual card sidebar is open */}
+          {isFilterOpen && !isSidebarOpen && (
+          <>
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 z-[9999]"
+              onClick={() => setIsFilterOpen(false)}
+            />
+            
+            {/* Dropdown */}
+            <div 
+              className="fixed bg-white shadow-2xl border border-gray-200 rounded-lg overflow-hidden z-[9999]"
+              style={{
+                top: '140px',
+                right: '40px',
+                width: '288px'
+              }}
+              data-filter-dropdown
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6 text-center">Sort Options</h3>
+                
+                {/* Sort Options */}
+                <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+                  {[
+                    { value: 'name', label: 'Sort by A to Z' },
+                    { value: 'date', label: 'Sort by Date' },
+                    { value: 'recent', label: 'Sort by Recent' }
+                  ].map((option) => (
+                    <label key={option.value} className="flex items-center p-2 sm:p-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sortOption"
+                        value={option.value}
+                        checked={selectedSortOption === option.value}
+                        onChange={(e) => {
+                          setSelectedSortOption(e.target.value);
+                        }}
+                        className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 border-gray-300 focus:ring-purple-500 mr-3"
+                      />
+                      <span className="text-sm font-medium text-gray-700">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Apply Button */}
+                <button 
+                  onClick={() => {
+                    setSortBy(selectedSortOption);
+                    setIsFilterOpen(false);
+                  }}
+                  className="w-full bg-blue-600 text-white py-3 sm:py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
+                >
+                  Apply Filter
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Message Modal */}
+        {messageModal.isOpen && messageModal.contact && (
+          <>
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 bg-black/50 z-50"
+              onClick={handleCloseMessageModal}
+            />
+            
+            {/* Modal */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="bg-white  shadow-2xl max-w-2xl w-full  rounded-sm max-h-[80vh] overflow-hidden">
+                {/* Modal Header */}
+                <div className="flex items-center justify-center border-b border-gray-200" >
+                  <div className="flex items-center gap-6" >
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Send Message to {messageModal.contact.name}
+                      </h3>
+                     
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleCloseMessageModal}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                   
+                  </button>
+                </div>
+
+                {/* Modal Content */}
+                <div className="flex justify-center" style={{padding: '24px'}}>
+                  <div className="mb-4 w-full max-w-lg">
+                    
+                    <div className="flex justify-center">
+                      <textarea
+                        value={messageText}
+                        onChange={(e) => setMessageText(e.target.value)}
+                        placeholder={`Hi ${messageModal.contact.name},`}
+                        className="w-full h-32 px-4 py-3 border border-gray-300 rounded-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="border-t border-gray-200 bg-gray-50" style={{padding: '24px 32px 32px 32px'}}>
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={handleSendMessage}
+                      disabled={!messageText.trim()}
+                      className="w-full px-6 py-3 text-sm font-semibold text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                    >
+                      
+                      Send Message
+                    </button>
+                    <button
+                      onClick={handleCloseMessageModal}
+                      className="w-full px-4 py-2 text-sm font-medium text-gray-600 bg-transparent border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>
