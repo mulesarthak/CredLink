@@ -27,6 +27,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Generate username from email
+    const baseUsername = email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '')
+    let username = baseUsername
+    let counter = 1
+    
+    // Ensure username is unique
+    while (await prisma.user.findUnique({ where: { username } })) {
+      username = `${baseUsername}${counter}`
+      counter++
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -37,6 +48,7 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         fullName,
         phone: phone || null,
+        username,
       },
       select: {
         id: true,

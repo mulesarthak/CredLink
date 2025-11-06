@@ -14,7 +14,11 @@ import {
   ChevronRight,
   LogOut,
   Home,
+<<<<<<< HEAD
+  Tag,
+=======
   Layers,
+>>>>>>> upstream/main
 } from "lucide-react";
 import styles from "./admin.module.css";
 
@@ -28,8 +32,8 @@ const allNavigation = [
   { name: "Dashboard", href: "/admin", icon: Home, permission: null },
   { name: "Users", href: "/admin/users", icon: Users, permission: "MANAGE_USERS" },
   { name: "Manage Admins", href: "/admin/manage-admins", icon: Shield, permission: "MANAGE_ADMINS" },
-  { name: "Manage Category", href: "/admin/categories", icon: Layers, permission: "MANAGE_CATEGORY" },
   { name: "Profiles", href: "/admin/profiles", icon: Users, permission: "MANAGE_PROFILES" },
+  { name: "Categories", href: "/admin/categories", icon: Tag, permission: "MANAGE_CATEGORIES" },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3, permission: "VIEW_ANALYTICS" },
   { name: "Settings", href: "/admin/settings", icon: Settings, permission: "MANAGE_SETTINGS" },
   { name: "Support", href: "/admin/support", icon: LifeBuoy , permission: null },

@@ -2,9 +2,11 @@ import { v2 as cloudinary } from 'cloudinary'
 
 // Configure Cloudinary
 if (!process.env.CLOUDINARY_URL) {
-  throw new Error(
-    "Missing Cloudinary config. Ensure CLOUDINARY_URL is set in .env and restart the dev server."
+  console.warn(
+    "Missing Cloudinary config. CLOUDINARY_URL is not set in .env. Image upload functionality will be disabled."
   )
+} else {
+  // Cloudinary automatically configures itself when CLOUDINARY_URL is set
 }
 
 // Cloudinary automatically configures itself when CLOUDINARY_URL is set
@@ -22,6 +24,10 @@ export async function uploadToCloudinary(
     transformation?: any
   } = {}
 ) {
+  if (!process.env.CLOUDINARY_URL) {
+    throw new Error('Cloudinary is not configured. Please set CLOUDINARY_URL in your environment variables.')
+  }
+  
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload_stream(
       {
