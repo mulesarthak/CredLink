@@ -20,47 +20,343 @@ import { Download, BarChart3, Users, Link2, MapPin, Clock } from "lucide-react";
 import styles from "./analytics.module.css";
 
 export default function AnalyticsPage() {
-  const [overview, setOverview] = useState<any>(null);
-  const [categoryData, setCategoryData] = useState<any[]>([]);
+  // Function to calculate new users based on period
+  const getNewUsersByPeriod = (period: string) => {
+    switch (period) {
+      case "thisWeek": return 23;
+      case "thisMonth": return 89;
+      case "lastMonth": return 76;
+      case "last3Months": return 234;
+      case "thisYear": return 567;
+      default: return 89;
+    }
+  };
+
+  const getPeriodLabel = (period: string) => {
+    switch (period) {
+      case "thisWeek": return "New Users (This Week)";
+      case "thisMonth": return "New Users (This Month)";
+      case "lastMonth": return "New Users (Last Month)";
+      case "last3Months": return "New Users (Last 3 Months)";
+      case "thisYear": return "New Users (This Year)";
+      default: return "New Users (This Month)";
+    }
+  };
+
+  // Demo data for overview metrics
+  const [overview, setOverview] = useState<any>({
+    totalUsers: 1247,
+    totalConnections: 3892,
+    activeCities: 15,
+    newUsersForPeriod: 89 // Default value
+  });
+
+  // Demo data for category distribution pie chart
+  const [categoryData, setCategoryData] = useState<any[]>([
+    { category: "Doctor", count: 312 },
+    { category: "Designer", count: 245 },
+    { category: "Developer", count: 198 },
+    { category: "Artist", count: 156 },
+    { category: "Consultant", count: 134 },
+    { category: "Teacher", count: 98 },
+    { category: "Engineer", count: 104 }
+  ]);
+
   const [engagementData, setEngagementData] = useState<any[]>([]);
-  const [activityData, setActivityData] = useState<any[]>([]);
+
+  // Demo data for user registration trend bar chart
+  const [activityData, setActivityData] = useState<any[]>([
+    { 
+      date: "Nov 1", 
+      newUsers: 12, 
+      connections: 28, 
+      topCity: "Mumbai", 
+      topCategory: "Doctor",
+      usersJoined: [
+        { name: "Dr. Rajesh Sharma", city: "Mumbai", category: "Doctor" },
+        { name: "Dr. Priya Patel", city: "Mumbai", category: "Doctor" },
+        { name: "Amit Kumar", city: "Delhi", category: "Engineer" },
+        { name: "Sneha Gupta", city: "Pune", category: "Designer" },
+        { name: "Rohit Singh", city: "Mumbai", category: "Developer" },
+        { name: "Kavya Nair", city: "Bangalore", category: "Artist" },
+        { name: "Arjun Mehta", city: "Mumbai", category: "Doctor" },
+        { name: "Pooja Joshi", city: "Delhi", category: "Teacher" },
+        { name: "Vikram Rao", city: "Chennai", category: "Consultant" },
+        { name: "Anita Desai", city: "Mumbai", category: "Doctor" },
+        { name: "Suresh Iyer", city: "Bangalore", category: "Engineer" },
+        { name: "Meera Agarwal", city: "Pune", category: "Designer" }
+      ]
+    },
+    { 
+      date: "Nov 2", 
+      newUsers: 8, 
+      connections: 35, 
+      topCity: "Delhi", 
+      topCategory: "Designer",
+      usersJoined: [
+        { name: "Ravi Verma", city: "Delhi", category: "Designer" },
+        { name: "Sonia Kapoor", city: "Delhi", category: "Designer" },
+        { name: "Manish Tiwari", city: "Mumbai", category: "Developer" },
+        { name: "Deepika Sharma", city: "Delhi", category: "Designer" },
+        { name: "Akash Jain", city: "Pune", category: "Engineer" },
+        { name: "Priyanka Singh", city: "Delhi", category: "Artist" },
+        { name: "Nikhil Agarwal", city: "Bangalore", category: "Consultant" },
+        { name: "Shreya Pandey", city: "Delhi", category: "Designer" }
+      ]
+    },
+    { 
+      date: "Nov 3", 
+      newUsers: 15, 
+      connections: 42, 
+      topCity: "Pune", 
+      topCategory: "Developer",
+      usersJoined: [
+        { name: "Rahul Patil", city: "Pune", category: "Developer" },
+        { name: "Neha Kulkarni", city: "Pune", category: "Developer" },
+        { name: "Sachin Jadhav", city: "Pune", category: "Developer" },
+        { name: "Pallavi Bhosale", city: "Mumbai", category: "Designer" },
+        { name: "Omkar Shinde", city: "Pune", category: "Developer" },
+        { name: "Sayali Deshpande", city: "Pune", category: "Engineer" },
+        { name: "Kiran Pawar", city: "Delhi", category: "Artist" },
+        { name: "Swati Joshi", city: "Pune", category: "Developer" },
+        { name: "Aditya Gaikwad", city: "Pune", category: "Developer" },
+        { name: "Vaishali Mane", city: "Mumbai", category: "Teacher" },
+        { name: "Prasad Kale", city: "Pune", category: "Developer" },
+        { name: "Rupali Sawant", city: "Pune", category: "Consultant" },
+        { name: "Ganesh More", city: "Bangalore", category: "Engineer" },
+        { name: "Sunita Raut", city: "Pune", category: "Developer" },
+        { name: "Mahesh Bhagat", city: "Chennai", category: "Doctor" }
+      ]
+    },
+    { 
+      date: "Nov 4", 
+      newUsers: 22, 
+      connections: 38, 
+      topCity: "Mumbai", 
+      topCategory: "Doctor",
+      usersJoined: [
+        { name: "Dr. Ashwin Shah", city: "Mumbai", category: "Doctor" },
+        { name: "Dr. Nisha Thakur", city: "Mumbai", category: "Doctor" },
+        { name: "Rajat Malhotra", city: "Delhi", category: "Engineer" },
+        { name: "Divya Reddy", city: "Bangalore", category: "Designer" },
+        { name: "Harsh Agrawal", city: "Mumbai", category: "Developer" },
+        { name: "Ritika Bansal", city: "Delhi", category: "Artist" },
+        { name: "Siddharth Jha", city: "Mumbai", category: "Doctor" },
+        { name: "Tanvi Mishra", city: "Pune", category: "Teacher" },
+        { name: "Yash Chopra", city: "Mumbai", category: "Consultant" },
+        { name: "Isha Sinha", city: "Delhi", category: "Designer" },
+        { name: "Gaurav Saxena", city: "Mumbai", category: "Doctor" },
+        { name: "Nidhi Gupta", city: "Pune", category: "Engineer" },
+        { name: "Karthik Nair", city: "Chennai", category: "Developer" },
+        { name: "Preeti Yadav", city: "Mumbai", category: "Doctor" },
+        { name: "Rohit Bhatia", city: "Delhi", category: "Artist" },
+        { name: "Simran Kaur", city: "Mumbai", category: "Doctor" },
+        { name: "Abhishek Pandey", city: "Bangalore", category: "Engineer" },
+        { name: "Kriti Sharma", city: "Mumbai", category: "Designer" },
+        { name: "Varun Aggarwal", city: "Delhi", category: "Consultant" },
+        { name: "Shweta Jain", city: "Pune", category: "Teacher" },
+        { name: "Aryan Khanna", city: "Mumbai", category: "Doctor" },
+        { name: "Ritu Singh", city: "Chennai", category: "Artist" }
+      ]
+    },
+    { 
+      date: "Nov 5", 
+      newUsers: 18, 
+      connections: 45, 
+      topCity: "Bangalore", 
+      topCategory: "Engineer",
+      usersJoined: [
+        { name: "Sunil Kumar", city: "Bangalore", category: "Engineer" },
+        { name: "Lakshmi Rao", city: "Bangalore", category: "Engineer" },
+        { name: "Naveen Reddy", city: "Bangalore", category: "Developer" },
+        { name: "Sowmya Nair", city: "Chennai", category: "Designer" },
+        { name: "Rajesh Babu", city: "Bangalore", category: "Engineer" },
+        { name: "Kavitha Shetty", city: "Mumbai", category: "Doctor" },
+        { name: "Mohan Gowda", city: "Bangalore", category: "Engineer" },
+        { name: "Deepa Murthy", city: "Bangalore", category: "Teacher" },
+        { name: "Srinivas Iyengar", city: "Chennai", category: "Consultant" },
+        { name: "Padma Krishnan", city: "Bangalore", category: "Artist" },
+        { name: "Venkat Subramanian", city: "Bangalore", category: "Engineer" },
+        { name: "Radha Menon", city: "Delhi", category: "Designer" },
+        { name: "Kishore Prasad", city: "Bangalore", category: "Engineer" },
+        { name: "Usha Devi", city: "Chennai", category: "Teacher" },
+        { name: "Raman Pillai", city: "Bangalore", category: "Developer" },
+        { name: "Sudha Bhat", city: "Mumbai", category: "Consultant" },
+        { name: "Prakash Hegde", city: "Bangalore", category: "Engineer" },
+        { name: "Latha Kamath", city: "Pune", category: "Artist" }
+      ]
+    },
+    { 
+      date: "Nov 6", 
+      newUsers: 25, 
+      connections: 52, 
+      topCity: "Delhi", 
+      topCategory: "Artist",
+      usersJoined: [
+        { name: "Arjun Kapoor", city: "Delhi", category: "Artist" },
+        { name: "Kavya Sharma", city: "Delhi", category: "Artist" },
+        { name: "Rohit Gupta", city: "Mumbai", category: "Designer" },
+        { name: "Priya Agarwal", city: "Delhi", category: "Artist" },
+        { name: "Vikash Kumar", city: "Pune", category: "Developer" },
+        { name: "Neetu Singh", city: "Delhi", category: "Teacher" },
+        { name: "Arun Joshi", city: "Delhi", category: "Artist" },
+        { name: "Pooja Verma", city: "Mumbai", category: "Consultant" },
+        { name: "Sanjay Tiwari", city: "Delhi", category: "Engineer" },
+        { name: "Renu Pandey", city: "Delhi", category: "Artist" },
+        { name: "Ajay Mishra", city: "Bangalore", category: "Developer" },
+        { name: "Sunita Yadav", city: "Delhi", category: "Designer" },
+        { name: "Manoj Saxena", city: "Delhi", category: "Artist" },
+        { name: "Geeta Bansal", city: "Mumbai", category: "Doctor" },
+        { name: "Pankaj Jain", city: "Delhi", category: "Artist" },
+        { name: "Seema Khanna", city: "Delhi", category: "Teacher" },
+        { name: "Rakesh Sinha", city: "Chennai", category: "Engineer" },
+        { name: "Meena Agrawal", city: "Delhi", category: "Artist" },
+        { name: "Deepak Malhotra", city: "Pune", category: "Consultant" },
+        { name: "Shilpa Gupta", city: "Delhi", category: "Designer" },
+        { name: "Nitin Sharma", city: "Delhi", category: "Artist" },
+        { name: "Anita Chopra", city: "Mumbai", category: "Doctor" },
+        { name: "Vivek Singh", city: "Delhi", category: "Artist" },
+        { name: "Ritu Jha", city: "Bangalore", category: "Developer" },
+        { name: "Amit Verma", city: "Delhi", category: "Artist" }
+      ]
+    },
+    { 
+      date: "Nov 7", 
+      newUsers: 19, 
+      connections: 41, 
+      topCity: "Pune", 
+      topCategory: "Designer",
+      usersJoined: [
+        { name: "Aniket Patil", city: "Pune", category: "Designer" },
+        { name: "Shruti Kulkarni", city: "Pune", category: "Designer" },
+        { name: "Mayur Jadhav", city: "Mumbai", category: "Developer" },
+        { name: "Priyanka Bhosale", city: "Pune", category: "Designer" },
+        { name: "Sagar Shinde", city: "Pune", category: "Engineer" },
+        { name: "Ashwini Deshpande", city: "Pune", category: "Designer" },
+        { name: "Nitin Pawar", city: "Delhi", category: "Artist" },
+        { name: "Manisha Joshi", city: "Pune", category: "Teacher" },
+        { name: "Santosh Gaikwad", city: "Pune", category: "Designer" },
+        { name: "Vidya Mane", city: "Mumbai", category: "Consultant" },
+        { name: "Rajesh Kale", city: "Pune", category: "Developer" },
+        { name: "Smita Sawant", city: "Pune", category: "Designer" },
+        { name: "Anil More", city: "Bangalore", category: "Engineer" },
+        { name: "Shubhangi Raut", city: "Pune", category: "Designer" },
+        { name: "Pravin Bhagat", city: "Chennai", category: "Doctor" },
+        { name: "Sarika Deshmukh", city: "Pune", category: "Designer" },
+        { name: "Yogesh Wagh", city: "Mumbai", category: "Developer" },
+        { name: "Pallavi Kadam", city: "Pune", category: "Designer" },
+        { name: "Suresh Lokhande", city: "Delhi", category: "Consultant" }
+      ]
+    },
+    { 
+      date: "Nov 8", 
+      newUsers: 14, 
+      connections: 33, 
+      topCity: "Mumbai", 
+      topCategory: "Consultant",
+      usersJoined: [
+        { name: "Ramesh Shah", city: "Mumbai", category: "Consultant" },
+        { name: "Nita Thakur", city: "Mumbai", category: "Consultant" },
+        { name: "Kiran Malhotra", city: "Delhi", category: "Engineer" },
+        { name: "Swati Reddy", city: "Bangalore", category: "Designer" },
+        { name: "Hemant Agrawal", city: "Mumbai", category: "Developer" },
+        { name: "Rashmi Bansal", city: "Delhi", category: "Artist" },
+        { name: "Sandeep Jha", city: "Mumbai", category: "Consultant" },
+        { name: "Trupti Mishra", city: "Pune", category: "Teacher" },
+        { name: "Yatin Chopra", city: "Mumbai", category: "Consultant" },
+        { name: "Ira Sinha", city: "Delhi", category: "Designer" },
+        { name: "Gopal Saxena", city: "Mumbai", category: "Consultant" },
+        { name: "Nisha Gupta", city: "Pune", category: "Engineer" },
+        { name: "Kartik Nair", city: "Chennai", category: "Developer" },
+        { name: "Preeti Yadav", city: "Mumbai", category: "Doctor" }
+      ]
+    },
+    { 
+      date: "Nov 9", 
+      newUsers: 21, 
+      connections: 47, 
+      topCity: "Chennai", 
+      topCategory: "Doctor",
+      usersJoined: [
+        { name: "Dr. Murugan", city: "Chennai", category: "Doctor" },
+        { name: "Dr. Lakshmi", city: "Chennai", category: "Doctor" },
+        { name: "Ravi Kumar", city: "Bangalore", category: "Engineer" },
+        { name: "Sangeetha Rao", city: "Chennai", category: "Designer" },
+        { name: "Rajesh Babu", city: "Chennai", category: "Developer" },
+        { name: "Kavitha Shetty", city: "Mumbai", category: "Doctor" },
+        { name: "Mohan Gowda", city: "Bangalore", category: "Engineer" },
+        { name: "Deepa Murthy", city: "Chennai", category: "Teacher" },
+        { name: "Srinivas Iyengar", city: "Chennai", category: "Consultant" },
+        { name: "Padma Krishnan", city: "Chennai", category: "Artist" },
+        { name: "Venkat Subramanian", city: "Bangalore", category: "Engineer" },
+        { name: "Radha Menon", city: "Delhi", category: "Designer" },
+        { name: "Kishore Prasad", city: "Chennai", category: "Doctor" },
+        { name: "Usha Devi", city: "Chennai", category: "Teacher" },
+        { name: "Raman Pillai", city: "Chennai", category: "Developer" },
+        { name: "Sudha Bhat", city: "Mumbai", category: "Consultant" },
+        { name: "Prakash Hegde", city: "Bangalore", category: "Engineer" },
+        { name: "Latha Kamath", city: "Pune", category: "Artist" },
+        { name: "Suresh Nair", city: "Chennai", category: "Doctor" },
+        { name: "Geetha Iyer", city: "Chennai", category: "Teacher" },
+        { name: "Anand Swamy", city: "Bangalore", category: "Developer" }
+      ]
+    },
+    { 
+      date: "Nov 10", 
+      newUsers: 16, 
+      connections: 39, 
+      topCity: "Delhi", 
+      topCategory: "Teacher",
+      usersJoined: [
+        { name: "Sunita Sharma", city: "Delhi", category: "Teacher" },
+        { name: "Ramesh Gupta", city: "Delhi", category: "Teacher" },
+        { name: "Kavita Agarwal", city: "Mumbai", category: "Designer" },
+        { name: "Vinod Kumar", city: "Delhi", category: "Engineer" },
+        { name: "Neeta Singh", city: "Delhi", category: "Teacher" },
+        { name: "Arun Joshi", city: "Pune", category: "Artist" },
+        { name: "Pooja Verma", city: "Delhi", category: "Consultant" },
+        { name: "Sanjay Tiwari", city: "Delhi", category: "Teacher" },
+        { name: "Renu Pandey", city: "Mumbai", category: "Developer" },
+        { name: "Ajay Mishra", city: "Delhi", category: "Teacher" },
+        { name: "Sunita Yadav", city: "Delhi", category: "Designer" },
+        { name: "Manoj Saxena", city: "Delhi", category: "Teacher" },
+        { name: "Geeta Bansal", city: "Bangalore", category: "Doctor" },
+        { name: "Pankaj Jain", city: "Delhi", category: "Artist" },
+        { name: "Seema Khanna", city: "Delhi", category: "Teacher" },
+        { name: "Rakesh Sinha", city: "Chennai", category: "Engineer" }
+      ]
+    }
+  ]);
+
   const [filters, setFilters] = useState({
     city: "all",
     category: "all",
     fromDate: "",
     toDate: "",
+    usersPeriod: "thisMonth", // New filter for users metric
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
-  // ===== Fetch Overview Metrics =====
+  // Update overview data when filters change
   useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        setLoading(true);
-        const [overviewRes, catRes, engRes, actRes] = await Promise.all([
-          fetch("/api/admin/analytics/overview"),
-          fetch("/api/admin/analytics/category-distribution"),
-          fetch(`/api/admin/analytics/engagement-trend?city=${filters.city}&category=${filters.category}`),
-          fetch("/api/admin/analytics/activity-summary"),
-        ]);
+    console.log("Filters updated:", filters);
+    // Update overview data based on new filters
+    setOverview((prev: any) => ({
+      ...prev,
+      newUsersForPeriod: getNewUsersByPeriod(filters.usersPeriod)
+    }));
+  }, [filters.usersPeriod]); // Only listen to usersPeriod changes
 
-        const overviewJson = await overviewRes.json();
-        const categoryJson = await catRes.json();
-        const engagementJson = await engRes.json();
-        const activityJson = await actRes.json();
-
-        setOverview(overviewJson);
-        setCategoryData(categoryJson);
-        setEngagementData(engagementJson);
-        setActivityData(activityJson);
-      } catch (err) {
-        console.error("Error loading analytics:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAll();
-  }, [filters]);
+  const toggleRowExpansion = (rowIndex: number) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(rowIndex)) {
+      newExpandedRows.delete(rowIndex);
+    } else {
+      newExpandedRows.add(rowIndex);
+    }
+    setExpandedRows(newExpandedRows);
+  };
 
   // ===== Export Handlers =====
   const exportCSV = () => {
@@ -97,9 +393,7 @@ export default function AnalyticsPage() {
             Visualize user growth, connections, and engagement trends across categories and cities.
           </p>
         </div>
-        <button className={styles.ctaButton} onClick={exportPDF}>
-          <Download size={18} className="inline mr-2" /> Export as PDF
-        </button>
+        
       </div>
 
       {/* ===== FILTERS ===== */}
@@ -119,20 +413,18 @@ export default function AnalyticsPage() {
           <option value="Artist">Artist</option>
         </select>
 
-        <input
-          type="date"
-          value={filters.fromDate}
-          onChange={(e) => setFilters({ ...filters, fromDate: e.target.value })}
-        />
-        <input
-          type="date"
-          value={filters.toDate}
-          onChange={(e) => setFilters({ ...filters, toDate: e.target.value })}
-        />
+        <select 
+          value={filters.usersPeriod} 
+          onChange={(e) => setFilters({ ...filters, usersPeriod: e.target.value })}
+          className={styles.periodFilter}
+        >
+          <option value="thisWeek">This Week</option>
+          <option value="thisMonth">This Month</option>
+          <option value="lastMonth">Last Month</option>
+          <option value="last3Months">Last 3 Months</option>
+          <option value="thisYear">This Year</option>
+        </select>
 
-        <button className={styles.ctaButton} onClick={exportCSV}>
-          <Download size={18} className="inline mr-2" /> Export CSV
-        </button>
       </div>
 
       {/* ===== METRIC CARDS ===== */}
@@ -143,22 +435,21 @@ export default function AnalyticsPage() {
           <p className={styles.metric}>{overview?.totalUsers || 0}</p>
         </div>
 
-        <div className={styles.card}>
-          <Link2 className="text-blue-600" size={28} />
-          <h3>Total Connections</h3>
-          <p className={styles.metric}>{overview?.totalConnections || 0}</p>
-        </div>
+        
 
         <div className={styles.card}>
           <MapPin className="text-blue-600" size={28} />
-          <h3>Active Cities</h3>
+          <h3>Total Cities</h3>
           <p className={styles.metric}>{overview?.activeCities || 0}</p>
         </div>
 
         <div className={styles.card}>
           <Clock className="text-blue-600" size={28} />
-          <h3>New Users (This Month)</h3>
-          <p className={styles.metric}>{overview?.newUsersThisMonth || 0}</p>
+          <h3>{getPeriodLabel(filters.usersPeriod)}</h3>
+          <p className={styles.metric}>{overview?.newUsersForPeriod || 0}</p>
+          <div className="text-xs text-gray-500 mt-1">
+            Filter: {filters.usersPeriod ? filters.usersPeriod.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) : 'This Month'}
+          </div>
         </div>
       </div>
 
@@ -179,45 +470,80 @@ export default function AnalyticsPage() {
           </ResponsiveContainer>
         </div>
 
-        <div className={styles.chartBox}>
-          <h2>Engagement Trend (Last 30 Days)</h2>
+        {/* <div className={styles.chartBox}>
+          <h2>User Registration Trend (Last 30 Days)</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={engagementData}>
+            <BarChart data={activityData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="views" stroke="#2563eb" name="Profile Views" />
-              <Line type="monotone" dataKey="shares" stroke="#22c55e" name="Connections" />
-            </LineChart>
+              <Bar dataKey="newUsers" fill="#2563eb" name="New Users" />
+              <Bar dataKey="connections" fill="#22c55e" name="New Connections" />
+            </BarChart>
           </ResponsiveContainer>
-        </div>
+        </div> */}
       </div>
 
       {/* ===== ACTIVITY TABLE ===== */}
       <div className={styles.insightSection}>
-        <h2>Activity Summary</h2>
+        <h2>Activity Summary </h2>
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b text-gray-600">
               <th className="py-2">Date</th>
-              <th>New Users</th>
-              <th>Connections</th>
+              <th>New Users Count</th>
+              <th>Users Who Joined</th>
               <th>Top City</th>
               <th>Top Category</th>
             </tr>
           </thead>
           <tbody>
-            {activityData.map((row, i) => (
-              <tr key={i} className="border-b hover:bg-gray-50">
-                <td className="py-2">{row.date}</td>
-                <td>{row.newUsers}</td>
-                <td>{row.connections}</td>
-                <td>{row.topCity}</td>
-                <td>{row.topCategory}</td>
-              </tr>
-            ))}
+            {activityData.map((row, i) => {
+              const isExpanded = expandedRows.has(i);
+              const usersToShow = isExpanded ? row.usersJoined : row.usersJoined.slice(0, 2);
+              const hasMoreUsers = row.usersJoined.length > 2;
+              
+              return (
+                <tr key={i} className="border-b hover:bg-gray-50">
+                  <td className="py-2 font-medium">{row.date}</td>
+                  <td className="text-blue-600 font-semibold">{row.newUsers}</td>
+                  <td className="py-2 max-w-md">
+                    <div className="flex flex-wrap gap-1">
+                      {usersToShow.map((user: any, idx: number) => (
+                        <div 
+                          key={idx} 
+                          className="inline-block bg-blue-50 border border-blue-200 text-blue-800 text-xs px-2 py-1 rounded-lg"
+                        >
+                          <div className="font-medium">{typeof user === 'string' ? user : user.name}</div>
+                          {typeof user === 'object' && (
+                            <div className="text-xs text-blue-600 mt-1">
+                              <span className="bg-green-100 text-green-700 px-1 rounded">{user.city}</span>
+                              {' • '}
+                              <span className="bg-purple-100 text-purple-700 px-1 rounded">{user.category}</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      {hasMoreUsers && (
+                        <button
+                          onClick={() => toggleRowExpansion(i)}
+                          className="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full hover:bg-orange-200 cursor-pointer transition-colors"
+                        >
+                          {isExpanded 
+                            ? `Show Less` 
+                            : `+${row.usersJoined.length - 2} Others`
+                          }
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                  <td className="text-black font-medium">{row.topCity}</td>
+                  <td className="text-black font-medium">{row.topCategory}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
