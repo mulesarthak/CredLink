@@ -1,4 +1,5 @@
-"use client";
+
+ "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -6,7 +7,6 @@ import Sidebar from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/header";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/hooks/use-auth";
-import { FiMenu, FiX } from "react-icons/fi";
 
 export default function DashboardLayout({
   children,
@@ -15,9 +15,6 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const { isAuthenticated, checkAuth, isLoading } = useAuth();
-  const [expanded, setExpanded] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [isLgUp, setIsLgUp] = useState(false);
 
   useEffect(() => {
@@ -35,44 +32,24 @@ export default function DashboardLayout({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Handle mobile detection
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   return (
     <div className="h-screen overflow-hidden" style={{ backgroundColor: '#f8fafc' }}>
       {/* Sidebar */}
-      <Sidebar expanded={expanded} setExpanded={setExpanded} mobileOpen={mobileOpen} />
+      <Sidebar />
 
       {/* Main Content */}
-      <motion.div
-        animate={{ marginLeft: isLgUp ? (expanded ? 270 : 90) : 0 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+      <div
         className="h-full flex flex-col"
         style={{ 
-          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
+          marginLeft: isLgUp ? '18rem' : '0', // 18rem = 288px matches sidebar width
+          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+          transition: 'margin-left 0.3s ease-in-out'
         }}
       >
         {/* Header */}
         <div className="sticky top-0 z-30 bg-white shadow-sm">
-          {/* Mobile top bar with hamburger */}
-          <div className="flex items-center gap-3 px-4 py-3 lg:hidden">
-            <button
-              aria-label="Open sidebar"
-              onClick={() => setMobileOpen(true)}
-              className="p-2 rounded-md text-gray-700 hover:bg-gray-100"
-            >
-              <FiMenu className="h-6 w-6" />
-            </button>
-            <div className="flex-1" />
-          </div>
+          {/* Removed duplicate mobile hamburger - using Sidebar's blue hamburger instead */}
           <Header />
         </div>
 
@@ -92,15 +69,7 @@ export default function DashboardLayout({
             {children}
           </motion.div>
         </main>
-      </motion.div>
-
-      {/* Backdrop for mobile sidebar */}
-      {mobileOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
+      </div>
     </div>
   );
 }
