@@ -14,11 +14,8 @@ import {
   ChevronRight,
   LogOut,
   Home,
-<<<<<<< HEAD
   Tag,
-=======
   Layers,
->>>>>>> upstream/main
 } from "lucide-react";
 import styles from "./admin.module.css";
 
