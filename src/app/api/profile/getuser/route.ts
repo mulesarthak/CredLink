@@ -13,11 +13,7 @@ export async function GET(req: NextRequest) {
         }
         // Fetch all users except the requesting user
         const users = await (prisma as any).user.findMany({
-            where: {
-                id: {
-                    not: userId
-                }
-            }
+           
         });
 
         return NextResponse.json({ ok: true, users });

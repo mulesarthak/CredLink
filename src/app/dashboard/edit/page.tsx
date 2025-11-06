@@ -1,12 +1,12 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const EditPage = () => {
   const [activeTab, setActiveTab] = useState('Display');
   const [selectedColor, setSelectedColor] = useState('#145dfd');
-  const [firstName, setFirstName] = useState('Yaasnick');
-  const [email, setEmail] = useState('yaasnick01@gmail.com');
-  const [phone, setPhone] = useState('+91 75584 24907');
+  const [firstName, setFirstName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [emailLink, setEmailLink] = useState('');
   const [phoneLink, setPhoneLink] = useState('');
   const [selectedDesign, setSelectedDesign] = useState('Classic');
@@ -24,19 +24,156 @@ const EditPage = () => {
   const [company, setCompany] = useState('');
   const [headline, setHeadline] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [selectedFont, setSelectedFont] = useState('Arial, sans-serif'); // New state for selected font
-  const [cardName, setCardName] = useState(''); // New state for card name
-  const [cardType, setCardType] = useState('Personal'); // New state for card type (Personal/Professional)
-  const [bannerImage, setBannerImage] = useState<string | null>(null); // New state for banner image
-  const [cardLocation, setCardLocation] = useState('California, USA'); // New state for card location
-  const [cardDescription, setCardDescription] = useState('A modern digital visiting card for software designer showcasing professional details, social links, and portfolio'); // New state for card description
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [selectedFont, setSelectedFont] = useState('Arial, sans-serif');
+  const [cardName, setCardName] = useState('');
+  const [cardType, setCardType] = useState('Personal');
+  const [bannerImage, setBannerImage] = useState<string | null>(null);
+  const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
+  const [cardLocation, setCardLocation] = useState('');
+  const [cardDescription, setCardDescription] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [displayTypes, setDisplayTypes] = useState<string[]>(['Classic']);
+
+  // Fetch profile data on component mount
+  useEffect(() => {
+    getProfile();
+  }, []);
+
+  // Fetch profile data
+  const getProfile = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Fetched profile:', data);
+        const user = data.user;
+
+        // Populate all fields with fetched data or keep empty
+        setFirstName(user.firstName || '');
+        setMiddleName(user.middleName || '');
+        setLastName(user.lastName || '');
+        setPrefix(user.prefix || '');
+        setSuffix(user.suffix || '');
+        setPreferredName(user.preferredName || '');
+        setMaidenName(user.maidenName || '');
+        setPronouns(user.pronouns || '');
+        setTitle(user.title || '');
+        setCompany(user.company || '');
+        setDepartment(user.department || '');
+        setAffiliation(user.affiliation || '');
+        setHeadline(user.headline || '');
+        setAccreditations(user.accreditations || '');
+        setEmail(user.email || '');
+        setPhone(user.phone || '');
+        setEmailLink(user.emailLink || '');
+        setPhoneLink(user.phoneLink || '');
+        setCardLocation(user.location || '');
+        setCardName(user.cardName || '');
+        setCardType(user.cardType || 'Personal');
+        setSelectedDesign(user.selectedDesign || 'Classic');
+        setSelectedColor(user.selectedColor || '#145dfd');
+        setSelectedFont(user.selectedFont || 'Arial, sans-serif');
+        setProfileImage(user.profileImage || null);
+        setBannerImage(user.bannerImage || null);
+        setCardDescription(user.bio || '');
+        
+        // Parse displayTypes if it exists
+        if (user.displayTypes) {
+          try {
+            const parsed = JSON.parse(user.displayTypes);
+            setDisplayTypes(Array.isArray(parsed) ? parsed : ['Classic']);
+          } catch (e) {
+            setDisplayTypes(['Classic']);
+          }
+        }
+      } else {
+        console.error('Failed to fetch profile');
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Save profile data
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const token = localStorage.getItem('token');
+      const cookieStore = document.cookie;
+      const token = cookieStore.split('; ').find(row => row.startsWith('user_token='))?.split('=')[1];
+
+      // Step 1: Upload profile image if changed
+      let profileImageData = profileImage;
+      if (profileImageFile) {
+        console.log('Uploading profile image...');
+        const base64Image = await convertFileToBase64(profileImageFile);
+        
+        const profileImageResponse = await fetch('/api/upload/image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            image: base64Image,
+            imageType: 'profile'
+          }),
+        });
+
+        if (profileImageResponse.ok) {
+          const imageData = await profileImageResponse.json();
+          profileImageData = imageData.imageUrl;
+          console.log('Profile image uploaded successfully');
+        } else {
+          const errorData = await profileImageResponse.json();
+          console.error('Failed to upload profile image:', errorData);
+          alert(`Failed to upload profile image: ${errorData.error || 'Unknown error'}`);
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      // Step 2: Upload banner image if changed
+      let bannerImageData = bannerImage;
+      if (bannerImageFile) {
+        console.log('Uploading banner image...');
+        const base64Image = await convertFileToBase64(bannerImageFile);
+        
+        const bannerImageResponse = await fetch('/api/upload/image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            image: base64Image,
+            imageType: 'banner'
+          }),
+        });
+
+        if (bannerImageResponse.ok) {
+          const imageData = await bannerImageResponse.json();
+          bannerImageData = imageData.imageUrl;
+          console.log('Banner image uploaded successfully');
+        } else {
+          const errorData = await bannerImageResponse.json();
+          console.error('Failed to upload banner image:', errorData);
+          alert(`Failed to upload banner image: ${errorData.error || 'Unknown error'}`);
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      // Step 3: Update profile with all data
+      console.log('Updating profile...');
       const response = await fetch('/api/profile/update', {
         method: 'PUT',
         headers: {
@@ -68,8 +205,9 @@ const EditPage = () => {
           selectedDesign,
           selectedColor,
           selectedFont,
-          profileImage,
-          bannerImage,
+          displayTypes,
+          profileImage: profileImageData,
+          bannerImage: bannerImageData,
           bio: cardDescription,
         }),
       });
@@ -78,6 +216,10 @@ const EditPage = () => {
         const data = await response.json();
         alert('Profile saved successfully!');
         console.log('Saved profile:', data);
+        
+        // Clear file states after successful save
+        setProfileImageFile(null);
+        setBannerImageFile(null);
       } else {
         const errorData = await response.json();
         console.error('Failed to save profile:', errorData);
@@ -89,6 +231,16 @@ const EditPage = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // Helper function to convert file to base64
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
   };
 
   const hexToRgb = (hex: string) => {
@@ -103,12 +255,12 @@ const EditPage = () => {
     return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
   };
 
-  const initialRgb = hexToRgb(selectedColor);
-  const [rValue, setRValue] = useState(initialRgb.r);
-  const [gValue, setGValue] = useState(initialRgb.g);
-  const [bValue, setBValue] = useState(initialRgb.b);
-  const [hexValue, setHexValue] = useState(selectedColor);
+  const [rValue, setRValue] = useState(20);
+  const [gValue, setGValue] = useState(93);
+  const [bValue, setBValue] = useState(253);
+  const [hexValue, setHexValue] = useState('#145dfd');
 
+  // Update RGB values when selectedColor changes
   React.useEffect(() => {
     const newRgb = hexToRgb(selectedColor);
     setRValue(newRgb.r);
@@ -180,7 +332,13 @@ const EditPage = () => {
                 {['Classic', 'Flat', 'Modern', 'Sleek', 'Blend'].map((design, index) => (
                   <div
                     key={design}
-                    onClick={() => setSelectedDesign(design)}
+                    onClick={() => {
+                      setSelectedDesign(design);
+                      // Add to displayTypes array if not already present
+                      if (!displayTypes.includes(design)) {
+                        setDisplayTypes([...displayTypes, design]);
+                      }
+                    }}
                     style={{
                       border: design === selectedDesign ? `2px solid ${selectedColor}` : '1px solid #ddd',
                       borderRadius: '10px',
@@ -191,7 +349,7 @@ const EditPage = () => {
                       cursor: 'pointer',
                       position: 'relative',
                       overflow: 'hidden',
-                      backgroundColor: 'white'
+                      backgroundColor: displayTypes.includes(design) ? '#f0f9ff' : 'white'
                     }}
                   >
                     {index > 0 && (
@@ -288,6 +446,7 @@ const EditPage = () => {
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
                         const file = e.target.files[0];
+                        setBannerImageFile(file);
                         setBannerImage(URL.createObjectURL(file));
                       }
                     }}
@@ -333,6 +492,7 @@ const EditPage = () => {
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
                       const file = e.target.files[0];
+                      setProfileImageFile(file);
                       setProfileImage(URL.createObjectURL(file));
                     }
                   }}
@@ -753,6 +913,38 @@ const EditPage = () => {
         return null;
     }
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh',
+        backgroundColor: '#f0f2f5'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ 
+            width: '50px', 
+            height: '50px', 
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #145dfd',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px'
+          }}></div>
+          <p style={{ color: '#666', fontSize: '16px' }}>Loading your profile...</p>
+        </div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div style={{ 

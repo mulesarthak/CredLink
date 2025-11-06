@@ -48,6 +48,7 @@ model User {
   selectedDesign   String?   @default("Classic")
   selectedColor    String?   @default("#145dfd")
   selectedFont     String?   @default("Arial, sans-serif")
+  displayTypes     String?   @db.Text  // JSON array of display types: ["Classic", "Modern", "Sleek"]
   
   // Media
   profileImage     String?   @db.Text
@@ -64,6 +65,7 @@ model User {
   updatedAt        DateTime  @updatedAt
   receivedMessages Message[] @relation("ReceivedMessages")
   sentMessages     Message[] @relation("SentMessages")
+  cards            Card[]    @relation("UserCards")
 
   @@index([username])
   @@map("users")
@@ -133,7 +135,7 @@ model Card {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation("UserCards", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([createdAt])

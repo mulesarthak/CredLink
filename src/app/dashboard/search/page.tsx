@@ -1,81 +1,65 @@
 "use client"
 
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useState, useEffect } from "react"
 import Link from "next/link"
-import { Search, List, Grid, Filter } from "lucide-react"
+import { Search, Filter } from "lucide-react"
 import { toast } from "react-hot-toast"
 
 type Profile = {
   id: string
   username: string
-  name: string
-  city: string
+  fullName: string
+  firstName?: string
+  lastName?: string
+  location?: string
   company?: string
-  designation?: string
-  category?: string
-  verified?: boolean
-  reviews?: number
+  title?: string
+  department?: string
+  headline?: string
+  profileImage?: string
   views?: number
 }
-
-const SAMPLE_PROFILES: Profile[] = [
-  {
-    id: "1",
-    username: "john",
-    name: "John Doe",
-    city: "New York",
-    company: "Tech Corp",
-    designation: "Full Stack Developer",
-    category: "Technology",
-    verified: true,
-    reviews: 18,
-    views: 1250,
-  },
-  {
-    id: "2",
-    username: "jane",
-    name: "Jane Smith",
-    city: "Los Angeles",
-    company: "Marketing Pro",
-    designation: "Digital Marketing Expert",
-    category: "Marketing",
-    verified: false,
-    reviews: 4,
-    views: 890,
-  },
-  {
-    id: "3",
-    username: "alex",
-    name: "Alex Kumar",
-    city: "Mumbai",
-    company: "Design Studio",
-    designation: "UI/UX Designer",
-    category: "Design",
-    verified: true,
-    reviews: 32,
-    views: 2100,
-  },
-  {
-    id: "4",
-    username: "maria",
-    name: "Maria Garcia",
-    city: "Madrid",
-    company: "ConsultCo",
-    designation: "Business Consultant",
-    category: "Consulting",
-    verified: false,
-    reviews: 0,
-    views: 120,
-  },
-]
 
 export default function SearchPage() {
   const [query, setQuery] = useState("")
   const [category, setCategory] = useState("")
-  const [onlyVerified, setOnlyVerified] = useState(false)
   const [minReviews, setMinReviews] = useState<number | "">("")
-  const [layout, setLayout] = useState<"grid" | "list">("grid")
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [profiles, setProfiles] = useState<Profile[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Fetch users on component mount
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      setIsLoading(true)
+      const response = await fetch('/api/profile/getuser', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include',
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Fetched users:', data)
+        setProfiles(data.users || [])
+      } else {
+        console.error('Failed to fetch users')
+        toast.error('Failed to load users')
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      toast.error('Error loading users')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleConnect = (name: string) => {
     toast.success(`Connection request sent to ${name}!`)
@@ -83,165 +67,235 @@ export default function SearchPage() {
 
   const categories = useMemo(() => {
     const set = new Set<string>()
-    SAMPLE_PROFILES.forEach((p) => p.category && set.add(p.category))
+    profiles.forEach((p) => p.department && set.add(p.department))
     return Array.from(set)
-  }, [])
+  }, [profiles])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return SAMPLE_PROFILES.filter((p) => {
-      if (q) {
-        const hay = `${p.name} ${p.designation ?? ""} ${p.company ?? ""} ${p.category ?? ""} ${p.city}`.toLowerCase()
-        if (!hay.includes(q)) return false
-      }
-      if (category && p.category !== category) return false
-      if (onlyVerified && !p.verified) return false
-      if (minReviews !== "" && p.reviews !== undefined && p.reviews < Number(minReviews)) return false
+    return profiles.filter((p) => {
+      // Search in multiple fields
+      const searchFields = [
+        p.fullName,
+        p.firstName,
+        p.lastName,
+        p.title,
+        p.company,
+        p.department,
+        p.headline,
+        p.location,
+        p.username
+      ].filter(Boolean).join(' ').toLowerCase()
+
+      if (q && !searchFields.includes(q)) return false
+      if (category && p.department !== category) return false
+      if (minReviews !== "" && p.views !== undefined && p.views < Number(minReviews)) return false
+
       return true
-    })
-  }, [query, category, onlyVerified, minReviews])
+    }).slice(0, 6)
+  }, [query, category, minReviews, profiles])
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="w-full">
-        {/* Hero Section */}
-        <div className="relative bg-white overflow-hidden" style={{ padding: "40px 32px" }}>
-          <div className="absolute inset-0 bg-black/10"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent"></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+      
+      {/* HEADER */}
+      <div className="relative flex flex-col items-center justify-center py-12 px-6 text-center">
 
-          <div className="absolute top-0 left-1/4 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl"></div>
+        {/* FIXED FILTER BUTTON (smaller + cleaner) */}
+        <button
+          onClick={() => setFiltersOpen(!filtersOpen)}
+          className="absolute right-10 top-8 flex items-center gap-2 px-4 py-1.5 bg-blue-600 w-20 h-5 text-white 
+          text-sm font-medium rounded-lg shadow hover:bg-blue-700 transition"
+        >
+          <Filter className="w-4 h-4" /> Filter
+        </button>
 
-          <div className="relative px-6 py-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="relative group w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg border border-white/30 cursor-pointer transition-all duration-300 hover:scale-105">
-                      <Search className="w-8 h-8 text-white" />
-                    </div>
-                    <div>
-                      <h1 className="text-4xl font-bold text-gray-900 mb-1">Search Professionals</h1>
-                      <p className="text-gray-600 text-lg">Find professionals, services, and profiles</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        {/* Title */}
+        <h1 className="text-5xl font-extrabold text-gray-900 bg-clip-text text-transparent bg-gradient-to-r from-blue-800 via-blue-600 to-sky-400">
+          Search Professionals
+        </h1>
 
-              <div className="flex items-center gap-4">
-                <div className="hidden md:flex flex-col items-center text-center">
-                  <div className="text-3xl font-bold text-gray-900">{filtered.length}</div>
-                  <div className="text-gray-600 text-sm">Results Found</div>
-                </div>
+        <p className="mt-3 text-gray-600 text-lg">
+          Search, filter, and connect with experts across industries
+        </p>
 
-                <div className="flex items-center gap-3">
-                  <div className="relative flex items-center bg-gradient-to-r from-slate-100 via-white to-slate-100 rounded-full p-2.5 shadow-lg border-2 border-slate-200/60 backdrop-blur-sm min-w-[200px]">
-                    <div
-                      className={`absolute top-0.5 bottom-0.5 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 rounded-full shadow-xl transition-all duration-500 ease-out transform ${
-                        layout === "grid" ? "left-2.5 right-1/2" : "left-1/2 right-2.5"
-                      }`}
-                      style={{
-                        boxShadow:
-                          "0 8px 25px -5px rgba(59, 130, 246, 0.4), 0 4px 6px -2px rgba(59, 130, 246, 0.1)",
-                      }}
-                    />
-                    <button
-                      onClick={() => setLayout("grid")}
-                      className={`relative z-10 px-12 py-7 text-lg font-bold transition-all duration-500 rounded-full transform min-w-[120px] ${
-                        layout === "grid"
-                          ? "text-white scale-105"
-                          : "text-slate-600 hover:text-slate-800 hover:scale-102"
-                      }`}
-                    >
-                      <Grid className="w-5 h-5 mx-auto" />
-                    </button>
-                    <button
-                      onClick={() => setLayout("list")}
-                      className={`relative z-10 px-12 py-7 text-lg font-bold transition-all duration-500 rounded-full transform min-w-[120px] ${
-                        layout === "list"
-                          ? "text-white scale-105"
-                          : "text-slate-600 hover:text-slate-800 hover:scale-102"
-                      }`}
-                    >
-                      <List className="w-5 h-5 mx-auto" />
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={() => setFiltersOpen(!filtersOpen)}
-                    className="flex items-center gap-2 px-6 py-3"
-                  >
-                    <Filter className="w-8 h-10" />
-                  </button>
-                </div>
-              </div>
+        {/* SEARCH BAR FIXED TEXT SIZE */}
+        <div className="relative mt-10 w-full max-w-2xl px-4">
+          <div className="relative flex items-center bg-white rounded-2xl shadow-lg border border-blue-100 focus-within:ring-4 focus-within:ring-blue-200 transition-all">
+            
+            <div className="pl-10 flex items-center">
+              <Search className="text-blue-500 w-5 h-5" />
             </div>
 
-            {/* Search Bar */}
-            <div className="mt-12 mb-8">
-              <div className="max-w-4xl mx-auto">
-                <div className="bg-gray-50 rounded-3xl p-8 border border-gray-200 shadow-2xl">
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-5">
-                      <Search className="h-6 w-6 text-gray-500" />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Search by name, skills, company, category, or location..."
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      className="block w-full py-5 bg-white border-2 border-gray-200 rounded-2xl text-gray-900 placeholder-gray-500 text-xl font-medium focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-400 transition-all duration-300 pl-14 pr-20"
-                    />
-                    {query && (
-                      <button
-                        onClick={() => setQuery("")}
-                        className="absolute inset-y-0 right-0 flex items-center pr-6"
-                      >
-                        <span className="text-gray-400 hover:text-gray-600">✕</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+            <input
+              type="text"
+              placeholder="Search by name, skills, company, or city..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full py-3 pl-3 pr-10 text-base rounded-2xl bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none"
+            />
 
-        {/* Results Section */}
-        <div className="px-8 py-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filtered.map((p) => (
-              <article
-                key={p.id}
-                className="group relative bg-white rounded-xl p-5 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden"
+            {query && (
+              <button
+                onClick={() => setQuery("")}
+                className="absolute right-5 text-blue-400 hover:text-blue-600 text-lg"
               >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md">
-                    {p.name.charAt(0)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
-                      <Link href={`/profile/${p.username}`}>{p.name}</Link>
-                    </h3>
-                    <p className="text-xs text-gray-500 truncate">{p.designation}</p>
-                  </div>
-                </div>
+                ✕
+              </button>
+            )}
 
-                <div className="mb-4">
-                  <p className="text-sm text-gray-700 font-medium truncate">{p.company}</p>
-                  <p className="text-xs text-gray-500 truncate">{p.city}</p>
-                </div>
-
-                <button
-                  onClick={() => handleConnect(p.name)}
-                  className="w-full py-2.5 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white rounded-lg text-sm font-semibold hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg transform active:scale-95"
-                >
-                  Connect Now
-                </button>
-              </article>
-            ))}
           </div>
         </div>
+      </div>
+
+      {/* FILTER PANEL */}
+      <div className={`transition-all duration-500 transform ${filtersOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5 pointer-events-none"}`}>
+        {filtersOpen && (
+          <div className="mx-auto mt-4 max-w-4xl rounded-2xl bg-white/95 backdrop-blur-md shadow-xl border border-blue-100 p-6 relative">
+
+            {/* Close Button */}
+            <button
+              onClick={() => setFiltersOpen(false)}
+              className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 transition"
+            >
+              ✕
+            </button>
+
+            {/* Header */}
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">Filters</h3>
+
+            {/* Grid Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-gray-700">Department</label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 text-gray-800 bg-white"
+                >
+                  <option value="">All Departments</option>
+                  {categories.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-gray-700">Min Views</label>
+                <input
+                  type="number"
+                  placeholder="e.g. 100"
+                  min={0}
+                  value={minReviews === "" ? "" : String(minReviews)}
+                  onChange={(e) => setMinReviews(e.target.value === "" ? "" : Number(e.target.value))}
+                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 text-gray-800 bg-white"
+                />
+              </div>
+
+            </div>
+
+            {/* Clear Filters */}
+            <button
+              onClick={() => {
+                setCategory("")
+                setMinReviews("")
+              }}
+              className="mt-6 text-sm font-semibold text-blue-600 hover:text-blue-700"
+            >
+              Clear all filters
+            </button>
+
+          </div>
+        )}
+      </div>
+
+      {/* RESULTS GRID */}
+      <div className="max-w-7xl mx-auto px-8 py-10">
+
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-lg text-gray-600">No professionals found</p>
+            <p className="text-sm text-gray-500 mt-2">Try adjusting your search or filters</p>
+          </div>
+        ) : (
+          <>
+            <p className="text-sm text-gray-600 mb-5">
+              Showing <span className="font-semibold">{filtered.length}</span> result{filtered.length !== 1 ? "s" : ""}
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
+
+              {filtered.map((p) => (
+                
+                <article
+                  key={p.id}
+                  className="group relative rounded-3xl p-[1px] shadow-lg hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 bg-gradient-to-br from-blue-200 via-blue-300  to-blue-100"
+                >
+                  <div className="relative bg-white/95 backdrop-blur-sm rounded-[calc(1.5rem-2px)] p-6 flex flex-col h-full border border-gray-200 shadow-sm overflow-hidden">
+
+                    {/* Header: Avatar + Name (left) and Connect Button (right) */}
+                    <div className="flex items-center justify-between mb-5 gap-3">
+                      
+                      {/* Left: Avatar + Name */}
+                      <div className="flex items-center gap-4 min-w-0 flex-1 overflow-hidden">
+                        
+                        {p.profileImage ? (
+                          <img 
+                            src={p.profileImage} 
+                            alt={p.fullName}
+                            className="w-14 h-14 rounded-full object-cover shadow-md ring-4 ring-blue-100 group-hover:ring-sky-300 transition flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-14 h-14 bg-gradient-to-br from-blue-700 via-blue-500 to-sky-400 
+                          rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md ring-4 
+                          ring-blue-100 group-hover:ring-sky-300 transition flex-shrink-0">
+                            {p.fullName?.charAt(0) || p.firstName?.charAt(0) || '?'}
+                          </div>
+                        )}
+
+                        <div className="min-w-0 flex-1 overflow-hidden">
+                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition truncate overflow-hidden">
+                            <Link href={`/profile/${p.username}`} className="block truncate">{p.fullName || `${p.firstName} ${p.lastName}`}</Link>
+                          </h3>
+                          <p className="text-sm text-gray-500 truncate overflow-hidden">{p.title || 'No title'}</p>
+                        </div>
+                        
+                      </div>
+
+                      {/* Right: Connect Button */}
+                      <button
+                        onClick={() => handleConnect(p.fullName || `${p.firstName} ${p.lastName}`)}
+                        className="px-4 py-1.5 mr-2 bg-blue-600 text-white text-xs font-semibold rounded-md hover:bg-blue-700 transition w-20 h-5 whitespace-nowrap"
+                      >
+                        Connect
+                      </button>
+                      
+                    </div>
+
+                    {/* Company + Location */}
+                    <div className="mb-4 space-y-1 overflow-hidden">
+                      <p className="text-sm font-semibold text-gray-800 truncate overflow-hidden">{p.company || 'No company'}</p>
+                      <p className="text-xs text-gray-500 truncate overflow-hidden">📍 {p.location || 'No location'}</p>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="flex items-center justify-center text-sm text-gray-500 border-t border-gray-100 pt-3 gap-27 px-1">
+                      <span className=" overflow-hidden pl-1">👁 {p.views ?? 0} views</span>
+                    </div>
+
+                  </div>
+                </article>
+
+              ))}
+
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

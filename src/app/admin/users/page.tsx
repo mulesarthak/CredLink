@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Search, Filter, Shield, Edit, Trash2, MoreHorizontal, X, Eye, EyeOff } from "lucide-react";
 import styles from "./users.module.css";
+import { he } from "zod/v4/locales";
 
 interface User {
   id: string;
@@ -55,11 +56,26 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/users");
+      const response = await fetch("/api/users", { method: "GET" });
+      console.log("Response status:", response.status);
       const data = await response.json();
-      if (data.users) setUsers(data.users);
+      console.log("Fetched users data:", data);
+      
+      if (!response.ok) {
+        console.error("API Error:", data.error);
+        alert(`Failed to fetch users: ${data.error || 'Unknown error'}`);
+        return;
+      }
+      
+      if (data.users) {
+        console.log("Setting users:", data.users.length);
+        setUsers(data.users);
+      } else {
+        console.warn("No users array in response");
+      }
     } catch (error) {
       console.error("Failed to fetch users:", error);
+      alert(`Error fetching users: ${error}`);
     } finally {
       setLoading(false);
     }
