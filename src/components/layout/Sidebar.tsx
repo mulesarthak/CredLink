@@ -20,10 +20,10 @@ import { motion, AnimatePresence } from "framer-motion";
 interface SidebarProps {
   expanded: boolean;
   setExpanded: (v: boolean) => void;
-  mobileOpen?: boolean;
+    mobileOpen?: boolean; 
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = false }) => {
+const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -75,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.2 }}
             onClick={toggleMobileMenu}
-            className="fixed top-4 left-4 z-50 p-3 bg-gradient-to-br from-[#0072EE] to-[#0052CC] text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm border border-white/20"
+            className="fixed top-4 left-4 z-50 p-3 bg-linear-to-br from-[#0072EE] to-[#0052CC] text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm border border-white/20"
             style={{
               boxShadow: '0 8px 32px rgba(0, 114, 238, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)'
             }}
@@ -106,18 +106,22 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
 
       {/* Sidebar */}
       <motion.div
+        initial={{ 
+          width: isMobile ? 0 : (expanded ? 270 : 90),
+          x: isMobile ? -270 : 0
+        }}
         animate={{ 
-          width: isMobile ? (isMobileOpen ? "17rem" : "0rem") : (expanded ? "17rem" : "5.5rem")
+          width: isMobile ? 270 : (expanded ? 270 : 90),
+          x: isMobile ? (isMobileOpen ? 0 : -270) : 0
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className={`fixed left-0 top-0 h-screen flex flex-col justify-between bg-gradient-to-b from-[#0072EE] via-[#0052CC] to-[#0072EE] border-r border-blue-800/30 shadow-2xl overflow-hidden ${
+        className={`fixed left-0 top-0 h-screen flex flex-col justify-between bg-gradient-to-b from-[#0072EE] via-[#0052CC] to-[#0072EE] border-r border-blue-800/30 shadow-2xl ${
           isMobile ? 'z-40' : 'z-40'
         }`}
         style={{
           boxShadow: isMobile 
             ? '8px 0 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)'
-            : '4px 0 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1)',
-          transform: isMobile && !isMobileOpen ? 'translateX(-100%)' : 'translateX(0)'
+            : '4px 0 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1)'
         }}
       >
         {/* ---------- Top Section ---------- */}
@@ -156,33 +160,62 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
                 </motion.div>
               </button>
             )}
-          </div>
+          </AnimatePresence>
+
+          {!isMobile && (
+            <motion.button
+              onClick={() => setExpanded(!expanded)}
+              className="p-2 hover:bg-white/20 hover:shadow-lg hover:shadow-white/25 text-white rounded-full transition-all duration-300 backdrop-blur-sm"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                boxShadow: '0 0 20px rgba(255,255,255,0.2)'
+              }}
+            >
+              <motion.div
+                animate={{ rotate: expanded ? 0 : 180 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="text-3xl"
+              >
+                {expanded ? <ChevronLeft /> : <ChevronRight />}
+              </motion.div>
+            </motion.button>
+          )}
+        </div>
 
           {/* Top Partition Line */}
-          <div className="h-[1px] bg-white/30 mx-4 mt-0.5 shadow-sm"></div>
+          <div className="h-px bg-white/30 mx-4 mt-0.5 shadow-sm"></div>
           
           <p className="opacity-0 select-none text-sm">Spacer</p>
 
-          {/* Navigation */}
-          <nav className="mt-8 flex flex-col gap-5 px-2">
-            {menuItems.map((item, index) => {
-              const isActive = pathname === item.path;
-              return (
-                <motion.div
-                  key={item.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  <Link href={item.path}>
-                    <motion.div
-                      whileHover={{ scale: 1.05, x: 6 }}
-                      whileTap={{ scale: 0.97 }}
-                      className={`flex items-center ${(isMobile || expanded) ? 'gap-5 px-4' : 'justify-center px-2'} py-3 rounded-lg cursor-pointer transition-all duration-300 ${
-                        isActive
-                          ? "text-white font-bold shadow-lg shadow-white/25 backdrop-blur-sm border border-white/30"
-                          : "text-white/90 hover:bg-white/15 hover:shadow-lg hover:shadow-white/20 hover:backdrop-blur-sm hover:border hover:border-white/20"
-                      }`}
+        {/* 2-finger gap above Dashboard (1rem = 16px) */}
+        <nav className="mt-8 flex flex-col gap-5 px-2">
+          {menuItems.map((item, index) => {
+            const isActive = pathname === item.path;
+            return (
+              <motion.div
+                key={item.name}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
+                <Link href={item.path}>
+                  <motion.div
+                    whileHover={{ scale: 1.05, x: 6 }}
+                    whileTap={{ scale: 0.97 }}
+                    className={`flex items-center ${(isMobile || expanded) ? 'gap-5 px-4' : 'justify-center px-2'} py-3 rounded-lg cursor-pointer transition-all duration-300 ${
+                      isActive
+                        ? "text-white font-bold shadow-lg shadow-white/25 backdrop-blur-sm border border-white/30"
+                        : "text-white/90 hover:bg-white/15 hover:shadow-lg hover:shadow-white/20 hover:backdrop-blur-sm hover:border hover:border-white/20"
+                    }`}
+                    style={isActive ? { 
+                      textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.4)',
+                      boxShadow: '0 0 25px rgba(255,255,255,0.4), 0 0 50px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.2)'
+                    } : {}}
+                  >
+                    <motion.div 
+                      whileHover={{ rotate: 12, scale: 1.15 }} 
+                      className="text-[1.6rem] transition-all duration-300"
                       style={isActive ? { 
                         textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.4)',
                         boxShadow: '0 0 25px rgba(255,255,255,0.4), 0 0 50px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.2)'
@@ -222,30 +255,38 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
           </nav>
         </div>
 
-        {/* ---------- Bottom Section ---------- */}
-        <div className="mb-8 px-2">
-          {/* Divider */}
-          <div className="h-[1px] bg-white/30 mx-4 mb-6"></div>
+      {/* ---------- Bottom Section ---------- */}
+      <div className="mb-6"> {/* Added extra gap below Support (1.5rem) */}
+        {/* Faint Divider Above Settings */}
+        <div className="border-t border-white/30 mx-6 mb-3 shadow-sm"></div>
 
-          <div className="flex flex-col gap-2">
-            {bottomItems.map((item, index) => {
-              const isActive = pathname === item.path;
-              return (
-                <motion.div
-                  key={item.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  <Link href={item.path}>
-                    <motion.div
-                      whileHover={{ scale: 1.05, x: 6 }}
-                      whileTap={{ scale: 0.97 }}
-                      className={`flex items-center ${(isMobile || expanded) ? 'gap-5 px-4' : 'justify-center px-2'} py-3 rounded-lg cursor-pointer transition-all duration-300 ${
-                        isActive
-                          ? "text-white font-bold shadow-lg shadow-white/25 backdrop-blur-sm border border-white/30"
-                          : "text-white/90 hover:bg-white/15 hover:shadow-lg hover:shadow-white/20 hover:backdrop-blur-sm hover:border hover:border-white/20"
-                      }`}
+        <div className="flex flex-col gap-5 px-2">
+          {bottomItems.map((item, index) => {
+            const isActive = pathname === item.path;
+            return (
+              <motion.div
+                key={item.name}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: (menuItems.length + index) * 0.1 }}
+              >
+                <Link href={item.path}>
+                  <motion.div
+                    whileHover={{ scale: 1.05, x: 6 }}
+                    whileTap={{ scale: 0.97 }}
+                    className={`flex items-center ${(isMobile || expanded) ? 'gap-5 px-4' : 'justify-center px-2'} py-3 rounded-lg cursor-pointer transition-all duration-300 ${
+                      isActive
+                        ? "text-white font-bold shadow-lg shadow-white/25 backdrop-blur-sm border border-white/30"
+                        : "text-white/90 hover:bg-white/15 hover:shadow-lg hover:shadow-white/20 hover:backdrop-blur-sm hover:border hover:border-white/20"
+                    }`}
+                    style={isActive ? { 
+                      textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.4)',
+                      boxShadow: '0 0 25px rgba(255,255,255,0.4), 0 0 50px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.2)'
+                    } : {}}
+                  >
+                    <motion.div 
+                      whileHover={{ rotate: 12, scale: 1.15 }} 
+                      className="text-[1.6rem] transition-all duration-300"
                       style={isActive ? { 
                         textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.4)',
                         boxShadow: '0 0 25px rgba(255,255,255,0.4), 0 0 50px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.2)'
@@ -263,32 +304,33 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded, mobileOpen = f
                         {item.icon}
                       </motion.div>
 
-                      <AnimatePresence>
-                        {(isMobile || expanded) && (
-                          <motion.span
-                            key={item.name}
-                            initial={{ opacity: 0, x: -15, scale: 0.9 }}
-                            animate={{ opacity: 1, x: 0, scale: 1 }}
-                            exit={{ opacity: 0, x: -15, scale: 0.9 }}
-                            transition={{ duration: 0.3, delay: 0.1 }}
-                            className="text-lg font-semibold tracking-wide"
-                          >
-                            {item.name}
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </div>
-          
-          <p className="opacity-0 select-none text-sm">Spacer</p>
+                    <AnimatePresence>
+                      {(isMobile || expanded) && (
+                        <motion.span
+                          key={item.name}
+                          initial={{ opacity: 0, x: -15, scale: 0.9 }}
+                          animate={{ opacity: 1, x: 0, scale: 1 }}
+                          exit={{ opacity: 0, x: -15, scale: 0.9 }}
+                          transition={{ duration: 0.3, delay: 0.1 }}
+                          className="text-lg font-semibold tracking-wide"
+                        >
+                          {item.name}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
+        
+        <p className="opacity-0 select-none text-sm">Spacer</p>
+      </div>
       </motion.div>
     </>
   );
 };
 
 export default Sidebar;
+ 
