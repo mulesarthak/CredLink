@@ -17,6 +17,7 @@ import {
   FiLinkedin,
   FiGlobe,
 } from "react-icons/fi";
+import DigitalCardPreview, { DigitalCardProps } from "@/components/cards/DigitalCardPreview";
 import {
   QrCode,
   Download,
@@ -50,107 +51,46 @@ interface Card {
   title: string;
   company: string;
   location: string;
-  profileImage: string;
-  backgroundImage: string;
-  gradientTheme: "blue" | "purple" | "teal";
+  about: string;
+  skills: string;
+  portfolio: string;
+  experience: string;
+  photo: string;
+  cover: string;
+  email: string;
+  phone: string;
+  linkedin: string;
+  website: string;
   views: string;
   boost: "Active" | "Inactive";
 }
 
 // ----------------- Card Preview -----------------
 const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
-  const getGradientClasses = (theme: "blue" | "purple" | "teal") => {
-    switch (theme) {
-      case "purple":
-        return {
-          main: styles["gradient-purple-main"],
-          header: styles["gradient-purple-header"],
-        };
-      case "teal":
-        return {
-          main: styles["gradient-teal-main"],
-          header: styles["gradient-teal-header"],
-        };
-      default:
-        return {
-          main: styles["gradient-blue-main"],
-          header: styles["gradient-blue-header"],
-        };
-    }
-  };
-
-  const gradientClasses = getGradientClasses(card.gradientTheme);
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
-      className={`${styles.cardPreview} ${gradientClasses.main}`}
+      className="flex items-center justify-center"
+      style={{ maxWidth: '360px' }}
     >
-      {/* Absolute positioning circles (optional, kept them simple) */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
-      </div>
-
-      <div className={`${styles.headerImage} ${gradientClasses.header}`}>
-        <div className={`absolute inset-0 ${gradientClasses.header}`}></div>
-        <div
-          className={styles.headerImage}
-          style={{
-            backgroundImage: `url(${card.backgroundImage})`,
-          }}
-        ></div>
-
-        <div className={styles.profileImageWrapper}>
-          <img
-            src={card.profileImage}
-            alt={card.name}
-            className={styles.profileImage}
-          />
-        </div>
-      </div>
-
-      <div className={styles.cardBody}>
-        <div className="text-center mb-4">
-          <h3 className={styles.cardName}>{card.name}</h3>
-          <p className={styles.cardTitle}>{card.title}</p>
-          <p className={styles.cardCompanyLocation}>{card.company}</p>
-          <p className={`${styles.cardCompanyLocation} mt-1`}>{card.location}</p>
-        </div>
-
-        <div className={styles.socialIcons}>
-          {[FiMail, FiPhone, FiLinkedin, FiGlobe].map((Icon, i) => (
-            <div key={i} className={styles.socialIconBtn}>
-              <Icon className={styles.socialIcon} />
-            </div>
-          ))}
-        </div>
-
-        <p className={styles.description}>
-          A modern digital visiting card for {card.title.toLowerCase()} showcasing professional
-          details, social links, and portfolio
-        </p>
-
-        <div className={styles.buttonGrid3}>
-          {["Services", "Portfolio", "Links"].map((b) => (
-            <button key={b} className={styles.cardButton}>
-              {b}
-            </button>
-          ))}
-        </div>
-
-        <div className={styles.buttonGrid2}>
-          {["Experience", "Review"].map((b) => (
-            <button key={b} className={styles.cardButton}>
-              {b}
-            </button>
-          ))}
-        </div>
-        {/* Placeholder for visual bottom spacing */}
-        <div style={{ height: "16px", visibility: "hidden" }}></div>
-      </div>
+      <DigitalCardPreview
+        name={card.name}
+        title={card.title}
+        company={card.company}
+        location={card.location}
+        about={card.about}
+        skills={card.skills}
+        portfolio={card.portfolio}
+        experience={card.experience}
+        photo={card.photo}
+        cover={card.cover}
+        email={card.email}
+        phone={card.phone}
+        linkedin={card.linkedin}
+        website={card.website}
+      />
     </motion.div>
   );
 };
@@ -173,11 +113,16 @@ const CardDetailsPage = () => {
       title: "Software Designer",
       company: "BoostNow LLP",
       location: "California, USA",
-      profileImage:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
-      backgroundImage:
-        "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&h=200&fit=crop",
-      gradientTheme: "blue",
+      about: "Crafting innovative software solutions and user experiences with modern design principles",
+      skills: "React, TypeScript, UI/UX Design, Figma, Node.js",
+      portfolio: "Mobile App Redesign, E-commerce Platform, Design System",
+      experience: "Senior Software Designer @ BoostNow LLP (2022-Present), UI Designer @ TechCorp (2020-2022)",
+      photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
+      cover: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&h=200&fit=crop",
+      email: "josh.hazelwood@boostnow.com",
+      phone: "+1-555-0123",
+      linkedin: "https://linkedin.com/in/joshhazelwood",
+      website: "https://joshhazelwood.dev",
       views: "234",
       boost: "Active",
     },
@@ -291,17 +236,7 @@ const CardDetailsPage = () => {
           transition={{ duration: 0.35 }}
           className={styles.settingsPanel}
         >
-          {/* Edit Button */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-            <Link href="/dashboard/edit">
-              <button className={styles.editCardBtn}>
-                <FiEdit size={16} />
-                Edit Card
-              </button>
-            </Link>
-          </div>
-
-          {/* Tabs */}
+          {/* Tabs Container with Edit Button */}
           <div className={styles.tabsContainer}>
             <div className={styles.tabsList}>
               {["share", "settings", "analytics"].map((tab) => (
@@ -315,6 +250,14 @@ const CardDetailsPage = () => {
                   {tab}
                 </button>
               ))}
+            </div>
+            <div className="flex justify-end">
+              <Link href="/dashboard/edit">
+                <button className={styles.editCardBtn}>
+                  <FiEdit size={16} />
+                  Edit Card
+                </button>
+              </Link>
             </div>
           </div>
 
