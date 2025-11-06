@@ -10,12 +10,12 @@ export async function GET() {
     
     // Add traffic data
     data.trafficData.forEach(item => {
-      csv += `Traffic,${item.date},${item.visits}\n`;
+      csv += `Traffic,${item.name},${item.visits}\n`;
     });
     
     // Add engagement data
     data.engagementData.forEach(item => {
-      csv += `Engagement,${item.category},${item.value}\n`;
+      csv += `Engagement,${item.name},${item.value}\n`;
     });
     
     // Add stats

@@ -111,20 +111,8 @@ export default function SupportPage() {
   return (
     <div className="support-page min-h-screen">
       <div className="support-container">
-        {/* Header */}
-        <header className="support-header">
-          <div>
-            <h1 className="support-title">Support & Feedback</h1>
-            <p className="support-subtitle">
-              Manage customer support tickets and feedback efficiently
-            </p>
-          </div>
-          <button className="export-btn">
-            <MessageSquare className="w-4 h-4" />
-            Export Tickets
-          </button>
-        </header>
-
+      
+        
         {/* Toolbar */}
         <div className="toolbar">
           <div className="search-box relative">

@@ -14,6 +14,11 @@ import {
   ChevronRight,
   LogOut,
   Home,
+<<<<<<< HEAD
+  Tag,
+=======
+  Layers,
+>>>>>>> upstream/main
 } from "lucide-react";
 import styles from "./admin.module.css";
 
@@ -28,6 +33,7 @@ const allNavigation = [
   { name: "Users", href: "/admin/users", icon: Users, permission: "MANAGE_USERS" },
   { name: "Manage Admins", href: "/admin/manage-admins", icon: Shield, permission: "MANAGE_ADMINS" },
   { name: "Profiles", href: "/admin/profiles", icon: Users, permission: "MANAGE_PROFILES" },
+  { name: "Categories", href: "/admin/categories", icon: Tag, permission: "MANAGE_CATEGORIES" },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3, permission: "VIEW_ANALYTICS" },
   { name: "Settings", href: "/admin/settings", icon: Settings, permission: "MANAGE_SETTINGS" },
   { name: "Support", href: "/admin/support", icon: LifeBuoy , permission: null },
@@ -36,7 +42,7 @@ const allNavigation = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [admin, setAdmin] = useState<AdminData | null>(null);
-  const [navigation, setNavigation] = useState<typeof allNavigation>([]);
+  const [navigation, setNavigation] = useState<typeof allNavigation>(allNavigation);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -62,9 +68,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           return data.admin.permissions.includes(item.permission);
         });
         setNavigation(filteredNav);
+      } else {
+        setNavigation(allNavigation);
       }
     } catch (error) {
       console.error("Auth check error:", error);
+      setNavigation(allNavigation);
     }
   };
 

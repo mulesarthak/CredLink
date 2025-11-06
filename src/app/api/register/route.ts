@@ -65,6 +65,7 @@ export async function POST(req: NextRequest) {
         fullName,
         username,
         phone: phone || null,
+        
       },
       select: { id: true, email: true, fullName: true, username: true, phone: true, createdAt: true },
     })

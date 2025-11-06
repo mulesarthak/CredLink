@@ -151,7 +151,7 @@
 .adminBadge {
   width: 2.5rem;
   height: 2.5rem;
-  background: linear-gradient(to bottom right, #2563eb, #4f46e5);
+  background: linear-gradient(to bottom right, #1e3a8a, #2563eb, #1d4ed8);
   border-radius: 50%;
   color: white;
   display: flex;
