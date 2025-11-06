@@ -41,7 +41,7 @@ const Sidebar = () => {
 
   const bottomItems = [
     { name: "Settings", path: "/dashboard/settings", icon: <Settings2 /> },
-    { name: "Help & Support", path: "/dashboard/help", icon: <HelpCircle /> },
+    { name: "Help & Support", path: "/dashboard/support", icon: <HelpCircle /> },
   ];
 
   return (
