@@ -14,7 +14,11 @@ import {
   ChevronRight,
   LogOut,
   Home,
+<<<<<<< HEAD
   Tag,
+=======
+  Layers,
+>>>>>>> upstream/main
 } from "lucide-react";
 import styles from "./admin.module.css";
 
@@ -38,7 +42,7 @@ const allNavigation = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [admin, setAdmin] = useState<AdminData | null>(null);
-  const [navigation, setNavigation] = useState<typeof allNavigation>([]);
+  const [navigation, setNavigation] = useState<typeof allNavigation>(allNavigation);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -64,9 +68,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           return data.admin.permissions.includes(item.permission);
         });
         setNavigation(filteredNav);
+      } else {
+        setNavigation(allNavigation);
       }
     } catch (error) {
       console.error("Auth check error:", error);
+      setNavigation(allNavigation);
     }
   };
 
