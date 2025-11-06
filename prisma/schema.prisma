@@ -64,6 +64,7 @@ model User {
   updatedAt        DateTime  @updatedAt
   receivedMessages Message[] @relation("ReceivedMessages")
   sentMessages     Message[] @relation("SentMessages")
+  cards            Card[]
 
   @@index([username])
   @@map("users")
