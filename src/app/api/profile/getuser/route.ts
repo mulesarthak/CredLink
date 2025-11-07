@@ -12,8 +12,30 @@ export async function GET(req: NextRequest) {
             }, { status: 401 });
         }
         // Fetch all users except the requesting user
-        const users = await (prisma as any).user.findMany({
-           
+        const users = await prisma.user.findMany({
+            where: {
+                NOT: {
+                    id: userId
+                }
+            },
+            select: {
+                id: true,
+                fullName: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                username: true,
+                phone: true,
+                title: true,
+                company: true,
+                department: true,
+                location: true,
+                headline: true,
+                profileImage: true,
+                views: true,
+                createdAt: true,
+                updatedAt: true
+            }
         });
 
         return NextResponse.json({ ok: true, users });

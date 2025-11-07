@@ -18,7 +18,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'email, password, and fullName are required' }, { status: 400 })
     }
 
-    const existing = await prisma.user.findUnique({ where: { email } })
+    const existing = await prisma.user.findUnique({ 
+      where: { email },
+      select: { id: true, email: true }
+    })
     if (existing) {
       return NextResponse.json({ error: 'User already exists' }, { status: 409 })
     }
@@ -42,7 +45,8 @@ export async function POST(req: NextRequest) {
       // Check if username exists, if yes, append number
       while (true) {
         const existingUser = await prisma.user.findUnique({
-          where: { username }
+          where: { username },
+          select: { id: true, username: true }
         });
 
         if (!existingUser) {

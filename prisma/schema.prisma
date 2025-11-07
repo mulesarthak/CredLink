@@ -18,6 +18,7 @@ model User {
   fullName         String
   phone            String?
   username         String    @unique
+  role             String?   @default("user")
   
   // Personal Information
   firstName        String?
