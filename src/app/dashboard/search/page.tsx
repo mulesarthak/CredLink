@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, Filter } from "lucide-react";
+import { toast } from "react-hot-toast";
 import styles from "./search.module.css";
 import { Modal } from "@/components/ui/modal";
 
@@ -14,11 +15,60 @@ type Profile = {
   company?: string;
   designation?: string;
   category?: string;
+  verified?: boolean;
   reviews?: number;
   views?: number;
 };
 
 const SAMPLE_PROFILES: Profile[] = [
+  {
+    id: "1",
+    username: "john",
+    name: "John Doe",
+    city: "New York",
+    company: "Tech Corp",
+    designation: "Full Stack Developer",
+    category: "Technology",
+    verified: true,
+    reviews: 18,
+    views: 1250,
+  },
+  {
+    id: "2",
+    username: "jane",
+    name: "Jane Smith",
+    city: "Los Angeles",
+    company: "Marketing Pro",
+    designation: "Digital Marketing Expert",
+    category: "Marketing",
+    verified: false,
+    reviews: 4,
+    views: 890,
+  },
+  {
+    id: "3",
+    username: "alex",
+    name: "Alex Kumar",
+    city: "Mumbai",
+    company: "Design Studio",
+    designation: "UI/UX Designer",
+    category: "Design",
+    verified: true,
+    reviews: 32,
+    views: 2100,
+  },
+  {
+    id: "4",
+    username: "maria",
+    name: "Maria Garcia",
+    city: "Madrid",
+    company: "ConsultCo",
+    designation: "Business Consultant",
+    category: "Consulting",
+    verified: false,
+    reviews: 0,
+    views: 120,
+  },
   { id: "1", username: "john", name: "John Doe", city: "New York", company: "Tech Corp", designation: "Full Stack Developer", category: "Technology", reviews: 18, views: 1250 },
   { id: "2", username: "jane", name: "Jane Smith", city: "Los Angeles", company: "Marketing Pro", designation: "Digital Marketing Expert", category: "Marketing", reviews: 4, views: 890 },
   { id: "3", username: "alex", name: "Alex Kumar", city: "Mumbai", company: "Design Studio", designation: "UI/UX Designer", category: "Design", reviews: 32, views: 2100 },
@@ -165,6 +215,10 @@ export default function SearchPage() {
             ))}
           </div>
         </div>
+
+        {filtered.length === 0 && (
+          <div className="text-center py-10 text-gray-500">No results found. Try changing filters.</div>
+        )}
       </div>
     </div>
   );
