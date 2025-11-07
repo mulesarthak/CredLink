@@ -163,6 +163,7 @@ export default function SignupPage() {
       setTimeout(() => {
         router.push('/auth/login')
       }, 1500)
+      
     } catch (error) {
       console.error('Signup error:', error)
       toast.error('Failed to create account. Please try again.')
