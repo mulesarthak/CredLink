@@ -36,7 +36,93 @@ export default function Footer() {
         position: 'relative',
         zIndex: 1
       }}>
-        
+        {/* Top Section - Brand & CTA */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingBottom: '3rem',
+          marginBottom: '3rem',
+          borderBottom: '1px solid rgba(0, 102, 255, 0.2)',
+          flexWrap: 'wrap',
+          gap: '3rem',
+          textAlign: 'center'
+        }}>
+          {/* Brand Section */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem'
+          }}>
+            <div style={{
+              width: '56px',
+              height: '56px',
+              background: 'linear-gradient(135deg, #0066FF 0%, #00D2FF 100%)',
+              borderRadius: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 10px 25px rgba(0, 102, 255, 0.3)'
+            }}>
+              <Sparkles style={{ width: '28px', height: '28px', color: 'white' }} strokeWidth={2.5} />
+            </div>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+              <h3 style={{
+                fontSize: '1.75rem',
+                fontWeight: '800',
+                background: 'linear-gradient(135deg, #0066FF 0%, #00D2FF 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                marginBottom: '0.25rem',
+                letterSpacing: '-0.02em',
+                margin: 0
+              }}>
+               CredLink
+              </h3>
+              <p style={{
+                fontSize: '0.875rem',
+                color: '#9CA3AF',
+                margin: 0
+              }}>
+                Your Digital Identity Platform
+              </p>
+            </div>
+          </div>
+          {/* CTA Button */}
+          <Link
+            href="/auth/signup"
+            style={{
+              padding: '1rem 2.5rem',
+              fontSize: '1rem',
+              fontWeight: '700',
+              color: 'white',
+              background: 'linear-gradient(135deg, #0066FF 0%, #00D2FF 100%)',
+              borderRadius: '12px',
+              textDecoration: 'none',
+              boxShadow: '0 10px 25px rgba(0, 102, 255, 0.3)',
+              transition: 'all 0.3s ease',
+              border: 'none',
+              display: 'inline-block'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-3px)';
+              e.currentTarget.style.boxShadow = '0 15px 35px rgba(0, 102, 255, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 10px 25px rgba(0, 102, 255, 0.3)';
+            }}
+          >
+            Start Building Your Profile
+          </Link>
+        </div>
         {/* Main Footer Grid */}
         <div style={{
           display: 'grid',
@@ -194,7 +280,7 @@ export default function Footer() {
               alignItems: 'center',
               gap: '1rem'
             }}>
-              {[{"Icon": Mail, "text": "hello@credlink.com", "href": "mailto:hello@credlink.com"}, {"Icon": Phone, "text": "+1 (555) 123-4567", "href": "tel:+15551234567"}, {"Icon": MapPin, "text": "San Francisco, CA", "href": "#"}]
+              {[{"Icon": Mail, "text": "hello@credlink.com", "href": "mailto:hello@mykard.com"}, {"Icon": Phone, "text": "+1 (555) 123-4567", "href": "tel:+15551234567"}, {"Icon": MapPin, "text": "San Francisco, CA", "href": "#"}]
                 .map((item, idx) => (
                   <a
                     key={idx}

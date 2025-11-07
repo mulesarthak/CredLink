@@ -310,59 +310,79 @@ export default function MessagesPage() {
       >
         {/* Header */}
         {isMobile ? (
-          <div style={{ marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>Messages</h1>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, position: "relative" }}>
-              <button
-                aria-label="Filters"
-                onClick={() => setMobileFilterOpen(v => !v)}
-                style={{ padding: 6, color: "#94A3B8" }}
-              >
-                <MoreVertical className="w-5 h-5" />
-              </button>
-              {mobileFilterOpen && (
-                <div
-                  style={{
-                    position: "absolute",
-                    right: 0,
-                    top: 34,
-                    backgroundColor: "#FFFFFF",
-                    border: "1px solid #E5E7EB",
-                    borderRadius: 8,
-                    boxShadow: "0 8px 24px rgba(16,24,40,0.12)",
-                    zIndex: 30,
-                    width: 180,
-                    overflow: "hidden",
-                  }}
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>Messages</h1>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, position: "relative" }}>
+                <button
+                  aria-label="Filters"
+                  onClick={() => setMobileFilterOpen(v => !v)}
+                  style={{ padding: 6, color: "#94A3B8" }}
                 >
-                  <button
-                    onClick={() => { setSortOrder("newest"); setMobileFilterOpen(false); }}
+                  <MoreVertical className="w-5 h-5" />
+                </button>
+                {mobileFilterOpen && (
+                  <div
                     style={{
-                      display: "block",
-                      width: "100%",
-                      textAlign: "left",
-                      padding: "10px 12px",
-                      background: sortOrder === "newest" ? "#EFF6FF" : "transparent",
-                      color: "#0F172A",
+                      position: "absolute",
+                      right: 0,
+                      top: 34,
+                      backgroundColor: "#FFFFFF",
+                      border: "1px solid #E5E7EB",
+                      borderRadius: 8,
+                      boxShadow: "0 8px 24px rgba(16,24,40,0.12)",
+                      zIndex: 30,
+                      width: 180,
+                      overflow: "hidden",
                     }}
                   >
-                    Newest First
-                  </button>
-                  <button
-                    onClick={() => { setSortOrder("oldest"); setMobileFilterOpen(false); }}
-                    style={{
-                      display: "block",
-                      width: "100%",
-                      textAlign: "left",
-                      padding: "10px 12px",
-                      background: sortOrder === "oldest" ? "#EFF6FF" : "transparent",
-                      color: "#0F172A",
-                    }}
-                  >
-                    Oldest First
-                  </button>
-                </div>
-              )}
+                    <button
+                      onClick={() => { setSortOrder("newest"); setMobileFilterOpen(false); }}
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        textAlign: "left",
+                        padding: "10px 12px",
+                        background: sortOrder === "newest" ? "#EFF6FF" : "transparent",
+                        color: "#0F172A",
+                      }}
+                    >
+                      Newest First
+                    </button>
+                    <button
+                      onClick={() => { setSortOrder("oldest"); setMobileFilterOpen(false); }}
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        textAlign: "left",
+                        padding: "10px 12px",
+                        background: sortOrder === "oldest" ? "#EFF6FF" : "transparent",
+                        color: "#0F172A",
+                      }}
+                    >
+                      Oldest First
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#94A3B8" }} />
+              <input
+                type="text"
+                placeholder="Search messages..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full"
+                style={{
+                  padding: "10px 14px 10px 40px",
+                  fontSize: 14,
+                  border: "1px solid #CBD5E1",
+                  borderRadius: 8,
+                  outline: "none",
+                  backgroundColor: "#FFFFFF",
+                }}
+              />
             </div>
           </div>
         ) : (

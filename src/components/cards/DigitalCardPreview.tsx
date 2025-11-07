@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 
-interface DigitalCardProps {
+export interface DigitalCardProps {
   name: string;
   title: string;
   company?: string;
@@ -63,15 +63,14 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   const experienceList = experience.split(',').map((s) => s.trim()).filter(Boolean);
 
   const renderItem = (title: string, subtitle?: string) => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
         <div>
           <div style={{ fontWeight: 700, color: '#111827' }}>{title}</div>
           {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
         </div>
       </div>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </div>
   );
 
@@ -104,18 +103,19 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   };
 
   return (
-    <div style={{
-      width: "360px",
-      borderRadius: "28px",
-      overflow: "hidden",
-      boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)",
-      fontFamily: "system-ui, sans-serif",
-      position: "relative",
-      background: "#ffffff",
-    }}>
+    <div style={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
+      <div style={{
+        width: "360px",
+        borderRadius: "28px",
+        overflow: "hidden",
+        boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)",
+        fontFamily: "system-ui, sans-serif",
+        position: "relative",
+        background: "#ffffff",
+      }}>
       {/* Header */}
       <div style={{
-        background: "linear-gradient(180deg, #f59e0b 0%, #f97316 45%, #ef4444 100%)",
+        background: "linear-gradient(180deg, #3b82f6 0%, #2563eb 45%, #1d4ed8 100%)",
         padding: "22px",
         color: "white",
         position: "relative",
@@ -180,7 +180,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
               </svg>
             </a>
             {/* LinkedIn */}
-            <a href={linkedin || 'https://mykard.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#0A66C2", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <a href={linkedin || 'https://linkedin.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#0A66C2", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
             </a>
             {/* Globe */}
@@ -196,7 +196,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       </div>
 
       {/* Body */}
-      <div style={{ padding: "2px 20px 16px", background: "linear-gradient(180deg, #ef4444 0%, #dc2626 100%)", color: "#FFFFFF", textAlign: "center" }}>
+      <div style={{ padding: "2px 20px 16px", background: "linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%)", color: "#FFFFFF", textAlign: "center" }}>
         <p style={{ fontSize: "13px", lineHeight: 1.6, margin: 0, color: "#FFFFFF", opacity: 1 }}>
           {about}
         </p>
@@ -231,13 +231,15 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         </div>
       </div>
 
+      </div>
+
       {activePanel && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setActivePanel(null)}>
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20 }} onClick={() => setActivePanel(null)}>
           <div
             onClick={(e) => e.stopPropagation()}
-            style={{ width: isMobile ? '100%' : 520, height: isMobile ? '100%' : 'auto', maxHeight: isMobile ? '100%' : '80vh', background: '#fff', borderRadius: isMobile ? 0 : 16, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }}
+            style={{ width: isMobile ? '100%' : 520, maxWidth: '100%', height: isMobile ? '100%' : 'auto', maxHeight: isMobile ? '100%' : '80%', background: '#fff', borderRadius: isMobile ? 0 : 16, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }}
           >
-            <div style={{ background: 'linear-gradient(180deg, #f59e0b 0%, #f97316 45%, #ef4444 100%)', color: '#fff', padding: isMobile ? '16px' : '18px', textAlign: 'center' }}>
+            <div style={{ background: 'linear-gradient(180deg, #3b82f6 0%, #2563eb 45%, #1d4ed8 100%)', color: '#fff', padding: isMobile ? '16px' : '18px', textAlign: 'center' }}>
               <div style={{ fontSize: 20, fontWeight: 800 }}>{activePanel}</div>
             </div>
             <button onClick={() => setActivePanel(null)} aria-label="Close" style={{ position: 'absolute', top: 10, right: 10, width: 36, height: 36, borderRadius: 9999, border: 'none', background: 'rgba(0,0,0,0.6)', color: '#fff', cursor: 'pointer' }}>×</button>
@@ -251,25 +253,4 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   );
 };
 
-export default function VisitingCardPage() {
-  return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "20px" }}>
-      <DigitalCardPreview 
-        name="John Doe"
-        title="Digital Marketer"
-        company="MyKard"
-        location="Mumbai, India"
-        about="Crafting engaging content & SEO strategies"
-        skills="SEO, Content Creation, Analytics"
-        portfolio="https://example.com/portfolio"
-        experience="Lead Marketer @ MyKard (2023-Present)"
-        photo=""
-        cover=""
-        email="john.doe@example.com"
-        phone="+911234567890"
-        linkedin="https://linkedin.com/in/johndoe"
-        website="https://johndoe.com"
-      />
-    </div>
-  );
-}
+export default DigitalCardPreview;
