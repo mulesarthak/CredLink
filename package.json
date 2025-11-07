@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cleanup": "npx tsx cleanup-ttl.ts",
+    "cleanup:auto": "npx tsx auto-cleanup.ts",
+    "seed:admin": "npx tsx seed-admin.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
