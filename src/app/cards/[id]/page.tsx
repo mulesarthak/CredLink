@@ -1,6 +1,6 @@
 "use client";
 
-import "./CardDetail.css";
+import styles from "./carddetail.module.css";
 import React, { useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,6 +17,7 @@ import {
   FiLinkedin,
   FiGlobe,
 } from "react-icons/fi";
+import DigitalCardPreview, { DigitalCardProps } from "@/components/cards/DigitalCardPreview";
 import {
   QrCode,
   Download,
@@ -50,115 +51,46 @@ interface Card {
   title: string;
   company: string;
   location: string;
-  profileImage: string;
-  backgroundImage: string;
-  gradientTheme: "blue" | "purple" | "teal";
+  about: string;
+  skills: string;
+  portfolio: string;
+  experience: string;
+  photo: string;
+  cover: string;
+  email: string;
+  phone: string;
+  linkedin: string;
+  website: string;
   views: string;
   boost: "Active" | "Inactive";
 }
 
 // ----------------- Card Preview -----------------
 const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
-  const getGradientClasses = (theme: "blue" | "purple" | "teal") => {
-    switch (theme) {
-      case "purple":
-        return {
-          main: "bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700",
-          header: "bg-gradient-to-br from-purple-400 to-purple-600",
-        };
-      case "teal":
-        return {
-          main: "bg-gradient-to-br from-teal-500 via-teal-600 to-teal-700",
-          header: "bg-gradient-to-br from-teal-400 to-teal-600",
-        };
-      default:
-        return {
-          main: "bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700",
-          header: "bg-gradient-to-br from-blue-400 to-blue-600",
-        };
-    }
-  };
-
-  const gradientClasses = getGradientClasses(card.gradientTheme);
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
-      className={`w-full max-w-[300px] md:max-w-[340px] ${gradientClasses.main} shadow-lg rounded-2xl overflow-hidden relative mx-auto`}
+      className="flex items-center justify-center"
+      style={{ maxWidth: '360px' }}
     >
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
-      </div>
-
-      <div className={`relative h-32 ${gradientClasses.header} flex items-center justify-center`}>
-        <div className={`absolute inset-0 ${gradientClasses.header}`}></div>
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-60"
-          style={{
-            backgroundImage: `url(${card.backgroundImage})`,
-            filter: "blur(0.5px)",
-          }}
-        ></div>
-
-        <div className="relative z-10 w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-          <img
-            src={card.profileImage}
-            alt={card.name}
-            className="w-16 h-16 rounded-full object-cover border-2 border-white"
-          />
-        </div>
-      </div>
-
-      <div className="p-6 text-white relative z-10">
-        <div className="text-center mb-4">
-          <h3 className="text-xl font-bold mb-1 text-white">{card.name}</h3>
-          <p className="text-white/90 text-sm font-medium mb-1">{card.title}</p>
-          <p className="text-white/80 text-xs">{card.company}</p>
-          <p className="text-white/80 text-xs mt-1">{card.location}</p>
-        </div>
-
-        <div className="flex justify-center gap-4 mb-6">
-          {[FiMail, FiPhone, FiLinkedin, FiGlobe].map((Icon, i) => (
-            <div
-              key={i}
-              className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors border border-white/30"
-            >
-              <Icon className="w-4 h-4 text-white" />
-            </div>
-          ))}
-        </div>
-
-        <p className="text-center text-white/90 text-xs leading-relaxed mb-6">
-          A modern digital visiting card for {card.title.toLowerCase()} showcasing professional
-          details, social links, and portfolio
-        </p>
-
-        <div className="grid grid-cols-3 gap-2 mb-4 px-2">
-          {["Services", "Portfolio", "Links"].map((b) => (
-            <button
-              key={b}
-              className="bg-white/20 hover:bg-white/30 text-white text-xs py-2 px-2 rounded-lg transition-colors font-medium border border-white/30"
-            >
-              {b}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 mb-4 px-8">
-          {["Experience", "Review"].map((b) => (
-            <button
-              key={b}
-              className="bg-white/20 hover:bg-white/30 text-white text-xs py-2 px-2 rounded-lg transition-colors font-medium border border-white/30"
-            >
-              {b}
-            </button>
-          ))}
-        </div>
-        <div style={{ height: "16px", visibility: "hidden" }}></div>
-      </div>
+      <DigitalCardPreview
+        name={card.name}
+        title={card.title}
+        company={card.company}
+        location={card.location}
+        about={card.about}
+        skills={card.skills}
+        portfolio={card.portfolio}
+        experience={card.experience}
+        photo={card.photo}
+        cover={card.cover}
+        email={card.email}
+        phone={card.phone}
+        linkedin={card.linkedin}
+        website={card.website}
+      />
     </motion.div>
   );
 };
@@ -167,10 +99,10 @@ const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
 const CardDetailsPage = () => {
   const params = useParams();
   const cardId = parseInt(params.id as string);
-  const [activeTab, setActiveTab] = useState<"share" | "settings" | "analytics">("share");
+  const [activeTab, setActiveTab] = useState<"share" | "settings" | "analytics">("settings"); // Set to 'settings' to match the image
   const [searchIndexing, setSearchIndexing] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [shareMethod, setShareMethod] = useState<"qr" | "link">("qr");
+  const [shareMethod, setShareMethod] = useState<"qr" | "link">("link"); // Set to 'link' to match the settings image context
 
   const qrRef = useRef<HTMLDivElement>(null);
 
@@ -181,11 +113,16 @@ const CardDetailsPage = () => {
       title: "Software Designer",
       company: "BoostNow LLP",
       location: "California, USA",
-      profileImage:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
-      backgroundImage:
-        "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&h=200&fit=crop",
-      gradientTheme: "blue",
+      about: "Crafting innovative software solutions and user experiences with modern design principles",
+      skills: "React, TypeScript, UI/UX Design, Figma, Node.js",
+      portfolio: "Mobile App Redesign, E-commerce Platform, Design System",
+      experience: "Senior Software Designer @ BoostNow LLP (2022-Present), UI Designer @ TechCorp (2020-2022)",
+      photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
+      cover: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&h=200&fit=crop",
+      email: "josh.hazelwood@boostnow.com",
+      phone: "+1-555-0123",
+      linkedin: "https://linkedin.com/in/joshhazelwood",
+      website: "https://joshhazelwood.dev",
       views: "234",
       boost: "Active",
     },
@@ -193,7 +130,7 @@ const CardDetailsPage = () => {
   const card = cards.find((c) => c.id === cardId);
 
   const mockUserData = {
-    cardUrl: `https://credlink.app/card/${cardId}`,
+    cardUrl: `https://credlink.com/hi/XXXX`,
   };
 
   const copyToClipboard = async (text: string) => {
@@ -254,9 +191,30 @@ const CardDetailsPage = () => {
     plugins: { legend: { display: false } },
   };
 
+  const [file, setFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const selectedFile = e.target.files[0];
+      setFile(selectedFile);
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
+
+  const triggerFileInput = () => {
+    document.getElementById('qrLogoUpload')?.click();
+  };
+
   if (!card)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className={`${styles.pageContainer} flex items-center justify-center`}>
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4 text-gray-800">Card Not Found</h1>
           <Link href="/dashboard" className="text-blue-600 hover:text-blue-700">
@@ -267,45 +225,40 @@ const CardDetailsPage = () => {
     );
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="h-6"></div>
-      <div className="flex flex-col lg:grid lg:grid-cols-[1.2fr_2fr] gap-4 md:gap-8 p-4 md:p-6">
-        <div className="flex items-center justify-center order-2 lg:order-1">
+    <div className={styles.pageContainer}>
+      <div className={styles.contentWrapper}>
+        <div className={styles.cardPreviewArea}>
           <CardPreview card={card} />
         </div>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="bg-white border border-gray-200 shadow-md rounded-2xl overflow-y-auto order-1 lg:order-2 p-4 md:p-6"
-          style={{ maxHeight: "calc(100vh - 8rem)" }}
+          className={styles.settingsPanel}
         >
-          {/* Tabs */}
-          <div className="flex flex-wrap md:flex-row md:justify-between md:items-center border-b border-gray-200 gap-3 pb-3">
-            <div className="flex-1 flex justify-start gap-5 text-base font-semibold overflow-x-auto">
+          {/* Tabs Container with Edit Button */}
+          <div className={styles.tabsContainer}>
+            <div className={styles.tabsList}>
               {["share", "settings", "analytics"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  className={`relative transition-all capitalize ${
-                    activeTab === tab
-                      ? "text-blue-600"
-                      : "text-gray-500 hover:text-blue-600"
+                  className={`${styles.tabButton} ${
+                    activeTab === tab ? styles.tabButtonActive : ""
                   }`}
                 >
                   {tab}
-                  {activeTab === tab && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full"></div>
-                  )}
                 </button>
               ))}
             </div>
-            <Link href="/dashboard/edit">
-              <button className="edit-card-btn flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-300 hover:border-blue-600 hover:bg-blue-600 hover:text-white transition-all rounded-lg text-sm font-semibold shadow-sm hover:shadow-md">
-                <FiEdit size={16} />
-                Edit
-              </button>
-            </Link>
+            <div className="flex justify-end">
+              <Link href="/dashboard/edit">
+                <button className={styles.editCardBtn}>
+                  <FiEdit size={16} />
+                  Edit Card
+                </button>
+              </Link>
+            </div>
           </div>
 
           {/* Tab Contents */}
@@ -317,17 +270,14 @@ const CardDetailsPage = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="mt-6 space-y-6 md:space-y-8"
+                className={styles.tabContent}
               >
-            <div className="flex justify-center mt-8 mb-2">
-  <div className="flex bg-gray-100 rounded-full p-1 max-w-sm w-full shadow-sm">
-
+                <div className={styles.shareToggleWrapper}>
+                  <div className={styles.shareToggle}>
                     <button
                       onClick={() => setShareMethod("qr")}
-                      className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-full font-semibold transition-all ${
-                        shareMethod === "qr"
-                          ? "bg-blue-600 text-white shadow-md"
-                          : "text-gray-600 hover:text-blue-600"
+                      className={`${styles.shareToggleButton} ${
+                        shareMethod === "qr" ? styles.shareToggleButtonActive : ""
                       }`}
                     >
                       <QrCode className="w-4 h-4" />
@@ -335,10 +285,8 @@ const CardDetailsPage = () => {
                     </button>
                     <button
                       onClick={() => setShareMethod("link")}
-                      className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-full font-semibold transition-all ${
-                        shareMethod === "link"
-                          ? "bg-blue-600 text-white shadow-md"
-                          : "text-gray-600 hover:text-blue-600"
+                      className={`${styles.shareToggleButton} ${
+                        shareMethod === "link" ? styles.shareToggleButtonActive : ""
                       }`}
                     >
                       <LinkIcon className="w-4 h-4" />
@@ -348,35 +296,34 @@ const CardDetailsPage = () => {
                 </div>
 
                 <div className="flex justify-center">
-                 {shareMethod === "link" ? (
-  <div className="max-w-lg mx-auto text-center space-y-4 direct-link-box">
-    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-      <p className="font-mono text-blue-600 text-sm break-all">
-        {mockUserData.cardUrl}
+                  {shareMethod === "link" ? (
+                    <div className={styles.directLinkBox}>
+                      <div className={styles.linkDisplay}>
+                        <p className={styles.linkText}>
+                          {mockUserData.cardUrl}
                         </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="qr-wrapper">
-                      <div className="qr-box">
+                    <div className={styles.qrWrapper}>
+                      <div className={styles.qrBox}>
                         <QRCode value={mockUserData.cardUrl} size={180} />
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* Gap added here */}
                 <div style={{ height: "16px" }}></div>
 
-                <div className="action-buttons">
-                  <button onClick={() => copyToClipboard(mockUserData.cardUrl)} className="action-btn">
+                <div className={styles.actionButtons}>
+                  <button onClick={() => copyToClipboard(mockUserData.cardUrl)} className={styles.actionBtn}>
                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     {copied ? "Copied!" : "Copy Link"}
                   </button>
-                  <button onClick={downloadQR} className="action-btn">
+                  <button onClick={downloadQR} className={styles.actionBtn}>
                     <Download className="w-4 h-4" /> Download QR
                   </button>
-                  <button onClick={shareProfile} className="action-btn">
+                  <button onClick={shareProfile} className={styles.actionBtn}>
                     <Share2 className="w-4 h-4" /> Share Profile
                   </button>
                 </div>
@@ -384,168 +331,180 @@ const CardDetailsPage = () => {
             )}
 
             {/* Analytics Section */}
-      {activeTab === "analytics" && (
-  <motion.div
-    key="analytics"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    className="mt-8"
-  >
-    {/* Wrapper with fixed soft side padding */}
-    <div className="px-4 sm:px-6 md:px-8 lg:px-10 space-y-8 analytics-wrapper">
-      <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-        <BarChart3 className="w-5 h-5 text-blue-600" /> Analytics Overview
-      </h3>
+            {activeTab === "analytics" && (
+              <motion.div
+                key="analytics"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className={`${styles.tabContent} ${styles.analyticsWrapper}`}
+              >
+                <h3 className={styles.analyticsTitle}>
+                  <BarChart3 className="w-5 h-5" /> Analytics Overview
+                </h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        {[{ label: "Total Views", value: "1,230", icon: Eye },
-          { label: "Shares", value: "540", icon: Share2 },
-          { label: "Contacts", value: "312", icon: Users }].map((s, i) => (
-          <div key={i} className="bg-white border border-gray-200 p-5 rounded-xl text-center shadow-sm">
-            <div className="flex justify-center mb-3">
-              <s.icon className="text-blue-600 w-6 h-6" />
-            </div>
-            <p className="text-2xl font-bold text-gray-900">{s.value}</p>
-            <p className="text-sm text-gray-500">{s.label}</p>
-          </div>
-        ))}
-      </div>
+                <div className={styles.statsGrid}>
+                  {[{ label: "Total Views", value: "1,230", icon: Eye },
+                  { label: "Shares", value: "540", icon: Share2 },
+                  { label: "Contacts", value: "312", icon: Users }].map((s, i) => (
+                    <div key={i} className={styles.statCard}>
+                      <div className={styles.statIcon}>
+                        <s.icon className="w-6 h-6" />
+                      </div>
+                      <p className={styles.statValue}>{s.value}</p>
+                      <p className={styles.statLabel}>{s.label}</p>
+                    </div>
+                  ))}
+                </div>
 
-      <div className="analytics-card mt-6 mb-6">
-        <h4 className="text-lg font-semibold mb-4 text-gray-800">Engagement Trends</h4>
-        <Line data={lineData} options={lineOptions} />
-      </div>
-    </div>
-  </motion.div>
-)}
+                <div className={styles.analyticsCard}>
+                  <h4>Engagement Trends</h4>
+                  <Line data={lineData} options={lineOptions} />
+                </div>
+              </motion.div>
+            )}
 
 
-            {/* ✅ Full Settings Section */}
+            {/* Full Settings Section */}
             {activeTab === "settings" && (
               <motion.div
                 key="settings"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="mt-8 px-4 md:px-8 space-y-6 md:space-y-8"
+                className={`${styles.tabContent} ${styles.settingsContent}`}
               >
                 {/* Card Configuration */}
-                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200 space-y-6">
-                  <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div> Card Configuration
+                <div className={styles.settingsCard}>
+                  <h3 className={styles.settingsCardTitle}>
+                    <div className={`${styles.dot}`} style={{ backgroundColor: 'var(--color-primary-light)' }}></div> Card Configuration
                   </h3>
+                  
                   {/* Card Name */}
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex-1">
-                      <h4 className="text-base font-semibold text-gray-800 mb-1">Card Name</h4>
-                      <p className="text-sm text-gray-500">Change the name of this card.</p>
+                  <div className={styles.settingsItem}>
+                    <div className={styles.settingsInfo}>
+                      <h4 className={styles.settingsLabel}>Card Name</h4>
+                      <p className={styles.settingsDescription}>Change the name of this card.</p>
                     </div>
-                    <div className="md:w-80">
+                    <div className={styles.settingsControl}>
                       <input
                         type="text"
                         defaultValue="Personal"
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all"
+                        className={styles.settingsInput}
                       />
                     </div>
                   </div>
+                  
                   {/* QR Code Logo */}
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex-1">
-                      <h4 className="text-base font-semibold text-gray-800 mb-1">QR Code Logo</h4>
-                      <p className="text-sm text-gray-500">Change the logo inside the QR code.</p>
+                  <div className={styles.settingsItem}>
+                    <div className={styles.settingsInfo}>
+                      <h4 className={styles.settingsLabel}>QR Code Logo</h4>
+                      <p className={styles.settingsDescription}>Change the logo inside the QR code.</p>
                     </div>
-                    <div className="md:w-80">
-                      <button className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded-lg px-4 py-3 text-sm transition-all">
+                    <div className={styles.settingsControl}>
+                      <input
+                        type="file"
+                        id="qrLogoUpload"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                      />
+                      <button 
+                        className={styles.settingsButton}
+                        onClick={triggerFileInput}
+                      >
                         <FiUpload size={16} /> Upload Logo
                       </button>
+                      {logoPreview && (
+                        <div style={{ marginTop: '0.5rem' }}>
+                          <img 
+                            src={logoPreview} 
+                            alt="Logo preview" 
+                            style={{ width: '50px', height: '50px', borderRadius: '4px' }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
+                  
                   {/* Personalized Link */}
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex-1">
-                      <h4 className="text-base font-semibold text-gray-800 mb-1">Personalized Link</h4>
-                      <p className="text-sm text-gray-500">Create your own link to further your brand.</p>
+                  <div className={styles.settingsItem}>
+                    <div className={styles.settingsInfo}>
+                      <h4 className={styles.settingsLabel}>Personalized Link</h4>
+                      <p className={styles.settingsDescription}>Create your own link to further your brand.</p>
                     </div>
-                    <div className="md:w-80">
+                    <div className={styles.settingsControl}>
                       <input
                         type="text"
-                        defaultValue="https://hihello.com/hi/XXXX"
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all"
+                        defaultValue="https://credlink.com/hi/XXXX"
+                        className={styles.settingsInput}
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Privacy & Visibility */}
-{/* Privacy & Visibility */}
-<div className="bg-gray-50 rounded-2xl border border-gray-200 px-6 pt-5 pb-6 mt-5 privacy-card">
+                <div className={`${styles.settingsCard} ${styles.privacyCard}`}>
+                  <h3 className={styles.settingsCardTitle} style={{ marginBottom: '1rem' }}>
+                    <div className={`${styles.dot}`} style={{ backgroundColor: 'var(--color-success)' }}></div> Privacy & Visibility
+                  </h3>
+                  
+                  {/* Pause Card */}
+                  <div className={styles.settingsItem}>
+                    <div className={styles.settingsInfo}>
+                      <h4 className={styles.settingsLabel}>Pause Card</h4>
+                      <p className={styles.settingsDescription}>Disable this card temporarily.</p>
+                    </div>
+                    <div className={styles.settingsControl}>
+                      <button
+                        onClick={() => setSearchIndexing(!searchIndexing)}
+                        className={styles.toggleBtn}
+                      >
+                        {searchIndexing ? (
+                          <FiToggleRight className={`${styles.toggleIcon} ${styles.active}`} />
+                        ) : (
+                          <FiToggleLeft className={`${styles.toggleIcon} ${styles.inactive}`} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
-  <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
-    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-    Privacy & Visibility
-  </h3>
+                {/* Advanced Settings */}
+                <div className={styles.settingsCard}>
+                  <h3 className={styles.settingsCardTitle}>
+                    <div className={`${styles.dot}`} style={{ backgroundColor: 'var(--color-purple-600)' }}></div> Advanced Settings
+                  </h3>
 
-  {/* Properly aligned content */}
-  <div className="flex items-center justify-between gap-4 pl-[0.25rem] pr-[0.25rem]">
-    <div className="flex flex-col flex-1">
-      <h4 className="text-base font-semibold text-gray-800 leading-snug">
-        Pause Card
-      </h4>
-      <p className="text-sm text-gray-500 mt-[2px]">
-        Disable this card temporarily.
-      </p>
-    </div>
-
-    {/* Toggle aligned visually to middle of text */}
-    <button
-      onClick={() => setSearchIndexing(!searchIndexing)}
-      className="ml-3 translate-y-[2px]"
-    >
-      {searchIndexing ? (
-        <FiToggleRight className="text-3xl text-green-500" />
-      ) : (
-        <FiToggleLeft className="text-3xl text-gray-400" />
-      )}
-    </button>
-  </div>
-</div>
-
-{/* Advanced Settings */}
-<div className="bg-gray-50 rounded-2xl p-6 border border-gray-200 space-y-6 mt-4">
-  <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
-    <div className="w-2 h-2 bg-purple-600 rounded-full"></div> Advanced Settings
-  </h3>
-
-  {/* Renew Link only */}
-  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-2">
-    <div className="flex-1">
-      <h4 className="text-base font-semibold text-gray-800 mb-1">Renew Link</h4>
-      <p className="text-sm text-gray-500">Renew the link to your card.</p>
-    </div>
-    <div className="md:w-80">
-      <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md hover:shadow-lg rounded-lg px-4 py-3 text-sm transition-all">
-        <FiRefreshCw size={16} /> Renew
-      </button>
-    </div>
-  </div>
-</div>
+                  {/* Renew Link only */}
+                  <div className={styles.settingsItem}>
+                    <div className={styles.settingsInfo}>
+                      <h4 className={styles.settingsLabel}>Renew Link</h4>
+                      <p className={styles.settingsDescription}>Renew the link to your card.</p>
+                    </div>
+                    <div className={styles.settingsControl}>
+                      <button className={`${styles.settingsButton} ${styles.renewButton}`}>
+                        <FiRefreshCw size={16} /> Renew
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
 
                 {/* Danger Zone */}
-                <div className="bg-red-50 rounded-2xl p-6 border border-red-200 space-y-6">
-                  <h3 className="text-lg font-bold text-red-800 flex items-center gap-2">
-                    <div className="w-2 h-2 bg-red-600 rounded-full"></div> Danger Zone
+                <div className={`${styles.settingsCard} ${styles.dangerCard}`}>
+                  <h3 className={`${styles.settingsCardTitle} ${styles.dangerCardTitle}`}>
+                    <div className={`${styles.dot}`}></div> Danger Zone
                   </h3>
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex-1">
-                      <h4 className="text-base font-semibold text-red-800 mb-1">Delete Card</h4>
-                      <p className="text-sm text-red-600">
+                  <div className={`${styles.settingsItem} ${styles.dangerItem}`}>
+                    <div className={styles.settingsInfo}>
+                      <h4 className={styles.settingsLabel}>Delete Card</h4>
+                      <p className={styles.settingsDescription}>
                         Delete this card permanently. This action cannot be undone.
                       </p>
                     </div>
-                    <div className="md:w-80">
-                      <button className="w-full bg-red-500 hover:bg-red-600 text-white rounded-lg px-4 py-3 text-sm shadow-md hover:shadow-lg transition-all">
+                    <div className={styles.settingsControl}>
+                      <button className={`${styles.settingsButton} ${styles.deleteButton}`}>
                         Delete Card
                       </button>
                     </div>

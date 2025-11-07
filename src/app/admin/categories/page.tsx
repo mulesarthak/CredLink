@@ -62,58 +62,21 @@ export default function CategoriesPage() {
   const fetchCategories = async () => {
     try {
       setLoading(true)
-      // Mock data for now - replace with actual API call
-      const mockCategories: Category[] = [
-        {
-          id: '1',
-          name: 'Technology',
-          description: 'Software development, IT, and tech professionals',
-          icon: 'Code',
-          color: '#3B82F6',
-          tags: ['software', 'development', 'programming', 'IT'],
-          isActive: true,
-          createdAt: '2024-01-15T10:00:00Z',
-          updatedAt: '2024-01-15T10:00:00Z',
-          userCount: 145
-        },
-        {
-          id: '2',
-          name: 'Healthcare',
-          description: 'Medical professionals, doctors, nurses, therapists',
-          icon: 'Stethoscope',
-          color: '#10B981',
-          tags: ['medical', 'doctor', 'nurse', 'healthcare'],
-          isActive: true,
-          createdAt: '2024-01-16T10:00:00Z',
-          updatedAt: '2024-01-16T10:00:00Z',
-          userCount: 89
-        },
-        {
-          id: '3',
-          name: 'Creative Arts',
-          description: 'Designers, artists, photographers, writers',
-          icon: 'Palette',
-          color: '#EC4899',
-          tags: ['design', 'art', 'creative', 'photography'],
-          isActive: true,
-          createdAt: '2024-01-17T10:00:00Z',
-          updatedAt: '2024-01-17T10:00:00Z',
-          userCount: 67
-        },
-        {
-          id: '4',
-          name: 'Business & Finance',
-          description: 'Business professionals, accountants, consultants',
-          icon: 'Briefcase',
-          color: '#F59E0B',
-          tags: ['business', 'finance', 'consulting', 'accounting'],
-          isActive: false,
-          createdAt: '2024-01-18T10:00:00Z',
-          updatedAt: '2024-01-18T10:00:00Z',
-          userCount: 123
-        }
-      ]
-      setCategories(mockCategories)
+      const response = await fetch('/api/admin/categories', {
+        method: 'GET',
+        credentials: 'include'
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories')
+      }
+      
+      const data = await response.json()
+      if (data.success) {
+        setCategories(data.categories)
+      } else {
+        throw new Error(data.error || 'Failed to fetch categories')
+      }
     } catch (error) {
       console.error('Failed to fetch categories:', error)
       toast.error('Failed to load categories')
@@ -133,33 +96,63 @@ export default function CategoriesPage() {
     try {
       const categoryData = {
         ...formData,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-        updatedAt: new Date().toISOString(),
-        ...(editingCategory ? {} : { 
-          id: Date.now().toString(),
-          createdAt: new Date().toISOString(),
-          userCount: 0
-        })
+        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
       }
 
       if (editingCategory) {
         // Update existing category
-        setCategories(categories.map(cat => 
-          cat.id === editingCategory.id 
-            ? { ...cat, ...categoryData }
-            : cat
-        ))
-        toast.success('Category updated successfully')
+        const response = await fetch(`/api/admin/categories/${editingCategory.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(categoryData)
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to update category')
+        }
+        
+        const data = await response.json()
+        if (data.success) {
+          setCategories(categories.map(cat => 
+            cat.id === editingCategory.id ? data.category : cat
+          ))
+          toast.success('Category updated successfully')
+        } else {
+          throw new Error(data.error || 'Failed to update category')
+        }
       } else {
         // Add new category
-        setCategories([categoryData as Category, ...categories])
-        toast.success('Category created successfully')
+        const response = await fetch('/api/admin/categories', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(categoryData)
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to create category')
+        }
+        
+        const data = await response.json()
+        if (data.success) {
+          setCategories([data.category, ...categories])
+          toast.success('Category created successfully')
+        } else {
+          throw new Error(data.error || 'Failed to create category')
+        }
       }
 
       handleCloseModal()
     } catch (error) {
       console.error('Failed to save category:', error)
-      toast.error('Failed to save category')
+      toast.error(error instanceof Error ? error.message : 'Failed to save category')
     }
   }
 
@@ -185,13 +178,29 @@ export default function CategoriesPage() {
     if (!categoryToDelete) return
 
     try {
-      setCategories(categories.filter(cat => cat.id !== categoryToDelete.id))
-      toast.success('Category deleted successfully')
+      const response = await fetch(`/api/admin/categories/${categoryToDelete.id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to delete category')
+      }
+      
+      const data = await response.json()
+      if (data.success) {
+        setCategories(categories.filter(cat => cat.id !== categoryToDelete.id))
+        toast.success('Category deleted successfully')
+      } else {
+        throw new Error(data.error || 'Failed to delete category')
+      }
+      
       setShowDeleteModal(false)
       setCategoryToDelete(null)
     } catch (error) {
       console.error('Failed to delete category:', error)
-      toast.error('Failed to delete category')
+      toast.error(error instanceof Error ? error.message : 'Failed to delete category')
     }
   }
 
@@ -205,16 +214,35 @@ export default function CategoriesPage() {
       const category = categories.find(cat => cat.id === categoryId)
       if (!category) return
 
-      setCategories(categories.map(cat => 
-        cat.id === categoryId 
-          ? { ...cat, isActive: !cat.isActive, updatedAt: new Date().toISOString() }
-          : cat
-      ))
+      const response = await fetch(`/api/admin/categories/${categoryId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          ...category,
+          isActive: !category.isActive
+        })
+      })
       
-      toast.success(`Category ${category.isActive ? 'deactivated' : 'activated'} successfully`)
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to update category status')
+      }
+      
+      const data = await response.json()
+      if (data.success) {
+        setCategories(categories.map(cat => 
+          cat.id === categoryId ? data.category : cat
+        ))
+        toast.success(`Category ${category.isActive ? 'deactivated' : 'activated'} successfully`)
+      } else {
+        throw new Error(data.error || 'Failed to update category status')
+      }
     } catch (error) {
       console.error('Failed to toggle category status:', error)
-      toast.error('Failed to update category status')
+      toast.error(error instanceof Error ? error.message : 'Failed to update category status')
     }
   }
 
