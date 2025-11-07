@@ -133,7 +133,6 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
     }}>
       {/* Header */}
       <div style={{
-        background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, 
         padding: "22px",
         color: "white",
         position: "relative",
@@ -214,7 +213,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       </div>
 
       {/* Body */}
-      <div style={{ padding: "20px 20px 16px", background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, color: "#FFFFFF", textAlign: "center" }}>
+      <div style={{ padding: "20px 20px 16px", color: "#FFFFFF", textAlign: "center" }}>
         <p style={{ fontSize: "13px", lineHeight: 1.6, margin: 0, color: "#FFFFFF", opacity: 1 }}>
           {about}
         </p>
@@ -269,6 +268,846 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   );
 };
 
+// ====================================================================
+// START: Template-Specific Card Components
+// ====================================================================
+
+// Flat Template
+const FlatCardPreview: React.FC<DigitalCardProps> = ({
+  name = "", title = "", company = "", location = "", about = "", photo = "", cover = "",
+  email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
+  skills = "", portfolio = "", experience = "", services = "", review = ""
+}) => {
+  const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
+  
+  type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
+  const [activePanel, setActivePanel] = useState<Section | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 768);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  // Updated to use props
+  const skillsList = skills.split(',').map((s) => s.trim()).filter(Boolean);
+  const portfolioList = portfolio.split(',').map((s) => s.trim()).filter(Boolean);
+  const experienceList = experience.split(',').map((s) => s.trim()).filter(Boolean);
+  const servicesList = services.split(',').map((s) => s.trim()).filter(Boolean);
+  const reviewList = review.split(',').map((s) => s.trim()).filter(Boolean);
+
+  const renderItem = (title: string, subtitle?: string) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: themeColor1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
+        <div>
+          <div style={{ fontWeight: 700, color: '#111827' }}>{title}</div>
+          {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
+        </div>
+      </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+  );
+
+  const renderPanelContent = (section: Section) => {
+    if (section === 'Skills') {
+      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      return (
+        <div style={{ padding: isMobile ? 12 : 16 }}>
+          {items.map((it, idx) => renderItem(it))}
+        </div>
+      );
+    }
+    if (section === 'Services') {
+      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Portfolio') {
+      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Experience') {
+      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Review') {
+      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    return null;
+  };
+  
+  return (
+    <div style={{
+      width: "360px", borderRadius: "12px", overflow: "hidden",
+      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)", fontFamily: fontFamily,
+      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `3px solid ${themeColor1}`
+    }}>
+      {/* Cover Image Section */}
+      <div style={{
+        width: "100%", height: "120px", overflow: "hidden",
+        background: cover ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+        backgroundSize: cover ? "cover" : "auto",
+        backgroundPosition: cover ? "center" : "initial"
+      }}>
+        {cover && (
+          <img src={cover} alt="Cover" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        )}
+      </div>
+      <div style={{ padding: "24px", textAlign: "center" }}>
+        <div style={{
+          width: "80px", height: "80px", borderRadius: "12px", overflow: "hidden",
+          margin: "0 auto 16px", background: photo ? "transparent" : themeColor1,
+          display: "flex", alignItems: "center", justifyContent: "center"
+        }}>
+          {photo ? (
+            <img src={photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : (
+            <span style={{ fontSize: "32px", fontWeight: 700, color: "white" }}>{firstLetter}</span>
+          )}
+        </div>
+        {name && <h3 style={{ margin: "0 0 8px", fontSize: "24px", fontWeight: 700, color: "#FFFFFF" }}>{name}</h3>}
+        {title && <p style={{ margin: "0 0 4px", fontSize: "16px", color: "#FFFFFF", fontWeight: 600, opacity: 0.95 }}>{title}</p>}
+        {company && <p style={{ margin: "0 0 16px", fontSize: "14px", color: "#FFFFFF" }}>{company}</p>}
+        {location && <p style={{ margin: "0 0 16px", fontSize: "14px", color: "#FFFFFF" }}>{location}</p>}
+        <p style={{ fontSize: "13px", lineHeight: 1.5, color: "#FFFFFF", margin: "0 0 20px", opacity: 0.9 }}>{about}</p>
+        
+        <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+          <a href={`mailto:${email}`} style={{
+            width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
+            display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
+            border: "1px solid rgba(255, 255, 255, 0.4)"
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+              <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
+              <path d="M4 8l8 5 8-5"/>
+            </svg>
+          </a>
+          <a href={`tel:${phone}`} style={{
+            width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
+            display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
+            border: "1px solid rgba(255, 255, 255, 0.4)"
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+            </svg>
+          </a>
+          <a href={linkedin} style={{
+            width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
+            display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
+            border: "1px solid rgba(255, 255, 255, 0.4)"
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+              <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/>
+            </svg>
+          </a>
+          <a href={website} style={{
+            width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.3)",
+            display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
+            border: "1px solid rgba(255, 255, 255, 0.4)"
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
+            </svg>
+          </a>
+        </div>
+
+        {/* Pills Section */}
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
+          {[
+            { text: "Services" },
+            { text: "Portfolio" },
+            { text: "Skills" },
+            { text: "Experience" },
+            { text: "Review" },
+          ].map((b) => (
+            <button
+              key={b.text}
+              onClick={() => setActivePanel(b.text as Section)}
+              style={{
+                padding: "8px 14px",
+                background: "rgba(255, 255, 255, 0.2)",
+                color: "#FFFFFF",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                borderRadius: "12px",
+                fontSize: "13px",
+                fontWeight: 600,
+                cursor: "pointer",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.04)",
+              }}
+            >
+              {b.text}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {activePanel && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setActivePanel(null)}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#fff',
+              borderRadius: 16,
+              maxWidth: isMobile ? '90vw' : 400,
+              maxHeight: isMobile ? '80vh' : 500,
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+            }}
+          >
+            <div style={{ padding: isMobile ? 12 : 16, borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h3 style={{ margin: 0, color: '#111827', fontWeight: 700 }}>{activePanel}</h3>
+              <button onClick={() => setActivePanel(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
+            </div>
+            <div style={{ maxHeight: isMobile ? 'calc(80vh - 60px)' : 400, overflow: 'auto' }}>
+              {renderPanelContent(activePanel)}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Modern Template
+const ModernCardPreview: React.FC<DigitalCardProps> = ({
+  name = "", title = "", company = "", location = "", about = "", photo = "", cover = "",
+  email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
+  skills = "", portfolio = "", experience = "", services = "", review = ""
+}) => {
+  const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
+  
+  type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
+  const [activePanel, setActivePanel] = useState<Section | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 768);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  // Updated to use props
+  const skillsList = skills.split(',').map((s) => s.trim()).filter(Boolean);
+  const portfolioList = portfolio.split(',').map((s) => s.trim()).filter(Boolean);
+  const experienceList = experience.split(',').map((s) => s.trim()).filter(Boolean);
+  const servicesList = services.split(',').map((s) => s.trim()).filter(Boolean);
+  const reviewList = review.split(',').map((s) => s.trim()).filter(Boolean);
+
+  const renderItem = (title: string, subtitle?: string) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: themeColor1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
+        <div>
+          <div style={{ fontWeight: 700, color: '#111827' }}>{title}</div>
+          {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
+        </div>
+      </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+  );
+
+  const renderPanelContent = (section: Section) => {
+    if (section === 'Skills') {
+      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      return (
+        <div style={{ padding: isMobile ? 12 : 16 }}>
+          {items.map((it, idx) => renderItem(it))}
+        </div>
+      );
+    }
+    if (section === 'Services') {
+      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Portfolio') {
+      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Experience') {
+      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Review') {
+      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    return null;
+  };
+  
+  return (
+    <div style={{
+      width: "360px", borderRadius: "20px", overflow: "hidden",
+      boxShadow: "0 12px 32px rgba(0, 0, 0, 0.15)", fontFamily: fontFamily,
+      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
+      border: "1px solid rgba(255,255,255,0.2)", backdropFilter: "blur(10px)"
+    }}>
+      {/* Cover Image Section */}
+      <div style={{
+        width: "100%", height: "140px", overflow: "hidden",
+        background: cover ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+        backgroundSize: cover ? "cover" : "auto",
+        backgroundPosition: cover ? "center" : "initial",
+        borderRadius: "20px 20px 0 0"
+      }}>
+        {cover && (
+          <img src={cover} alt="Cover" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        )}
+      </div>
+      <div style={{ padding: "28px", textAlign: "left" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
+          <div style={{
+            width: "64px", height: "64px", borderRadius: "50%", overflow: "hidden",
+            background: photo ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            border: `2px solid ${themeColor1}40`
+          }}>
+            {photo ? (
+              <img src={photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <span style={{ fontSize: "24px", fontWeight: 700, color: "white" }}>{firstLetter}</span>
+            )}
+          </div>
+          <div>
+            {name && <h3 style={{ margin: "0 0 4px", fontSize: "22px", fontWeight: 700, color: "#FFFFFF" }}>{name}</h3>}
+            {title && <p style={{ margin: "0 0 2px", fontSize: "14px", color: "#FFFFFF", fontWeight: 600, opacity: 0.95 }}>{title}</p>}
+            {company && <p style={{ margin: "0", fontSize: "13px", color: "#FFFFFF" }}>{company}</p>}
+          </div>
+        </div>
+        
+        {location && <p style={{ margin: "0 0 12px", fontSize: "13px", color: "#FFFFFF", display: "flex", alignItems: "center", gap: "6px" }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={themeColor1} strokeWidth="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          {location}
+        </p>}
+        
+        <p style={{ fontSize: "13px", lineHeight: 1.6, color: "#FFFFFF", margin: "0 0 24px", opacity: 0.9 }}>{about}</p>
+        
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+          <a href={`mailto:${email}`} style={{
+            padding: "12px", borderRadius: "12px", background: `${themeColor1}10`,
+            border: `1px solid ${themeColor1}30`, textDecoration: "none",
+            display: "flex", alignItems: "center", gap: "8px", color: themeColor1, fontSize: "12px", fontWeight: 600
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
+              <path d="M4 8l8 5 8-5"/>
+            </svg>
+            Email
+          </a>
+          <a href={`tel:${phone}`} style={{
+            padding: "12px", borderRadius: "12px", background: `${themeColor1}10`,
+            border: `1px solid ${themeColor1}30`, textDecoration: "none",
+            display: "flex", alignItems: "center", gap: "8px", color: themeColor1, fontSize: "12px", fontWeight: 600
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+            </svg>
+            Call
+          </a>
+          <a href={linkedin} style={{
+            padding: "12px", borderRadius: "12px", background: `${themeColor1}10`,
+            border: `1px solid ${themeColor1}30`, textDecoration: "none",
+            display: "flex", alignItems: "center", gap: "8px", color: themeColor1, fontSize: "12px", fontWeight: 600
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/>
+            </svg>
+            LinkedIn
+          </a>
+          <a href={website} style={{
+            padding: "12px", borderRadius: "12px", background: `${themeColor1}10`,
+            border: `1px solid ${themeColor1}30`, textDecoration: "none",
+            display: "flex", alignItems: "center", gap: "8px", color: themeColor1, fontSize: "12px", fontWeight: 600
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
+            </svg>
+            Website
+          </a>
+        </div>
+
+        {/* Pills Section */}
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
+          {[
+            { text: "Services" },
+            { text: "Portfolio" },
+            { text: "Skills" },
+            { text: "Experience" },
+            { text: "Review" },
+          ].map((b) => (
+            <button
+              key={b.text}
+              onClick={() => setActivePanel(b.text as Section)}
+              style={{
+                padding: "8px 14px",
+                background: "rgba(255, 255, 255, 0.2)",
+                color: "#FFFFFF",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                borderRadius: "12px",
+                fontSize: "13px",
+                fontWeight: 600,
+                cursor: "pointer",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.04)",
+              }}
+            >
+              {b.text}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {activePanel && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setActivePanel(null)}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#fff',
+              borderRadius: 16,
+              maxWidth: isMobile ? '90vw' : 400,
+              maxHeight: isMobile ? '80vh' : 500,
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+            }}
+          >
+            <div style={{ padding: isMobile ? 12 : 16, borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h3 style={{ margin: 0, color: '#111827', fontWeight: 700 }}>{activePanel}</h3>
+              <button onClick={() => setActivePanel(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
+            </div>
+            <div style={{ maxHeight: isMobile ? 'calc(80vh - 60px)' : 400, overflow: 'auto' }}>
+              {renderPanelContent(activePanel)}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Sleek Template
+const SleekCardPreview: React.FC<DigitalCardProps> = ({
+  name = "", title = "", company = "", location = "", about = "", photo = "", cover = "",
+  email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
+  skills = "", portfolio = "", experience = "", services = "", review = ""
+}) => {
+  const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
+  
+  type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
+  const [activePanel, setActivePanel] = useState<Section | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 768);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  // Updated to use props
+  const skillsList = skills.split(',').map((s) => s.trim()).filter(Boolean);
+  const portfolioList = portfolio.split(',').map((s) => s.trim()).filter(Boolean);
+  const experienceList = experience.split(',').map((s) => s.trim()).filter(Boolean);
+  const servicesList = services.split(',').map((s) => s.trim()).filter(Boolean);
+  const reviewList = review.split(',').map((s) => s.trim()).filter(Boolean);
+
+  const renderItem = (title: string, subtitle?: string) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: themeColor1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
+        <div>
+          <div style={{ fontWeight: 700, color: '#111827' }}>{title}</div>
+          {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
+        </div>
+      </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+  );
+
+  const renderPanelContent = (section: Section) => {
+    if (section === 'Skills') {
+      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      return (
+        <div style={{ padding: isMobile ? 12 : 16 }}>
+          {items.map((it, idx) => renderItem(it))}
+        </div>
+      );
+    }
+    if (section === 'Services') {
+      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Portfolio') {
+      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Experience') {
+      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Review') {
+      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    return null;
+  };
+  
+  return (
+    <div style={{
+      width: "360px", borderRadius: "4px", overflow: "hidden",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", fontFamily: fontFamily,
+      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `1px solid #e5e5e5`
+    }}>
+      <div style={{
+        height: "120px", 
+        background: cover ? `url(${cover})` : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+        backgroundSize: cover ? "cover" : "auto",
+        backgroundPosition: cover ? "center" : "initial",
+        position: "relative", display: "flex", alignItems: "flex-end", padding: "20px"
+      }}>
+        {/* Overlay for better text readability when cover image is present */}
+        {cover && (
+          <div style={{
+            position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+            background: "rgba(0,0,0,0.3)"
+          }}></div>
+        )}
+        <div style={{
+          width: "60px", height: "60px", borderRadius: "2px", overflow: "hidden",
+          background: photo ? "transparent" : "rgba(255,255,255,0.2)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          border: "2px solid rgba(255,255,255,0.3)", position: "relative", zIndex: 2
+        }}>
+          {photo ? (
+            <img src={photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : (
+            <span style={{ fontSize: "20px", fontWeight: 700, color: "white" }}>{firstLetter}</span>
+          )}
+        </div>
+        <div style={{ marginLeft: "16px", color: "white", position: "relative", zIndex: 2 }}>
+          {name && <h3 style={{ margin: "0 0 4px", fontSize: "18px", fontWeight: 600 }}>{name}</h3>}
+          {title && <p style={{ margin: "0", fontSize: "13px", opacity: 0.9 }}>{title}</p>}
+        </div>
+      </div>
+      
+      <div style={{ padding: "20px" }}>
+        <div style={{ marginBottom: "16px" }}>
+          {company && <p style={{ margin: "0 0 4px", fontSize: "14px", color: "#FFFFFF", fontWeight: 500 }}>{company}</p>}
+          {location && <p style={{ margin: "0 0 12px", fontSize: "12px", color: "#FFFFFF" }}>{location}</p>}
+          <p style={{ fontSize: "12px", lineHeight: 1.5, color: "#FFFFFF", margin: "0", opacity: 0.9 }}>{about}</p>
+        </div>
+        
+        <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "16px" }}>
+          <div style={{ display: "flex", gap: "1px" }}>
+            <a href={`mailto:${email}`} style={{
+              flex: 1, padding: "10px", background: themeColor1, textDecoration: "none",
+              display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "11px", fontWeight: 600
+            }}>
+              EMAIL
+            </a>
+            <a href={`tel:${phone}`} style={{
+              flex: 1, padding: "10px", background: themeColor1, textDecoration: "none",
+              display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "11px", fontWeight: 600
+            }}>
+              CALL
+            </a>
+            <a href={linkedin} style={{
+              flex: 1, padding: "10px", background: themeColor1, textDecoration: "none",
+              display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "11px", fontWeight: 600
+            }}>
+              LINKEDIN
+            </a>
+            <a href={website} style={{
+              flex: 1, padding: "10px", background: themeColor1, textDecoration: "none",
+              display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "11px", fontWeight: 600
+            }}>
+              WEBSITE
+            </a>
+          </div>
+        </div>
+
+        {/* Pills Section */}
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px", padding: "0 20px" }}>
+          {[
+            { text: "Services" },
+            { text: "Portfolio" },
+            { text: "Skills" },
+            { text: "Experience" },
+            { text: "Review" },
+          ].map((b) => (
+            <button
+              key={b.text}
+              onClick={() => setActivePanel(b.text as Section)}
+              style={{
+                padding: "8px 14px",
+                background: "rgba(255, 255, 255, 0.2)",
+                color: "#FFFFFF",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                borderRadius: "12px",
+                fontSize: "13px",
+                fontWeight: 600,
+                cursor: "pointer",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.04)",
+              }}
+            >
+              {b.text}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {activePanel && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setActivePanel(null)}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#fff',
+              borderRadius: 16,
+              maxWidth: isMobile ? '90vw' : 400,
+              maxHeight: isMobile ? '80vh' : 500,
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+            }}
+          >
+            <div style={{ padding: isMobile ? 12 : 16, borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h3 style={{ margin: 0, color: '#111827', fontWeight: 700 }}>{activePanel}</h3>
+              <button onClick={() => setActivePanel(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
+            </div>
+            <div style={{ maxHeight: isMobile ? 'calc(80vh - 60px)' : 400, overflow: 'auto' }}>
+              {renderPanelContent(activePanel)}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Blend Template
+const BlendCardPreview: React.FC<DigitalCardProps> = ({
+  name = "", title = "", company = "", location = "", about = "", photo = "", cover = "",
+  email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
+  skills = "", portfolio = "", experience = "", services = "", review = ""
+}) => {
+  const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
+  
+  type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
+  const [activePanel, setActivePanel] = useState<Section | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 768);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  // Updated to use props
+  const skillsList = skills.split(',').map((s) => s.trim()).filter(Boolean);
+  const portfolioList = portfolio.split(',').map((s) => s.trim()).filter(Boolean);
+  const experienceList = experience.split(',').map((s) => s.trim()).filter(Boolean);
+  const servicesList = services.split(',').map((s) => s.trim()).filter(Boolean);
+  const reviewList = review.split(',').map((s) => s.trim()).filter(Boolean);
+
+  const renderItem = (title: string, subtitle?: string) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: themeColor1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
+        <div>
+          <div style={{ fontWeight: 700, color: '#111827' }}>{title}</div>
+          {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
+        </div>
+      </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+  );
+
+  const renderPanelContent = (section: Section) => {
+    if (section === 'Skills') {
+      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      return (
+        <div style={{ padding: isMobile ? 12 : 16 }}>
+          {items.map((it, idx) => renderItem(it))}
+        </div>
+      );
+    }
+    if (section === 'Services') {
+      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Portfolio') {
+      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Experience') {
+      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Review') {
+      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    return null;
+  };
+  
+  return (
+    <div style={{
+      width: "360px", borderRadius: "24px", overflow: "hidden",
+      boxShadow: "0 16px 40px rgba(0, 0, 0, 0.12)", fontFamily: fontFamily,
+      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, position: "relative"
+    }}>
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: "200px",
+        background: cover ? `url(${cover})` : `linear-gradient(135deg, ${themeColor1}20, ${themeColor2}20)`,
+        backgroundSize: cover ? "cover" : "auto",
+        backgroundPosition: cover ? "center" : "initial",
+        borderRadius: "24px 24px 0 0"
+      }}>
+        {/* Overlay for better content readability when cover image is present */}
+        {cover && (
+          <div style={{
+            position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+            background: `linear-gradient(135deg, ${themeColor1}40, ${themeColor2}40)`,
+            borderRadius: "24px 24px 0 0"
+          }}></div>
+        )}
+      </div>
+      
+      <div style={{ padding: "32px", paddingTop: "220px", position: "relative", zIndex: 1 }}>
+        <div style={{ textAlign: "center", marginBottom: "24px" }}>
+          <div style={{
+            width: "90px", height: "90px", borderRadius: "50%", overflow: "hidden",
+            margin: "0 auto 16px", background: photo ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            border: "4px solid white", boxShadow: "0 8px 24px rgba(0,0,0,0.1)"
+          }}>
+            {photo ? (
+              <img src={photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <span style={{ fontSize: "36px", fontWeight: 700, color: "white" }}>{firstLetter}</span>
+            )}
+          </div>
+          {name && <h3 style={{ margin: "0 0 8px", fontSize: "26px", fontWeight: 700, color: "#FFFFFF" }}>{name}</h3>}
+          {title && <p style={{ margin: "0 0 4px", fontSize: "16px", color: "#FFFFFF", fontWeight: 600, opacity: 0.95 }}>{title}</p>}
+          {company && <p style={{ margin: "0 0 8px", fontSize: "14px", color: "#FFFFFF" }}>{company}</p>}
+          {location && <p style={{ margin: "0", fontSize: "13px", color: "#FFFFFF" }}>{location}</p>}
+        </div>
+        
+        <div style={{
+          background: `linear-gradient(135deg, ${themeColor1}08, ${themeColor2}08)`,
+          borderRadius: "16px", padding: "20px", marginBottom: "20px",
+          border: `1px solid ${themeColor1}20`
+        }}>
+          <p style={{ fontSize: "13px", lineHeight: 1.6, color: "#FFFFFF", margin: "0", textAlign: "center", opacity: 0.9 }}>{about}</p>
+        </div>
+        
+        <div style={{ display: "flex", gap: "8px" }}>
+          <a href={`mailto:${email}`} style={{
+            flex: 1, padding: "14px", borderRadius: "12px", 
+            background: `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+            textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center",
+            color: "white", fontSize: "12px", fontWeight: 600, boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: "6px" }}>
+              <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
+              <path d="M4 8l8 5 8-5"/>
+            </svg>
+            Email
+          </a>
+          <a href={`tel:${phone}`} style={{
+            flex: 1, padding: "14px", borderRadius: "12px", 
+            background: `linear-gradient(135deg, ${themeColor2}, ${themeColor1})`,
+            textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center",
+            color: "white", fontSize: "12px", fontWeight: 600, boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: "6px" }}>
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+            </svg>
+            Call
+          </a>
+        </div>
+        
+        <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+          <a href={linkedin} style={{
+            flex: 1, padding: "12px", borderRadius: "12px", background: `${themeColor1}15`,
+            border: `1px solid ${themeColor1}30`, textDecoration: "none",
+            display: "flex", alignItems: "center", justifyContent: "center", color: themeColor1, fontSize: "11px", fontWeight: 600
+          }}>
+            LinkedIn
+          </a>
+          <a href={website} style={{
+            flex: 1, padding: "12px", borderRadius: "12px", background: `${themeColor1}15`,
+            border: `1px solid ${themeColor1}30`, textDecoration: "none",
+            display: "flex", alignItems: "center", justifyContent: "center", color: themeColor1, fontSize: "11px", fontWeight: 600
+          }}>
+            Website
+          </a>
+        </div>
+
+        {/* Pills Section */}
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
+          {[
+            { text: "Services" },
+            { text: "Portfolio" },
+            { text: "Skills" },
+            { text: "Experience" },
+            { text: "Review" },
+          ].map((b) => (
+            <button
+              key={b.text}
+              onClick={() => setActivePanel(b.text as Section)}
+              style={{
+                padding: "8px 14px",
+                background: "rgba(255, 255, 255, 0.2)",
+                color: "#FFFFFF",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                borderRadius: "12px",
+                fontSize: "13px",
+                fontWeight: 600,
+                cursor: "pointer",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.04)",
+              }}
+            >
+              {b.text}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {activePanel && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setActivePanel(null)}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#fff',
+              borderRadius: 16,
+              maxWidth: isMobile ? '90vw' : 400,
+              maxHeight: isMobile ? '80vh' : 500,
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+            }}
+          >
+            <div style={{ padding: isMobile ? 12 : 16, borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h3 style={{ margin: 0, color: '#111827', fontWeight: 700 }}>{activePanel}</h3>
+              <button onClick={() => setActivePanel(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
+            </div>
+            <div style={{ maxHeight: isMobile ? 'calc(80vh - 60px)' : 400, overflow: 'auto' }}>
+              {renderPanelContent(activePanel)}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ====================================================================
 // START: EditPage Component
@@ -527,6 +1366,44 @@ const EditPage = () => {
   };
   // --- END NEW HANDLER FUNCTIONS ---
 
+  // Function to render the appropriate template based on selectedDesign
+  const renderTemplatePreview = () => {
+    const commonProps = {
+      name: cardName || `${prefix} ${firstName} ${middleName} ${lastName} ${suffix}`.trim(),
+      title,
+      company,
+      location: cardLocation,
+      about,
+      skills,
+      portfolio,
+      experience,
+      services,
+      review: reviews,
+      photo: profileImage,
+      cover: bannerImage,
+      email,
+      phone,
+      linkedin,
+      website,
+      themeColor1: selectedColor1,
+      themeColor2: selectedColor2,
+      fontFamily: selectedFont,
+    };
+
+    switch (selectedDesign) {
+      case 'Flat':
+        return <FlatCardPreview {...commonProps} />;
+      case 'Modern':
+        return <ModernCardPreview {...commonProps} />;
+      case 'Sleek':
+        return <SleekCardPreview {...commonProps} />;
+      case 'Blend':
+        return <BlendCardPreview {...commonProps} />;
+      case 'Classic':
+      default:
+        return <DigitalCardPreview {...commonProps} />;
+    }
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -572,38 +1449,159 @@ const EditPage = () => {
                       width: '100%',
                       maxWidth: '80px',
                       height: '50px',
-                      backgroundColor: index === 0 ? `linear-gradient(135deg, ${selectedColor1} 0%, ${selectedColor2} 100%)` : '#dcdcdc',
                       borderRadius: '5px',
                       marginBottom: '10px',
                       margin: '0 auto 10px auto',
                       position: 'relative',
-                      overflow: 'hidden'
+                      overflow: 'hidden',
+                      background: design === 'Classic' ? `linear-gradient(135deg, ${selectedColor1} 0%, ${selectedColor2} 100%)` : 
+                                 design === 'Flat' ? 'white' :
+                                 design === 'Modern' ? `linear-gradient(145deg, ${selectedColor1}15, ${selectedColor2}15)` :
+                                 design === 'Sleek' ? `linear-gradient(135deg, ${selectedColor1}, ${selectedColor2})` :
+                                 design === 'Blend' ? 'white' : '#dcdcdc',
+                      border: design === 'Flat' ? `2px solid ${selectedColor1}` : 
+                             design === 'Sleek' ? 'none' : '1px solid #eee'
                     }}>
                       {design === 'Classic' && (
                         <div style={{
                           width: '100%',
                           height: '100%',
-                          backgroundImage: `url(${bannerImage || 'https://via.placeholder.com/80x50.png?text=Banner'})`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          borderRadius: '5px 5px 0 0',
                           position: 'relative',
                         }}>
                           <div style={{
-                            width: '30px',
-                            height: '30px',
+                            width: '16px',
+                            height: '16px',
                             borderRadius: '50%',
-                            backgroundColor: '#eee',
+                            backgroundColor: 'rgba(255,255,255,0.9)',
                             position: 'absolute',
-                            bottom: '-15px',
+                            bottom: '8px',
                             left: '50%',
                             transform: 'translateX(-50%)',
-                            border: '2px solid white',
-                            boxSizing: 'border-box',
+                            border: '1px solid rgba(255,255,255,0.8)',
                           }}></div>
                         </div>
                       )}
-                      {/* Other design previews... */}
+                      {design === 'Flat' && (
+                        <div style={{
+                          width: '100%',
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '4px'
+                        }}>
+                          <div style={{
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '2px',
+                            backgroundColor: selectedColor1,
+                          }}></div>
+                          <div style={{
+                            width: '20px',
+                            height: '2px',
+                            backgroundColor: '#ddd',
+                            borderRadius: '1px'
+                          }}></div>
+                          <div style={{
+                            width: '16px',
+                            height: '1px',
+                            backgroundColor: '#eee',
+                          }}></div>
+                        </div>
+                      )}
+                      {design === 'Modern' && (
+                        <div style={{
+                          width: '100%',
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          padding: '8px'
+                        }}>
+                          <div style={{
+                            width: '10px',
+                            height: '10px',
+                            borderRadius: '50%',
+                            background: `linear-gradient(135deg, ${selectedColor1}, ${selectedColor2})`,
+                          }}></div>
+                          <div style={{
+                            flex: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '2px'
+                          }}>
+                            <div style={{
+                              width: '100%',
+                              height: '2px',
+                              backgroundColor: '#333',
+                              borderRadius: '1px'
+                            }}></div>
+                            <div style={{
+                              width: '80%',
+                              height: '1px',
+                              backgroundColor: '#999',
+                            }}></div>
+                          </div>
+                        </div>
+                      )}
+                      {design === 'Sleek' && (
+                        <div style={{
+                          width: '100%',
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column'
+                        }}>
+                          <div style={{
+                            height: '60%',
+                            background: `linear-gradient(135deg, ${selectedColor1}, ${selectedColor2})`,
+                            display: 'flex',
+                            alignItems: 'flex-end',
+                            padding: '4px'
+                          }}>
+                            <div style={{
+                              width: '8px',
+                              height: '8px',
+                              backgroundColor: 'rgba(255,255,255,0.3)',
+                              borderRadius: '1px',
+                              marginRight: '2px'
+                            }}></div>
+                          </div>
+                          <div style={{
+                            height: '40%',
+                            backgroundColor: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '1px'
+                          }}>
+                            <div style={{ width: '8px', height: '4px', backgroundColor: selectedColor1, fontSize: '4px' }}></div>
+                            <div style={{ width: '8px', height: '4px', backgroundColor: selectedColor1, fontSize: '4px' }}></div>
+                          </div>
+                        </div>
+                      )}
+                      {design === 'Blend' && (
+                        <div style={{
+                          width: '100%',
+                          height: '100%',
+                          position: 'relative',
+                          background: `linear-gradient(135deg, ${selectedColor1}20, ${selectedColor2}20)`,
+                          borderRadius: '8px'
+                        }}>
+                          <div style={{
+                            width: '14px',
+                            height: '14px',
+                            borderRadius: '50%',
+                            background: `linear-gradient(135deg, ${selectedColor1}, ${selectedColor2})`,
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            border: '1px solid white',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                          }}></div>
+                        </div>
+                      )}
                     </div>
                     <span style={{ fontSize: '12px', color: '#555' }}>{design}</span>
                   </div>
@@ -1574,31 +2572,11 @@ const EditPage = () => {
           justifyContent: 'center',
           alignItems: 'flex-start',
         }}>
-            <DigitalCardPreview 
-              name={cardName || `${prefix} ${firstName} ${middleName} ${lastName} ${suffix}`.trim()}
-              title={title}
-              company={company}
-              location={cardLocation}
-              about={about}
-              skills={skills}
-              portfolio={portfolio}
-              experience={experience}
-              services={services} // Passed prop
-              review={reviews} // Passed prop
-              photo={profileImage}
-              cover={bannerImage}
-              email={email}
-              phone={phone}
-              linkedin={linkedin}
-              website={website}
-              themeColor1={selectedColor1}
-              themeColor2={selectedColor2}
-              fontFamily={selectedFont}
-            />
+            {renderTemplatePreview()}
         </div>
         {/* ==================================================================== */}
         {/* END: Card Preview Section                                          */}
-        {/* ==================================================================== */}
+        {/* ==================================================================== */
 
 
         <div className="edit-panel" style={{
@@ -1668,6 +2646,7 @@ const EditPage = () => {
             </button>
           </div>
         </div>
+}
       </div>
 
       {/* --- NEWLY ADDED: "Add Field" Modal --- */}

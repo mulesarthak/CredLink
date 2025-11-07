@@ -36,93 +36,7 @@ export default function Footer() {
         position: 'relative',
         zIndex: 1
       }}>
-        {/* Top Section - Brand & CTA */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          paddingBottom: '3rem',
-          marginBottom: '3rem',
-          borderBottom: '1px solid rgba(0, 102, 255, 0.2)',
-          flexWrap: 'wrap',
-          gap: '3rem',
-          textAlign: 'center'
-        }}>
-          {/* Brand Section */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '1rem'
-          }}>
-            <div style={{
-              width: '56px',
-              height: '56px',
-              background: 'linear-gradient(135deg, #0066FF 0%, #00D2FF 100%)',
-              borderRadius: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 10px 25px rgba(0, 102, 255, 0.3)'
-            }}>
-              <Sparkles style={{ width: '28px', height: '28px', color: 'white' }} strokeWidth={2.5} />
-            </div>
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center'
-            }}>
-              <h3 style={{
-                fontSize: '1.75rem',
-                fontWeight: '800',
-                background: 'linear-gradient(135deg, #0066FF 0%, #00D2FF 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                marginBottom: '0.25rem',
-                letterSpacing: '-0.02em',
-                margin: 0
-              }}>
-                CredLink
-              </h3>
-              <p style={{
-                fontSize: '0.875rem',
-                color: '#9CA3AF',
-                margin: 0
-              }}>
-                Your Digital Identity Platform
-              </p>
-            </div>
-          </div>
-          {/* CTA Button */}
-          <Link
-            href="/auth/signup"
-            style={{
-              padding: '1rem 2.5rem',
-              fontSize: '1rem',
-              fontWeight: '700',
-              color: 'white',
-              background: 'linear-gradient(135deg, #0066FF 0%, #00D2FF 100%)',
-              borderRadius: '12px',
-              textDecoration: 'none',
-              boxShadow: '0 10px 25px rgba(0, 102, 255, 0.3)',
-              transition: 'all 0.3s ease',
-              border: 'none',
-              display: 'inline-block'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-3px)';
-              e.currentTarget.style.boxShadow = '0 15px 35px rgba(0, 102, 255, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 10px 25px rgba(0, 102, 255, 0.3)';
-            }}
-          >
-            Start Building Your Profile
-          </Link>
-        </div>
+        
         {/* Main Footer Grid */}
         <div style={{
           display: 'grid',
@@ -380,68 +294,15 @@ export default function Footer() {
                 ))}
             </div>
             {/* Newsletter */}
-            <p style={{
-              fontSize: '0.875rem',
-              color: '#9CA3AF',
-              marginBottom: '0.75rem',
-              textAlign: 'center'
-            }}>
-              Stay updated with our latest news
-            </p>
+           
             <div style={{
               display: 'flex',
               justifyContent: 'center',
               gap: '0.5rem',
               maxWidth: '100%'
             }}>
-              <input
-                type="email"
-                placeholder="Your email"
-                style={{
-                  flex: 1,
-                  padding: '0.75rem 1rem',
-                  fontSize: '0.875rem',
-                  color: '#2C3E50',
-                  background: 'white',
-                  border: '1px solid rgba(0, 102, 255, 0.3)',
-                  borderRadius: '10px',
-                  outline: 'none',
-                  transition: 'all 0.2s ease'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#0066FF';
-                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 102, 255, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(0, 102, 255, 0.3)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-                suppressHydrationWarning
-              />
-              <button
-                style={{
-                  padding: '0.75rem 1.25rem',
-                  background: 'linear-gradient(135deg, #0066FF 0%, #00D2FF 100%)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '0.875rem',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 102, 255, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-                suppressHydrationWarning
-              >
-                Subscribe
-              </button>
+              
+              
             </div>
           </div>
         </div>
@@ -475,26 +336,7 @@ export default function Footer() {
             . All rights reserved.
           </p>
           
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}>
-            <div style={{
-              width: '8px',
-              height: '8px',
-              background: 'linear-gradient(135deg, #0066FF 0%, #00D2FF 100%)',
-              borderRadius: '50%',
-              animation: 'pulse 2s ease-in-out infinite'
-            }} />
-            <p style={{
-              fontSize: '0.875rem',
-              color: '#9CA3AF',
-              margin: 0
-            }}>
-              Built with ❤️ for professionals worldwide
-            </p>
-          </div>
+          
         </div>
       </div>
       <style>{`
