@@ -356,7 +356,7 @@ const OnboardingPage: React.FC = () => {
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                CredLink
+                MyKard
               </span>
             </h1>
             <p
