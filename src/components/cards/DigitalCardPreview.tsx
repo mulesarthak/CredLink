@@ -63,7 +63,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   const experienceList = experience.split(',').map((s) => s.trim()).filter(Boolean);
 
   const renderItem = (title: string, subtitle?: string) => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ width: 28, height: 28, borderRadius: 8, background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
         <div>
@@ -71,7 +71,6 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
         </div>
       </div>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </div>
   );
 
@@ -104,15 +103,16 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   };
 
   return (
-    <div style={{
-      width: "360px",
-      borderRadius: "28px",
-      overflow: "hidden",
-      boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)",
-      fontFamily: "system-ui, sans-serif",
-      position: "relative",
-      background: "#ffffff",
-    }}>
+    <div style={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
+      <div style={{
+        width: "360px",
+        borderRadius: "28px",
+        overflow: "hidden",
+        boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)",
+        fontFamily: "system-ui, sans-serif",
+        position: "relative",
+        background: "#ffffff",
+      }}>
       {/* Header */}
       <div style={{
         background: "linear-gradient(180deg, #3b82f6 0%, #2563eb 45%, #1d4ed8 100%)",
@@ -231,11 +231,13 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         </div>
       </div>
 
+      </div>
+
       {activePanel && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setActivePanel(null)}>
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20 }} onClick={() => setActivePanel(null)}>
           <div
             onClick={(e) => e.stopPropagation()}
-            style={{ width: isMobile ? '100%' : 520, height: isMobile ? '100%' : 'auto', maxHeight: isMobile ? '100%' : '80vh', background: '#fff', borderRadius: isMobile ? 0 : 16, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }}
+            style={{ width: isMobile ? '100%' : 520, maxWidth: '100%', height: isMobile ? '100%' : 'auto', maxHeight: isMobile ? '100%' : '80%', background: '#fff', borderRadius: isMobile ? 0 : 16, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }}
           >
             <div style={{ background: 'linear-gradient(180deg, #3b82f6 0%, #2563eb 45%, #1d4ed8 100%)', color: '#fff', padding: isMobile ? '16px' : '18px', textAlign: 'center' }}>
               <div style={{ fontSize: 20, fontWeight: 800 }}>{activePanel}</div>
