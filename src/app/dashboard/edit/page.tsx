@@ -78,8 +78,8 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   const servicesList = services.split(',').map((s) => s.trim()).filter(Boolean);
   const reviewList = review.split(',').map((s) => s.trim()).filter(Boolean);
 
-  const renderItem = (title: string, subtitle?: string) => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
+  const renderItem = (title: string, subtitle?: string, key?: number) => (
+    <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ width: 28, height: 28, borderRadius: 8, background: themeColor1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
         <div>
@@ -96,27 +96,27 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
       return (
         <div style={{ padding: isMobile ? 12 : 16 }}>
-          {items.map((it, idx) => renderItem(it))}
+          {items.map((it, idx) => renderItem(it, undefined, idx))}
         </div>
       );
     }
     if (section === 'Services') {
       // Changed to use prop
       const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => renderItem(it, undefined, idx))}</div>;
     }
     if (section === 'Portfolio') {
       const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => renderItem(it, undefined, idx))}</div>;
     }
     if (section === 'Experience') {
       const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => renderItem(it, undefined, idx))}</div>;
     }
     if (section === 'Review') {
       // Changed to use prop
       const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => renderItem(it, undefined, idx))}</div>;
     }
     return null;
   };
@@ -133,7 +133,6 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
     }}>
       {/* Header */}
       <div style={{
-        background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, 
         padding: "22px",
         color: "white",
         position: "relative",
@@ -184,37 +183,55 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           {/* Social Row */}
           <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}> 
             {/* Mail */}
-            <a href={`mailto:${email || 'example@credlink.com'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <div
+              onClick={() => {
+                if (email) window.location.href = `mailto:${email}`;
+                else window.location.href = 'mailto:example@credlink.com';
+              }}
+              style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer" }}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 4h16v16H4z" opacity="0"/>
                 <path d="M4 8l8 5 8-5"/>
                 <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
               </svg>
-            </a>
+            </div>
             {/* Phone */}
-            <a href={`tel:${phone || '+911234567890'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <div
+              onClick={() => {
+                if (phone) window.location.href = `tel:${phone}`;
+                else window.location.href = 'tel:+911234567890';
+              }}
+              style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer" }}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
               </svg>
-            </a>
+            </div>
             {/* LinkedIn */}
-            <a href={linkedin || 'https://linkedin.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <div
+              onClick={() => window.open(linkedin || 'https://linkedin.com', '_blank', 'noopener noreferrer')}
+              style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer" }}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
-            </a>
+            </div>
             {/* Globe */}
-            <a href={website || 'https://credlink.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <div
+              onClick={() => window.open(website || 'https://credlink.com', '_blank', 'noopener noreferrer')}
+              style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer" }}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="2" y1="12" x2="22" y2="12"/>
                 <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
               </svg>
-            </a>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Body */}
-      <div style={{ padding: "20px 20px 16px", background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, color: "#FFFFFF", textAlign: "center" }}>
+      <div style={{ padding: "20px 20px 16px", color: "#FFFFFF", textAlign: "center" }}>
         <p style={{ fontSize: "13px", lineHeight: 1.6, margin: 0, color: "#FFFFFF", opacity: 1 }}>
           {about}
         </p>
