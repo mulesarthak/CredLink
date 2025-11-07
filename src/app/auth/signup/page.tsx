@@ -158,7 +158,6 @@ export default function SignupPage() {
       toast.success('🎉 Account created successfully! Redirecting to login...', {
         duration: 3000,
       })
-      
       // Wait a moment before redirecting so user sees the message
       setTimeout(() => {
         router.push('/auth/login')
