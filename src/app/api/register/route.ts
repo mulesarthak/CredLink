@@ -23,6 +23,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User already exists' }, { status: 409 })
     }
 
+    // Generate username from email
+    const baseUsername = email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '')
+    let username = baseUsername
+    let counter = 1
+    
+    // Ensure username is unique
+    while (await prisma.user.findUnique({ where: { username } })) {
+      username = `${baseUsername}${counter}`
+      counter++
+    }
+
     const hashed = await bcrypt.hash(password, 10)
     const user = await prisma.user.create({
       data: {
@@ -30,6 +41,7 @@ export async function POST(req: NextRequest) {
         password: hashed,
         fullName,
         phone: phone || null,
+        username,
       },
       select: { id: true, email: true, fullName: true, phone: true, createdAt: true },
     })
