@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Search, Filter } from "lucide-react";
 import styles from "./search.module.css";
 import { Modal } from "@/components/ui/modal";
+import DigitalCardPreview from "@/components/cards/DigitalCardPreview";
 
 type Profile = {
   id: string;
@@ -33,6 +34,7 @@ export default function SearchPage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [connectionName, setConnectionName] = useState("");
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
 
   const handleConnect = (name: string) => {
     setConnectionName(name);
@@ -64,10 +66,35 @@ export default function SearchPage() {
         onClose={() => setShowModal(false)}
         title="Connection Request Sent"
         message={
-          <>Your connection request has been sent to <span style={{ fontWeight: 600, color: "#111827" }}>{connectionName}</span>. They'll be notified and can accept your request.</>
+          <p style={{ fontSize: 14, color: "#475569", lineHeight: 1.5 }}>
+            Your connection request has been sent to <span style={{ fontWeight: 600, color: "#111827" }}>{connectionName}</span>. They'll be notified and can accept your request.
+          </p>
         }
         primaryText="Close"
       />
+
+      {selectedProfile && (
+        <Modal 
+          isOpen={!!selectedProfile}
+          onClose={() => setSelectedProfile(null)}
+          title=""
+          message={null}
+          showActions={false}
+        >
+          <div style={{ padding: 20 }}>
+            <DigitalCardPreview
+              name={selectedProfile.name}
+              title={selectedProfile.designation || ''}
+              company={selectedProfile.company}
+              location={selectedProfile.city}
+              about={`${selectedProfile.designation} at ${selectedProfile.company}`}
+              skills=""
+              portfolio=""
+              experience=""
+            />
+          </div>
+        </Modal>
+      )}
 
       {/* HEADER */}
       <div className="mb-8">
@@ -134,14 +161,21 @@ export default function SearchPage() {
 
           <div className={styles.cardGrid}>
             {filtered.map((p) => (
-              <article key={p.id} className={styles.profileCard}>
+              <article 
+                key={p.id} 
+                className={styles.profileCard}
+                style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                onClick={() => setSelectedProfile(p)}
+              >
                 <div className={styles.cardInner}>
                   <div className={styles.cardHeader}>
                     <div className={styles.userInfo}>
                       <div className={styles.avatar}>{p.name.charAt(0)}</div>
                       <div>
                         <h3 className={styles.userName}>
-                          <Link href={`/profile/${p.username}`}>{p.name}</Link>
+                          {p.name}
                         </h3>
                         <p className={styles.userDesignation}>{p.designation}</p>
                       </div>

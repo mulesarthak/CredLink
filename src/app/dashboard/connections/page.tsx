@@ -295,7 +295,7 @@ export default function DashboardContactPage() {
                     {/* Filter: Desktop Only in Header */}
                     {!isSidebarOpen && (
                       <div className={styles.desktopOnly}>
-                        <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown style={{zIndex: 10000}}>
+                        <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown>
                           <button 
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
                             className={styles.filterButton}
@@ -428,7 +428,7 @@ export default function DashboardContactPage() {
             <div className={styles.controlsFlexContainer}>
               <div className={styles.controlsGroup}>
                 <div className={styles.controlsInnerFlex}>
-                  <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown style={{zIndex: 10000}}>
+                  <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown>
                     <button 
                       onClick={() => setIsFilterOpen(!isFilterOpen)}
                       className={styles.filterButton}
@@ -847,7 +847,14 @@ export default function DashboardContactPage() {
                       <div className={styles.requestActions}>
                         <button 
                           onClick={() => handleApproveRequest(request.id)}
-                          className={styles.requestApproveButton}
+                          style={{
+                            background: 'linear-gradient(to bottom right, #1e3a8a, #2563eb)',
+                            color: 'white',
+                            padding: '8px 16px',
+                            borderRadius: '8px',
+                            fontWeight: '500',
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                          }}
                         >
                           Approve
                         </button>

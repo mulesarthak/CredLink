@@ -147,6 +147,19 @@
   border-radius: 9999px;
 }
 
+.editCardWrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* On mobile, place Edit button above the tabs */
+@media (max-width: 767px) {
+  .editCardWrapper {
+    order: -1;
+    align-self: flex-end;
+  }
+}
+
 .editCardBtn {
   display: flex;
   align-items: center;

@@ -251,7 +251,7 @@ const CardDetailsPage = () => {
                 </button>
               ))}
             </div>
-            <div className="flex justify-end">
+            <div className={styles.editCardWrapper}>
               <Link href="/dashboard/edit">
                 <button className={styles.editCardBtn}>
                   <FiEdit size={16} />
