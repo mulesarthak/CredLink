@@ -29,12 +29,12 @@ export default function UsersPage() {
   });
 
   // ✅ Fetching data from backend
-  useEffect(() => {
-    const fetchUsers = async () => {
+  const fetchUsers = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/api/admin/users");
+        const res = await fetch("/api/users");  
         const data = await res.json();
+        console.log(data);
         setUsers(data.users || []);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -42,6 +42,8 @@ export default function UsersPage() {
         setLoading(false);
       }
     };
+  useEffect(() => {
+    
 
     fetchUsers();
   }, []);
@@ -68,7 +70,20 @@ export default function UsersPage() {
 
     return searchMatch;
   });
-
+const handleDeleteUser = async(userId: string) => {
+  const res = await fetch(`/api/admin/manage/users/delete`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId }),
+  });
+  const data = await res.json();
+ if(data.success){
+  alert("User deleted successfully");
+  fetchUsers();
+ }
+}
   return (
     <div className={styles.container}>
       {/* ===== Header ===== */}
@@ -155,7 +170,7 @@ export default function UsersPage() {
                     <td>
                       <div className={styles.actionBtns}>
                         <Edit className={styles.editIcon} />
-                        <Trash2 className={styles.deleteIcon} />
+                        <Trash2 onClick={() => handleDeleteUser(user.id)} className={styles.deleteIcon} />
                         <MoreHorizontal className={styles.moreIcon} />
                       </div>
                     </td>
