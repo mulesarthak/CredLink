@@ -6,6 +6,7 @@ import { Search, Filter } from "lucide-react";
 import { toast } from "react-hot-toast";
 import styles from "./search.module.css";
 import { Modal } from "@/components/ui/modal";
+import DigitalCardPreview from "@/components/cards/DigitalCardPreview";
 
 type Profile = {
   id: string;
@@ -29,6 +30,7 @@ export default function SearchPage() {
   const [showModal, setShowModal] = useState(false);
   const [connectionName, setConnectionName] = useState("");
   const [connectingUserId, setConnectingUserId] = useState<string | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
 
   // Fetch users from backend
   useEffect(() => {
@@ -128,6 +130,29 @@ export default function SearchPage() {
         primaryText="Close"
       />
 
+      {selectedProfile && (
+        <Modal 
+          isOpen={!!selectedProfile}
+          onClose={() => setSelectedProfile(null)}
+          title=""
+          message={null}
+          showActions={false}
+        >
+          <div style={{ padding: 20 }}>
+            <DigitalCardPreview
+              name={selectedProfile.name}
+              title={selectedProfile.designation || ''}
+              company={selectedProfile.company}
+              location={selectedProfile.city}
+              about={`${selectedProfile.designation} at ${selectedProfile.company}`}
+              skills=""
+              portfolio=""
+              experience=""
+            />
+          </div>
+        </Modal>
+      )}
+
       {/* HEADER */}
       <div className="mb-8">
         <h1 style={{ fontSize: 28, fontWeight: 700, color: "#111827" }}>Search Professionals</h1>
@@ -209,14 +234,21 @@ export default function SearchPage() {
 
               <div className={styles.cardGrid}>
             {filtered.map((p) => (
-              <article key={p.id} className={styles.profileCard}>
+              <article 
+                key={p.id} 
+                className={styles.profileCard}
+                style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                onClick={() => setSelectedProfile(p)}
+              >
                 <div className={styles.cardInner}>
                   <div className={styles.cardHeader}>
                     <div className={styles.userInfo}>
                       <div className={styles.avatar}>{p.name.charAt(0)}</div>
                       <div>
                         <h3 className={styles.userName}>
-                          <Link href={`/profile/${p.username}`}>{p.name}</Link>
+                          {p.name}
                         </h3>
                         <p className={styles.userDesignation}>{p.designation}</p>
                       </div>

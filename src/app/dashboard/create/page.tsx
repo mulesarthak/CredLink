@@ -915,12 +915,11 @@ interface ExtraField {
 
 const EditPage = () => {
   const [activeTab, setActiveTab] = useState('Display');
-  const [selectedColor, setSelectedColor] = useState('#145dfd');
   const [selectedColor1, setSelectedColor1] = useState('#145dfd');
-  const [selectedColor2, setSelectedColor2] = useState('#145dfd');
-  const [firstName, setFirstName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [selectedColor2, setSelectedColor2] = useState('#00c0fd'); // New state for second color
+  const [firstName, setFirstName] = useState('Yaasnick');
+  const [email, setEmail] = useState('yaasnick01@gmail.com');
+  const [phone, setPhone] = useState('+91 75584 24907');
   const [emailLink, setEmailLink] = useState('');
   const [phoneLink, setPhoneLink] = useState('');
   const [selectedDesign, setSelectedDesign] = useState('Classic');
@@ -933,17 +932,16 @@ const EditPage = () => {
   const [maidenName, setMaidenName] = useState('');
   const [pronouns, setPronouns] = useState('');
   const [affiliation, setAffiliation] = useState('');
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState('Software Designer'); // Added default
   const [department, setDepartment] = useState('');
-  const [company, setCompany] = useState('');
+  const [company, setCompany] = useState('CredLink'); // Added default
   const [headline, setHeadline] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [selectedFont, setSelectedFont] = useState('Arial, sans-serif');
   const [cardName, setCardName] = useState('');
   const [cardType, setCardType] = useState('Personal');
   const [bannerImage, setBannerImage] = useState<string | null>(null);
-  const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
   const [cardLocation, setCardLocation] = useState('California, USA');
   
   // Renamed cardDescription to about
@@ -969,12 +967,6 @@ const EditPage = () => {
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [cardDescription, setCardDescription] = useState('');
-  const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [displayTypes, setDisplayTypes] = useState<string[]>(['Classic']);
-  const [existingCardId, setExistingCardId] = useState<string | null>(null);
 
   const hexToRgb = (hex: string) => {
     // Ensure hex is valid
@@ -1067,83 +1059,80 @@ const EditPage = () => {
             setBValue1(newRgb.b);
             setSelectedColor1(hex);
         }
+    } else {
+         setHexValue1(hex); // Allow user to type
     }
   };
 
-  // Helper function to convert file to base64
-  const convertFileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
-    });
+  const handleColorInputChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const hex = e.target.value.toUpperCase();
+    setHexValue1(hex);
+    const newRgb = hexToRgb(hex);
+    setRValue1(newRgb.r);
+    setGValue1(newRgb.g);
+    setBValue1(newRgb.b);
+    setSelectedColor1(hex);
   };
 
-  const [rValue, setRValue] = useState(20);
-  const [gValue, setGValue] = useState(93);
-  const [bValue, setBValue] = useState(253);
-  const [hexValue, setHexValue] = useState('#145dfd');
-
-  // Update RGB values when selectedColor changes
-  React.useEffect(() => {
-    const newRgb = hexToRgb(selectedColor);
-    setRValue(newRgb.r);
-    setGValue(newRgb.g);
-    setBValue(newRgb.b);
-    setHexValue(selectedColor);
-  }, [selectedColor]);
-
-  const handleRChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // New handlers for second color
+  const handleRChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const r = Number(e.target.value);
     if (!isNaN(r) && r >= 0 && r <= 255) {
-      setRValue(r);
-      const newHex = rgbToHex(r, gValue, bValue);
-      setHexValue(newHex);
-      setSelectedColor(newHex);
+      setRValue2(r);
+      const newHex = rgbToHex(r, gValue2, bValue2);
+      setHexValue2(newHex);
+      setSelectedColor2(newHex);
     }
   };
 
-  const handleGChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const g = Number(e.target.value);
     if (!isNaN(g) && g >= 0 && g <= 255) {
-      setGValue(g);
-      const newHex = rgbToHex(rValue, g, bValue);
-      setHexValue(newHex);
-      setSelectedColor(newHex);
+      setGValue2(g);
+      const newHex = rgbToHex(rValue2, g, bValue2);
+      setHexValue2(newHex);
+      setSelectedColor2(newHex);
     }
   };
 
-  const handleBChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const b = Number(e.target.value);
     if (!isNaN(b) && b >= 0 && b <= 255) {
-      setBValue(b);
-      const newHex = rgbToHex(rValue, gValue, b);
-      setHexValue(newHex);
-      setSelectedColor(newHex);
+      setBValue2(b);
+      const newHex = rgbToHex(rValue2, gValue2, b);
+      setHexValue2(newHex);
+      setSelectedColor2(newHex);
     }
   };
 
-  const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const hex = e.target.value.toUpperCase();
-    if (/^#([0-9A-F]{3}){1,2}$/.test(hex)) {
-      setHexValue(hex);
-      const newRgb = hexToRgb(hex);
-      setRValue(newRgb.r);
-      setGValue(newRgb.g);
-      setBValue(newRgb.b);
-      setSelectedColor(hex);
+  const handleHexChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let hex = e.target.value.toUpperCase();
+    if (!hex.startsWith('#')) {
+        hex = '#' + hex;
+    }
+    
+    if (/^#([0-9A-F]{3}){1,2}$/i.test(hex)) {
+        setHexValue2(hex);
+        const newRgb = hexToRgb(hex);
+        if(newRgb) {
+            setRValue2(newRgb.r);
+            setGValue2(newRgb.g);
+            setBValue2(newRgb.b);
+            setSelectedColor2(hex);
+        }
+    } else {
+         setHexValue2(hex); // Allow user to type
     }
   };
 
-  const handleColorInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleColorInputChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const hex = e.target.value.toUpperCase();
-    setHexValue(hex);
+    setHexValue2(hex);
     const newRgb = hexToRgb(hex);
-    setRValue(newRgb.r);
-    setGValue(newRgb.g);
-    setBValue(newRgb.b);
-    setSelectedColor(hex);
+    setRValue2(newRgb.r);
+    setGValue2(newRgb.g);
+    setBValue2(newRgb.b);
+    setSelectedColor2(hex);
   };
 
   // --- NEW HANDLER FUNCTIONS for "Add Field" ---
@@ -1171,93 +1160,6 @@ const EditPage = () => {
     ));
   };
   // --- END NEW HANDLER FUNCTIONS ---
-
-  // Save card function
-  const handleSaveCard = async () => {
-    try {
-      setIsSaving(true);
-
-      // Validate required fields
-      const fullName = `${prefix} ${firstName} ${middleName} ${lastName} ${suffix}`.trim();
-      const finalName = cardName || fullName;
-      
-      if (!finalName) {
-        setIsPopupOpen(true);
-        setPopupMessage('Please enter at least your first name or a card name.');
-        setIsSaving(false);
-        return;
-      }
-
-      // Create FormData
-      const formData = new FormData();
-      
-      // Add all the card fields
-      formData.append('fullName', finalName);
-      if (firstName) formData.append('firstName', firstName);
-      if (middleName) formData.append('middleName', middleName);
-      if (lastName) formData.append('lastName', lastName);
-      if (prefix) formData.append('prefix', prefix);
-      if (suffix) formData.append('suffix', suffix);
-      if (preferredName) formData.append('preferredName', preferredName);
-      if (maidenName) formData.append('maidenName', maidenName);
-      if (pronouns) formData.append('pronouns', pronouns);
-      if (title) formData.append('title', title);
-      if (company) formData.append('company', company);
-      if (department) formData.append('department', department);
-      if (affiliation) formData.append('affiliation', affiliation);
-      if (headline) formData.append('headline', headline);
-      if (accreditations) formData.append('accreditations', accreditations);
-      if (email) formData.append('email', email);
-      if (phone) formData.append('phone', phone);
-      if (emailLink) formData.append('emailLink', emailLink);
-      if (phoneLink) formData.append('phoneLink', phoneLink);
-      if (cardLocation) formData.append('location', cardLocation);
-      if (linkedin) formData.append('linkedinUrl', linkedin);
-      if (website) formData.append('websiteUrl', website);
-      if (cardName) formData.append('cardName', cardName);
-      if (cardType) formData.append('cardType', cardType);
-      if (selectedDesign) formData.append('selectedDesign', selectedDesign);
-      if (selectedColor) formData.append('selectedColor', selectedColor);
-      if (selectedFont) formData.append('selectedFont', selectedFont);
-      if (about) formData.append('bio', about);
-      if (cardDescription) formData.append('description', cardDescription);
-      
-      formData.append('status', 'draft');
-
-      // Add image files if they exist
-      if (profileImageFile) {
-        formData.append('profileImage', profileImageFile);
-      }
-      
-      if (bannerImageFile) {
-        formData.append('bannerImage', bannerImageFile);
-      }
-
-      // Make API call
-      const response = await fetch('/api/card/create', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create card');
-      }
-
-      // Success!
-      setExistingCardId(data.card.id);
-      setIsPopupOpen(true);
-      setPopupMessage('Card created successfully! 🎉');
-
-    } catch (error: any) {
-      console.error('Error saving card:', error);
-      setIsPopupOpen(true);
-      setPopupMessage(error.message || 'Failed to save card. Please try again.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   // Function to render the appropriate template based on selectedDesign
   const renderTemplatePreview = () => {
@@ -1307,15 +1209,9 @@ const EditPage = () => {
                 {[ 'Classic', 'Flat', 'Modern', 'Sleek'].map((design, index) => (
                   <div
                     key={design}
-                    onClick={() => {
-                      setSelectedDesign(design);
-                      // Add to displayTypes array if not already present
-                      if (!displayTypes.includes(design)) {
-                        setDisplayTypes([...displayTypes, design]);
-                      }
-                    }}
+                    onClick={() => setSelectedDesign(design)}
                     style={{
-                      border: design === selectedDesign ? `2px solid ${selectedColor}` : '1px solid #ddd',
+                      border: design === selectedDesign ? `2px solid ${selectedColor1}` : '1px solid #ddd',
                       borderRadius: '10px',
                       padding: '10px',
                       width: 'calc(50% - 5px)',
@@ -1506,7 +1402,6 @@ const EditPage = () => {
                     if (e.target.files && e.target.files[0]) {
                       const file = e.target.files[0];
                       setBannerImage(URL.createObjectURL(file));
-                      setBannerImageFile(file);
                     }
                   }}
                 />
@@ -1539,8 +1434,12 @@ const EditPage = () => {
                 Profile Photo
               </h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '15px' }}>
-                <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#eee', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#eee', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+                    {profileImage ? (
+                       <img src={profileImage} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    )}
                 </div>
                 <input
                   type="file"
@@ -1550,7 +1449,6 @@ const EditPage = () => {
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
                       const file = e.target.files[0];
-                      setProfileImageFile(file);
                       setProfileImage(URL.createObjectURL(file));
                     }
                   }}
@@ -1585,93 +1483,190 @@ const EditPage = () => {
                 Color
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <input
-                    type="color"
-                    value={hexValue}
-                    onChange={handleColorInputChange}
-                    style={{ width: '50px', height: '30px', border: 'none', padding: '0' }}
-                  />
-                  <span style={{ fontSize: '14px', color: '#555' }}>Select Color</span>
+                {/* Color 1 */}
+                <div style={{ marginBottom: '15px'}}>
+                  <h4 style={{fontSize: '16px', marginBottom: '10px', color: '#333'}}>Color 1</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                    <input
+                      type="color"
+                      value={hexValue1}
+                      onChange={handleColorInputChange1}
+                      style={{ width: '50px', height: '30px', border: 'none', padding: '0' }}
+                    />
+                    <span style={{ fontSize: '14px', color: '#555' }}>Select Color 1</span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>R:</label>
+                      <input
+                        type="number"
+                        value={rValue1}
+                        onChange={handleRChange1}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>G:</label>
+                      <input
+                        type="number"
+                        value={gValue1}
+                        onChange={handleGChange1}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>B:</label>
+                      <input
+                        type="number"
+                        value={bValue1}
+                        onChange={handleBChange1}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ fontSize: '14px', color: '#555' }}>Hex:</label>
+                    <input
+                      type="text"
+                      value={hexValue1}
+                      onChange={handleHexChange1}
+                      maxLength={7}
+                      style={{
+                        flex: '1',
+                        padding: '8px',
+                        fontSize: '14px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        boxSizing: 'border-box',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
-                    <label style={{ fontSize: '14px', color: '#555' }}>R:</label>
+                {/* Color 2 */}
+                <div style={{ marginBottom: '15px'}}>
+                  <h4 style={{fontSize: '16px', marginBottom: '10px', color: '#333'}}>Color 2</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                     <input
-                      type="number"
-                      value={rValue}
-                      onChange={handleRChange}
-                      min="0"
-                      max="255"
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '14px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        boxSizing: 'border-box',
-                        outline: 'none',
-                      }}
+                      type="color"
+                      value={hexValue2}
+                      onChange={handleColorInputChange2}
+                      style={{ width: '50px', height: '30px', border: 'none', padding: '0' }}
                     />
+                    <span style={{ fontSize: '14px', color: '#555' }}>Select Color 2</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
-                    <label style={{ fontSize: '14px', color: '#555' }}>G:</label>
-                    <input
-                      type="number"
-                      value={gValue}
-                      onChange={handleGChange}
-                      min="0"
-                      max="255"
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '14px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        boxSizing: 'border-box',
-                        outline: 'none',
-                      }}
-                    />
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
-                    <label style={{ fontSize: '14px', color: '#555' }}>B:</label>
-                    <input
-                      type="number"
-                      value={bValue}
-                      onChange={handleBChange}
-                      min="0"
-                      max="255"
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '14px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        boxSizing: 'border-box',
-                        outline: 'none',
-                      }}
-                    />
-                  </div>
-                </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <label style={{ fontSize: '14px', color: '#555' }}>Hex:</label>
-                  <input
-                    type="text"
-                    value={hexValue}
-                    onChange={handleHexChange}
-                    maxLength={7}
-                    style={{
-                      flex: '1',
-                      padding: '8px',
-                      fontSize: '14px',
-                      border: '1px solid #ddd',
-                      borderRadius: '8px',
-                      boxSizing: 'border-box',
-                      outline: 'none',
-                    }}
-                  />
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>R:</label>
+                      <input
+                        type="number"
+                        value={rValue2}
+                        onChange={handleRChange2}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>G:</label>
+                      <input
+                        type="number"
+                        value={gValue2}
+                        onChange={handleGChange2}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>B:</label>
+                      <input
+                        type="number"
+                        value={bValue2}
+                        onChange={handleBChange2}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ fontSize: '14px', color: '#555' }}>Hex:</label>
+                    <input
+                      type="text"
+                      value={hexValue2}
+                      onChange={handleHexChange2}
+                      maxLength={7}
+                      style={{
+                        flex: '1',
+                        padding: '8px',
+                        fontSize: '14px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        boxSizing: 'border-box',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1714,7 +1709,7 @@ const EditPage = () => {
                     top: '50%',
                     transform: 'translateY(-50%)',
                     pointerEvents: 'none',
-                    color: selectedColor
+                    color: selectedColor1
                   }}
                 >
                   <polyline points="6 9 12 15 18 9"></polyline>
@@ -1733,15 +1728,8 @@ const EditPage = () => {
               { label: 'Middle Name', value: middleName, setter: setMiddleName },
               { label: 'Last Name', value: lastName, setter: setLastName },
               { label: 'Suffix', value: suffix, setter: setSuffix },
-              { label: 'Accreditations', value: accreditations, setter: setAccreditations },
-              { label: 'Preferred Name', value: preferredName, setter: setPreferredName },
-              { label: 'Maiden Name', value: maidenName, setter: setMaidenName },
-              { label: 'Pronouns', value: pronouns, setter: setPronouns },
-              { label: 'Affiliation', value: affiliation, setter: setAffiliation },
               { label: 'Title', value: title, setter: setTitle },
-              { label: 'Department', value: department, setter: setDepartment },
               { label: 'Company', value: company, setter: setCompany },
-              { label: 'Headline', value: headline, setter: setHeadline },
               { label: 'Location', value: cardLocation, setter: setCardLocation }
             ].map(field => (
               <div key={field.label} style={{ marginBottom: '15px' }}>
@@ -1766,10 +1754,10 @@ const EditPage = () => {
             ))}
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Description</label>
+              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>About / Description</label>
               <textarea
-                value={cardDescription}
-                onChange={(e) => setCardDescription(e.target.value)}
+                value={about}
+                onChange={(e) => setAbout(e.target.value)}
                 rows={4}
                 style={{
                   width: '100%',
@@ -1830,9 +1818,10 @@ const EditPage = () => {
           <div>
             <div style={{ marginBottom: '30px', border: '1px solid #eee', borderRadius: '8px', padding: '15px', backgroundColor: '#f9f9f9' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '15px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0', color: '#333' }}>Additional Fields <span style={{ fontSize: '14px', color: '#888', fontWeight: 'normal' }}>(?)</span></h3>
+                <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0', color: '#333' }}>Core Fields <span style={{ fontSize: '14px', color: '#888', fontWeight: 'normal' }}>(?)</span></h3>
               </div>
 
+              {/* Email */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', marginBottom: '15px', backgroundColor: 'white' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
                   <span style={{ cursor: 'grab', color: '#aaa' }}>
@@ -1877,7 +1866,8 @@ const EditPage = () => {
                 /> */}
               </div>
 
-              <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white' }}>
+              {/* Phone */}
+              <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
                   <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -2297,6 +2287,7 @@ const EditPage = () => {
               >
                 <option value="Personal">Personal</option>
                 <option value="Professional">Professional</option>
+                <option value="Business">Business</option>
               </select>
             </div>
           </div>
@@ -2305,38 +2296,6 @@ const EditPage = () => {
         return null;
     }
   };
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '100vh',
-        backgroundColor: '#f0f2f5'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ 
-            width: '50px', 
-            height: '50px', 
-            border: '4px solid #f3f3f3',
-            borderTop: '4px solid #145dfd',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 20px'
-          }}></div>
-          <p style={{ color: '#666', fontSize: '16px' }}>Loading your profile...</p>
-        </div>
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
-    );
-  }
 
   return (
     <div style={{ 
@@ -2357,7 +2316,13 @@ const EditPage = () => {
           .card-preview {
             position: sticky !important;
             top: 20px !important;
-            max-width: 350px !important;
+            width: 400px !important; /* Fixed width for preview */
+            max-width: 400px !important;
+            flex-shrink: 0 !important;
+          }
+          .edit-panel {
+            flex: 1 !important;
+            min-width: 0 !important;
           }
         }
       `}</style>
@@ -2370,6 +2335,10 @@ const EditPage = () => {
         margin: '0 auto',
         width: '100%'
       }}>
+
+        {/* ==================================================================== */}
+        {/* START: Card Preview Section (NOW REPLACED)                       */}
+        {/* ==================================================================== */}
         <div className="card-preview" style={{
           width: '100%',
           display: 'flex',
@@ -2403,8 +2372,8 @@ const EditPage = () => {
                   border: 'none',
                   backgroundColor: 'transparent',
                   cursor: 'pointer',
-                  borderBottom: activeTab === tab ? `2px solid ${selectedColor}` : 'none',
-                  color: activeTab === tab ? selectedColor : '#777',
+                  borderBottom: activeTab === tab ? `2px solid ${selectedColor1}` : 'none',
+                  color: activeTab === tab ? selectedColor1 : '#777',
                   outline: 'none',
                   marginRight: '10px',
                   whiteSpace: 'nowrap'
@@ -2433,68 +2402,61 @@ const EditPage = () => {
             }}>
               Cancel
             </button>
-            <button 
-              onClick={handleSaveCard}
-              disabled={isSaving}
-              style={{
-              backgroundColor: isSaving ? '#999' : selectedColor,
+            <button style={{
+              backgroundColor: selectedColor1,
               border: 'none',
               borderRadius: '8px',
               padding: '10px 20px',
               fontSize: 'clamp(13px, 3.5vw, 16px)',
               fontWeight: 'bold',
               color: 'white',
-              cursor: isSaving ? 'not-allowed' : 'pointer',
+              cursor: 'pointer',
               outline: 'none',
               flex: '1',
               minWidth: '100px'
             }}>
-              {isSaving ? 'Saving...' : 'Save'}
+              Save
             </button>
           </div>
-
-
         </div>
+}
+      </div>
 
-          } </div>
-
-      {/* Modal for adding a new field */}
+      {/* --- NEWLY ADDED: "Add Field" Modal --- */}
       {isModalOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onClick={() => setIsModalOpen(false)}
-        >
-          <div
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '15px'
+        }}>
+          <div 
+            onClick={(e) => e.stopPropagation()}
             style={{
               backgroundColor: 'white',
-              borderRadius: '15px',
-              padding: '30px',
+              borderRadius: '12px',
+              padding: '20px',
+              width: '100%',
               maxWidth: '400px',
-              width: '90%',
-              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+              boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '15px'
             }}
-            onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ marginBottom: '20px', fontSize: '18px', fontWeight: 'bold', color: '#333' }}>Add Custom Field</h3>
-
-            <div style={{ marginBottom: '15px' }}>
+            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#333' }}>Add New Field</h3>
+            
+            <div>
               <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Field Name</label>
               <input
                 type="text"
                 value={newFieldName}
                 onChange={(e) => setNewFieldName(e.target.value)}
-                placeholder="e.g. GitHub"
+                placeholder="e.g. Website, Twitter"
                 style={{
                   width: '100%',
                   padding: '10px',

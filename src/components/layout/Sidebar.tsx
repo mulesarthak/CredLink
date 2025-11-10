@@ -83,7 +83,7 @@ const Sidebar = () => {
             <div className="logoIcon">
               <LayoutDashboard />
             </div>
-            <span className="logoText">CredLink</span>
+            <span className="logoText">MyKard</span>
           </Link>
         </div>
 
