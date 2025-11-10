@@ -40,6 +40,8 @@ export default function UsersPage() {
     category: "",
     status: "",
   });
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const [passwords, setPasswords] = useState({ password: "", confirm: "" });
 
   const dummyUsers: User[] = [
     {
@@ -151,6 +153,8 @@ export default function UsersPage() {
       category: user.category || "",
       status: user.status || ""
     });
+    setShowPasswordFields(false);
+    setPasswords({ password: "", confirm: "" });
   };
   
   const handleDelete = (id: string) => setDeletingUser(id);
@@ -170,12 +174,38 @@ export default function UsersPage() {
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingUser) return;
+    if (showPasswordFields) {
+      if (!passwords.password || !passwords.confirm) {
+        alert("Please enter and confirm the new password.");
+        return;
+      }
+      if (passwords.password !== passwords.confirm) {
+        alert("Passwords do not match.");
+        return;
+      }
+    }
 
     try {
-      // TODO: Call PUT /api/users/${editingUser.id}
+      const payload: any = {
+        fullName: editForm.fullName,
+        phone: editForm.phone,
+        status: editForm.status
+      };
+      if (showPasswordFields && passwords.password) {
+        payload.password = passwords.password;
+      }
+      const res = await fetch(`/api/users/${editingUser.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update");
+      }
+      const data = await res.json();
       setUsers(users.map(user => 
         user.id === editingUser.id 
-          ? { ...user, ...editForm } 
+          ? { ...user, ...data.user }
           : user
       ));
       setEditingUser(null);
@@ -402,8 +432,35 @@ export default function UsersPage() {
                   </select>
                 </div>
               </div>
+              {showPasswordFields && (
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label> New Password</label>
+                    <input
+                      type="password"
+                      value={passwords.password}
+                      onChange={(e) => setPasswords({ ...passwords, password: e.target.value })}
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label> Confirm Password</label>
+                    <input
+                      type="password"
+                      value={passwords.confirm}
+                      onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+                    />
+                  </div>
+                </div>
+              )}
               
               <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  className={styles.cancelBtn}
+                  onClick={() => setShowPasswordFields((p) => !p)}
+                >
+                  {showPasswordFields ? "Hide Password" : "Change Password"}
+                </button>
                 <button 
                   type="button" 
                   onClick={() => setEditingUser(null)}

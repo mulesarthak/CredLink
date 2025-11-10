@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useMemo, useState } from "react";
-import { Mail, Phone, HelpCircle } from "lucide-react";
+import { Mail, HelpCircle } from "lucide-react";
 
 // Add type definition for Lucide icons
 interface LucideIconProps extends React.SVGAttributes<SVGElement> {
@@ -40,14 +40,6 @@ export default function SupportPage() {
       icon: Mail,
       accentColor: "#2563eb",
       action: { type: "link", label: "support@mykard.com", href: "mailto:support@mykard.com" },
-    },
-    {
-      title: "Schedule a Call",
-      description:
-        "Speak with a MyKard specialist about onboarding, billing, or enterprise access.",
-      icon: Phone,
-      accentColor: "#2563eb",
-      action: { type: "link", label: "+1 (415) 555-0134", href: "tel:+14155550134" },
     },
   ], []);
 
@@ -253,7 +245,7 @@ const S: Record<string, React.CSSProperties> = {
   heroBadge: { background: "white", display: "inline-block", padding: "0.4rem 1rem", borderRadius: 20, color: "#2563eb", fontWeight: 600, fontSize: 14, boxShadow: "0 2px 6px rgba(0,0,0,0.05)" },
   title: { fontSize: "2.3rem", fontWeight: 700, marginTop: 12 },
   subtitle: { color: "#6b7280", marginTop: 12, maxWidth: 700, marginInline: "auto", lineHeight: 1.6 },
-  contactGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem" },
+  contactGrid: { display: "grid", gridTemplateColumns: "minmax(280px, 420px)", justifyContent: "center", gap: "1.5rem" },
   card: { background: "white", borderRadius: 18, padding: "1.8rem", boxShadow: "0 10px 20px rgba(0,0,0,0.05)", display: "flex", flexDirection: "column", alignItems: "center", transition: "0.3s" },
   iconCircle: { background: "#f9fafb", borderRadius: "50%", width: 70, height: 70, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 },
   cardTitle: { fontSize: "1.2rem", fontWeight: 600 },
