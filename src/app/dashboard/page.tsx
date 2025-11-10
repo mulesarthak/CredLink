@@ -32,6 +32,9 @@ interface Card {
 const Dashboard = () => {
   const router = useRouter();
   const { user, isAuthenticated, logout, isLoading } = useAuth();
+  const [searchResults, setSearchResults] = useState<Card[]>([]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filterMode, setFilterMode] = useState<"none" | "review" | "verified">("none");
 
   const cards: Card[] = [
     {

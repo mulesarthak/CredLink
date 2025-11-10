@@ -102,12 +102,13 @@ export default function UsersPage() {
   ];
 
   // ✅ Fetch users
-  useEffect(() => {
+  
     const fetchUsers = async () => {
       try {
         setLoading(true);
         const res = await fetch("/api/users");
         const data = await res.json();
+        console.log(data);
         setUsers(data.users || []);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -115,6 +116,9 @@ export default function UsersPage() {
         setLoading(false);
       }
     };
+  
+  useEffect(() => {
+    
 
     fetchUsers();
   }, []);
