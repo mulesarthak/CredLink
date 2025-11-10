@@ -228,6 +228,20 @@ export default function AdminDashboardPage() {
               <h4 className={styles.actionName}>Analytics</h4>
               <p className={styles.actionDesc}>View platform statistics</p>
             </div>
+
+            {(admin.role === "SUPER_ADMIN" ||
+              admin.permissions.includes("MANAGE_SETTINGS")) && (
+              <div
+                onClick={() => router.push("/admin/dashboard/adminsetting")}
+                className={styles.actionCard}
+              >
+                <div className={`${styles.actionIcon} ${styles.blue}`}>
+                  <Settings />
+                </div>
+                <h4 className={styles.actionName}>Settings</h4>
+                <p className={styles.actionDesc}>Manage admin settings and security</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Shield,
   Key,
@@ -15,6 +16,7 @@ import {
   Trash2,
   Search,
   X,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -50,6 +52,7 @@ const ROLE_PERMISSIONS = {
 } as const;
 
 export default function AdminSettingsPage() {
+  const router = useRouter();
   const [admin, setAdmin] = useState<AdminData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -145,6 +148,23 @@ export default function AdminSettingsPage() {
       toast.success("User added");
     }
     setIsModalOpen(false);
+  };
+
+  // Navigation functions
+  const goBackToDashboard = () => {
+    router.push("/admin/dashboard");
+  };
+
+  const navigateToUsers = () => {
+    router.push("/admin/users");
+  };
+
+  const navigateToManageAdmins = () => {
+    router.push("/admin/manage-admins");
+  };
+
+  const navigateToSupport = () => {
+    router.push("/admin/support");
   };
 
   if (loading)
