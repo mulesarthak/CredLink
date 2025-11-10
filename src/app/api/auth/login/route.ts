@@ -77,10 +77,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      token,
       user: {
         id: user.id,
         email: user.email,
         fullName: user.fullName,
+        username: user.username,
         phone: user.phone
       }
     })
