@@ -64,6 +64,7 @@ model User {
   updatedAt        DateTime  @updatedAt
   receivedMessages Message[] @relation("ReceivedMessages")
   sentMessages     Message[] @relation("SentMessages")
+  cards            Card[]
 
   @@index([username])
   @@map("users")
@@ -138,6 +139,23 @@ model Card {
   @@index([userId])
   @@index([createdAt])
   @@map("cards")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique @db.VarChar(255)
+  description String?  @db.Text
+  icon        String   @default("Briefcase") @db.VarChar(50)
+  color       String   @default("#3B82F6") @db.VarChar(7)
+  tags        Json     @default("[]")
+  isActive    Boolean  @default(true)
+  userCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+  @@index([isActive])
+  @@map("categories")
 }
 
 enum AdminRole {

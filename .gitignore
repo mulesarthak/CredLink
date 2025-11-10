@@ -45,3 +45,6 @@ next-env.d.ts
 seed-admin.js
 seed-admin.ts
 clear-sessions.js
+auto-cleanup.ts
+CLEANUP_README.md
+cleanup-ttl.ts

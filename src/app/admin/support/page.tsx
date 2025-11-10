@@ -370,10 +370,7 @@ export default function SupportPage() {
               Manage customer support tickets and feedback efficiently
             </p>
           </div>
-          <button 
-            onClick={exportTickets}
-            className="export-btn"
-          >
+          <button className="export-btn">
             <MessageSquare className="w-4 h-4" />
             Export Tickets
           </button>

@@ -4,6 +4,8 @@ import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, Filter } from "lucide-react";
 import { toast } from "react-hot-toast";
+import styles from "./search.module.css";
+import { Modal } from "@/components/ui/modal";
 
 type Profile = {
   id: string;
@@ -67,16 +69,24 @@ const SAMPLE_PROFILES: Profile[] = [
     reviews: 0,
     views: 120,
   },
+  { id: "1", username: "john", name: "John Doe", city: "New York", company: "Tech Corp", designation: "Full Stack Developer", category: "Technology", reviews: 18, views: 1250 },
+  { id: "2", username: "jane", name: "Jane Smith", city: "Los Angeles", company: "Marketing Pro", designation: "Digital Marketing Expert", category: "Marketing", reviews: 4, views: 890 },
+  { id: "3", username: "alex", name: "Alex Kumar", city: "Mumbai", company: "Design Studio", designation: "UI/UX Designer", category: "Design", reviews: 32, views: 2100 },
+  { id: "4", username: "maria", name: "Maria Garcia", city: "Madrid", company: "ConsultCo", designation: "Business Consultant", category: "Consulting", reviews: 0, views: 120 },
+  { id: "5", username: "li", name: "Li Wei", city: "Beijing", company: "NextGen AI", designation: "Machine Learning Engineer", category: "AI", reviews: 45, views: 3300 },
+  { id: "6", username: "emma", name: "Emma Brown", city: "London", company: "HealthFirst", designation: "Healthcare Analyst", category: "Healthcare", reviews: 11, views: 870 },
 ];
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
-  const [onlyVerified, setOnlyVerified] = useState(false);
-  const [minReviews, setMinReviews] = useState<number | "">("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [connectionName, setConnectionName] = useState("");
 
   const handleConnect = (name: string) => {
-    toast.success(`Connection request sent to ${name}!`);
+    setConnectionName(name);
+    setShowModal(true);
   };
 
   const categories = useMemo(() => {
@@ -88,107 +98,122 @@ export default function SearchPage() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return SAMPLE_PROFILES.filter((p) => {
-      if (q) {
-        const hay = `${p.name} ${p.designation ?? ""} ${p.company ?? ""} ${p.category ?? ""} ${p.city}`.toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
+      const hay = `${p.name} ${p.designation ?? ""} ${p.company ?? ""} ${p.category ?? ""} ${p.city}`.toLowerCase();
+
+      if (q && !hay.includes(q)) return false;
       if (category && p.category !== category) return false;
-      if (onlyVerified && !p.verified) return false;
-      if (minReviews !== "" && p.reviews !== undefined && p.reviews < Number(minReviews)) return false;
+
       return true;
-    });
-  }, [query, category, onlyVerified, minReviews]);
+    }).slice(0, 6);
+  }, [query, category]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <div className="bg-gradient-to-br from-blue-50 via-white to-blue-100 py-12 px-6 shadow-sm border-b border-blue-100">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow">
-              <Search className="text-white w-7 h-7" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Search Professionals</h1>
-              <p className="text-gray-600 text-sm">Find talented professionals easily</p>
-            </div>
-          </div>
+    <div className={styles.container}>
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="Connection Request Sent"
+        message={
+          <>Your connection request has been sent to <span style={{ fontWeight: 600, color: "#111827" }}>{connectionName}</span>. They'll be notified and can accept your request.</>
+        }
+        primaryText="Close"
+      />
 
-          <div className="text-center md:text-right">
-            <p className="text-3xl font-bold text-gray-900">{filtered.length}</p>
-            <p className="text-gray-600 text-sm">Results Found</p>
-          </div>
-        </div>
-
-        {/* Search Bar */}
-        <div className="max-w-3xl mx-auto mt-8">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-blue-600" />
-            <input
-              type="text"
-              placeholder="Search by name, skills, company, or location..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-14 pr-4 py-4 rounded-2xl bg-white border border-blue-200 text-gray-800 shadow-md focus:ring-4 focus:ring-blue-200 outline-none text-lg"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Results Grid */}
-      <div className="max-w-6xl mx-auto py-10 px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((p) => (
-            <div
-              key={p.id}
-              className="group bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.07)] hover:shadow-[0_8px_22px_rgba(0,0,0,0.12)] transition-all hover:-translate-y-1"
-            >
-              {/* Avatar + Name */}
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 via-blue-600 to-blue-800 text-white flex items-center justify-center text-xl font-semibold shadow-md">
-                  {p.name.charAt(0)}
-                </div>
-
-                <div>
-                  <Link href={`/profile/${p.username}`} className="text-lg font-semibold text-gray-900 hover:text-blue-600">
-                    {p.name}
-                  </Link>
-                  <p className="text-sm text-gray-500">{p.designation}</p>
-                </div>
+      {/* HEADER */}
+      <div className="mb-8">
+        <h1 style={{ fontSize: 28, fontWeight: 700, color: "#111827" }}>Search Professionals</h1>
+        <p style={{ fontSize: 16, color: "#4B5563", marginTop: 8 }}>Find and connect with experts across industries</p>
+        
+        {/* SEARCH BAR WITH INLINE FILTERS */}
+        <div style={{ marginTop: 24 }}>
+          <div
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: 12,
+              boxShadow: "0 1px 2px rgba(16, 24, 40, 0.06)",
+              padding: 16,
+              marginBottom: 16,
+              border: "1px solid #E5E7EB",
+            }}
+          >
+            <div className="flex flex-col sm:flex-row gap-3 items-center">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#94A3B8" }} />
+                <input
+                  type="text"
+                  placeholder="Search by name, skills, company, or city..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="w-full"
+                  style={{
+                    padding: "10px 14px 10px 40px",
+                    fontSize: 14,
+                    border: "1px solid #CBD5E1",
+                    borderRadius: 8,
+                    outline: "none",
+                  }}
+                />
               </div>
-
-              {/* Company + City */}
-              <div className="mt-4 space-y-1 text-sm">
-                <p className="text-gray-700 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span> {p.company}
-                </p>
-                <p className="text-gray-500 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span> {p.city}
-                </p>
-              </div>
-
-              {/* Views + Verified */}
-              <div className="mt-5 flex items-center justify-between border-t pt-4 text-sm text-gray-500">
-                <span className="flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeWidth="2" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5z" />
-                    <circle cx="12" cy="12" r="3" strokeWidth="2" />
-                  </svg>
-                  {p.views} views
-                </span>
-
-                {p.verified && <span className="text-blue-600 text-xs bg-blue-50 px-2 py-1 rounded-full">✓ Verified</span>}
-              </div>
-
-              {/* Button */}
-              <button
-                onClick={() => handleConnect(p.name)}
-                className="mt-5 w-full py-2.5 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 active:scale-95 transition"
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                style={{
+                  padding: "10px 16px",
+                  fontSize: 14,
+                  border: "1px solid #CBD5E1",
+                  borderRadius: 8,
+                  outline: "none",
+                  backgroundColor: "#FFFFFF",
+                  color: "#0F172A",
+                }}
               >
-                Connect Now
-              </button>
+                <option value="">All Categories</option>
+                {categories.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
             </div>
-          ))}
+          </div>
+        </div>
+
+        {/* RESULTS */}
+        <div className={styles.resultsContainer}>
+          <p className={styles.resultsCount}>
+            Showing <span>{filtered.length}</span> result{filtered.length !== 1 ? "s" : ""}
+          </p>
+
+          <div className={styles.cardGrid}>
+            {filtered.map((p) => (
+              <article key={p.id} className={styles.profileCard}>
+                <div className={styles.cardInner}>
+                  <div className={styles.cardHeader}>
+                    <div className={styles.userInfo}>
+                      <div className={styles.avatar}>{p.name.charAt(0)}</div>
+                      <div>
+                        <h3 className={styles.userName}>
+                          <Link href={`/profile/${p.username}`}>{p.name}</Link>
+                        </h3>
+                        <p className={styles.userDesignation}>{p.designation}</p>
+                      </div>
+                    </div>
+
+                    <button onClick={() => handleConnect(p.name)} className={styles.connectBtn}>
+                      Connect
+                    </button>
+                  </div>
+
+                  <div className={styles.companyCity}>
+                    <p className={styles.company}>{p.company}</p>
+                    <p className={styles.city}>📍 {p.city}</p>
+                  </div>
+
+                  <div className={styles.stats}>
+                    <span>👁 {p.views ?? 0} views</span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
 
         {filtered.length === 0 && (

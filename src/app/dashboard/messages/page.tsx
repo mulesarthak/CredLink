@@ -295,7 +295,7 @@ export default function MessagesPage() {
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#F5F7FB",
+        backgroundColor: "#FFFFFF",
         overflowX: "hidden",
       }}
     >
@@ -305,18 +305,18 @@ export default function MessagesPage() {
           maxWidth: "100%",
           margin: 0,
           boxSizing: "border-box",
-          padding: isMobile ? "8px 10px" : "20px 24px",
+          padding: isMobile ? "16px 12px" : "24px 32px",
         }}
       >
         {/* Header */}
         {isMobile ? (
-          <div style={{ marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <h1 style={{ fontSize: 20, fontWeight: 700, color: "#0F172A" }}>Messages</h1>
+          <div style={{ marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>Messages</h1>
             <div style={{ display: "flex", alignItems: "center", gap: 12, position: "relative" }}>
               <button
                 aria-label="Filters"
                 onClick={() => setMobileFilterOpen(v => !v)}
-                style={{ padding: 6, color: "#475569" }}
+                style={{ padding: 6, color: "#94A3B8" }}
               >
                 <MoreVertical className="w-5 h-5" />
               </button>
@@ -366,9 +366,9 @@ export default function MessagesPage() {
             </div>
           </div>
         ) : (
-          <div style={{ marginBottom: 24 }}>
-            <h1 style={{ fontSize: "var(--text-2xl)", fontWeight: 700, color: "#0F172A" }}>Messages</h1>
-            <p style={{ fontSize: "var(--text-sm)", color: "#475569", marginTop: 4 }}>Manage incoming messages, leads, and conversations.</p>
+          <div style={{ marginBottom: 32 }}>
+            <h1 style={{ fontSize: 28, fontWeight: 700, color: "#111827" }}>Messages</h1>
+            <p style={{ fontSize: 16, color: "#4B5563", marginTop: 8 }}>Manage incoming messages, leads, and conversations.</p>
           </div>
         )}
 
@@ -473,12 +473,12 @@ export default function MessagesPage() {
                   onMouseEnter={() => !isMobile && setHoveredId(m.id)}
                   onMouseLeave={() => !isMobile && setHoveredId(null)}
                   style={{
-                    padding: 16,
-                    margin: "8px 8px",
-                    backgroundColor: "#FFFFFF",
+                    padding: 20,
+                    margin: "12px 0",
+                    backgroundColor: "#F9FAFB",
                     border: "1px solid #E5E7EB",
                     borderRadius: 12,
-                    boxShadow: hoveredId === m.id && !isMobile ? "0 8px 16px rgba(16,24,40,0.12)" : "0 1px 2px rgba(16,24,40,0.06)",
+                    boxShadow: hoveredId === m.id && !isMobile ? "0 8px 16px rgba(16,24,40,0.08)" : "0 1px 2px rgba(16,24,40,0.04)",
                     transform: hoveredId === m.id && !isMobile ? "translateY(-2px)" : "translateY(0)",
                     transition: "transform .15s ease, box-shadow .15s ease",
                   }}
@@ -502,7 +502,7 @@ export default function MessagesPage() {
                         {m.tag && <span className={getTagBadge(m.tag)}>{m.tag}</span>}
                         <span className={getStatusBadge(m.status)}>{m.status}</span>
                       </div>
-                      <p style={{ marginTop: 4, fontSize: "var(--text-sm)", color: "#475569" }} className="line-clamp-2">{m.message}</p>
+                      <p style={{ marginTop: 8, fontSize: 16, color: "#374151" }} className="line-clamp-2">{m.message}</p>
                       {m.replies && m.replies.length > 0 && (
                         <div style={{ marginTop: 8 }}>
                           <p style={{ fontSize: "var(--text-xs)", color: "#6B7280" }}>Replies:</p>
@@ -514,7 +514,7 @@ export default function MessagesPage() {
                     </div>
 
                     {/* Date */}
-                    <div className="whitespace-nowrap self-center" style={{ minWidth: "90px", textAlign: "right", fontSize: 12, color: "#6B7280" }}>
+                    <div className="whitespace-nowrap self-center" style={{ minWidth: "90px", textAlign: "right", fontSize: 14, color: "#4B5563" }}>
                       {formatDate(m.date)}
                     </div>
 
@@ -593,7 +593,7 @@ export default function MessagesPage() {
                     style={{
                       marginTop: 16,
                       padding: 16,
-                      backgroundColor: "#F8FAFC",
+                      backgroundColor: "#F3F4F6",
                       borderRadius: 8,
                       border: "1px solid #E5E7EB",
                       color: "#1F2937",

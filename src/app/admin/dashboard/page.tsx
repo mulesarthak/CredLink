@@ -11,7 +11,12 @@ interface AdminData {
   email: string;
   fullName: string;
   role: string;
-  permissions: string[];
+  permissions: {
+    users?: { read?: boolean; write?: boolean; delete?: boolean };
+    analytics?: { read?: boolean };
+    profiles?: { read?: boolean; write?: boolean; delete?: boolean };
+    support?: { read?: boolean; write?: boolean };
+  };
 }
 
 export default function AdminDashboardPage() {
@@ -121,7 +126,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className={styles.statsGrid}>
               <div>
-                <p className={styles.statValue}>{admin.permissions.length}</p>
+                <p className={styles.statValue}>{Object.keys(admin.permissions).length}</p>
                 <p className={styles.statLabel}>Permissions</p>
               </div>
               <div>
@@ -147,15 +152,15 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <div className={styles.permList}>
-              {admin.permissions.slice(0, 5).map((perm) => (
-                <div key={perm} className={styles.permItem}>
+              {Object.keys(admin.permissions).slice(0, 5).map((permKey) => (
+                <div key={permKey} className={styles.permItem}>
                   <span className={styles.permDot}></span>
-                  {perm.replace(/_/g, " ")}
+                  {permKey.replace(/_/g, " ")}
                 </div>
               ))}
-              {admin.permissions.length > 5 && (
+              {Object.keys(admin.permissions).length > 5 && (
                 <p className={styles.morePerm}>
-                  +{admin.permissions.length - 5} more permissions
+                  +{Object.keys(admin.permissions).length - 5} more permissions
                 </p>
               )}
             </div>
@@ -169,8 +174,7 @@ export default function AdminDashboardPage() {
             Manage your admin panel efficiently
           </p>
           <div className={styles.actionsGrid}>
-            {(admin.role === "SUPER_ADMIN" ||
-              admin.permissions.includes("MANAGE_ADMINS")) && (
+            {(admin.role === "SUPER_ADMIN") && (
               <div
                 onClick={() => router.push("/admin/manage-admins")}
                 className={styles.actionCard}
