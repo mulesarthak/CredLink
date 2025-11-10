@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Shield, Plus, Edit, Trash2, X } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import styles from "./manage-admins.module.css";
 
@@ -55,6 +55,7 @@ export default function ManageAdminsPage() {
     password: "",
     role: "SUB_ADMIN",
     permissions: [] as string[],
+    newPassword: "", // ✅ new field
   });
 
   useEffect(() => {
@@ -131,7 +132,7 @@ export default function ManageAdminsPage() {
 
       toast.success("Admin created successfully!");
       setShowCreateModal(false);
-      setFormData({ email: "", fullName: "", password: "", role: "SUB_ADMIN", permissions: [] });
+      setFormData({ email: "", fullName: "", password: "", role: "SUB_ADMIN", permissions: [], newPassword: "" });
       fetchAdmins();
     } catch (error) {
       console.error("Create admin error:", error);
@@ -141,7 +142,6 @@ export default function ManageAdminsPage() {
 
   const handleUpdateAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!selectedAdmin) return;
 
     try {
@@ -152,6 +152,7 @@ export default function ManageAdminsPage() {
           role: formData.role,
           permissions: formData.permissions,
           isActive: selectedAdmin.isActive,
+          ...(formData.newPassword ? { password: formData.newPassword } : {}), // ✅ only send if provided
         }),
       });
 
@@ -221,6 +222,7 @@ export default function ManageAdminsPage() {
       password: "",
       role: admin.role,
       permissions: admin.permissions,
+      newPassword: "", // ✅ reset
     });
     setShowEditModal(true);
   };
@@ -229,7 +231,7 @@ export default function ManageAdminsPage() {
     return (
       <div className={styles.container}>
         <div className={styles.tableWrapper}>
-          <div style={{ padding: 20, textAlign: 'center' }}>
+          <div style={{ padding: 20, textAlign: "center" }}>
             <Loader2 className="w-6 h-6 animate-spin" />
           </div>
         </div>
@@ -247,7 +249,7 @@ export default function ManageAdminsPage() {
         <button
           className={styles.createBtn}
           onClick={() => {
-            setFormData({ email: "", fullName: "", password: "", role: "SUB_ADMIN", permissions: [] });
+            setFormData({ email: "", fullName: "", password: "", role: "SUB_ADMIN", permissions: [], newPassword: "" });
             setShowCreateModal(true);
           }}
         >
@@ -264,40 +266,68 @@ export default function ManageAdminsPage() {
               <th>Permissions</th>
               <th>Status</th>
               <th>Last Login</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
+              <th style={{ textAlign: "right" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {admins.map((admin) => (
               <tr key={admin.id}>
                 <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 8, background: 'linear-gradient(135deg, #1e3a8a, #2563eb, #1d4ed8)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
-                      {admin.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 8,
+                        background: "linear-gradient(135deg, #1e3a8a, #2563eb, #1d4ed8)",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {admin.fullName.split(" ").map((n) => n[0]).join("").toUpperCase()}
                     </div>
                     <div>
                       <div style={{ fontWeight: 700 }}>{admin.fullName}</div>
-                      <div style={{ color: '#64748b', fontSize: 13 }}>{admin.email}</div>
+                      <div style={{ color: "#64748b", fontSize: 13 }}>{admin.email}</div>
                     </div>
                   </div>
                 </td>
                 <td>
-                  <span className={`${styles.roleBadge} ${admin.role === 'SUPER_ADMIN' ? styles.roleSuper : admin.role === 'ADMIN' ? styles.roleAdmin : styles.roleSub}`}>
-                    {admin.role.replace('_', ' ')}
+                  <span
+                    className={`${styles.roleBadge} ${
+                      admin.role === "SUPER_ADMIN"
+                        ? styles.roleSuper
+                        : admin.role === "ADMIN"
+                        ? styles.roleAdmin
+                        : styles.roleSub
+                    }`}
+                  >
+                    {admin.role.replace("_", " ")}
                   </span>
                 </td>
                 <td>{admin.permissions.length} permissions</td>
                 <td>
                   <span className={admin.isActive ? styles.statusActive : styles.statusInactive}>
-                    {admin.isActive ? 'Active' : 'Inactive'}
+                    {admin.isActive ? "Active" : "Inactive"}
                   </span>
                 </td>
-                <td>{admin.lastLogin ? new Date(admin.lastLogin).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Never'}</td>
-                <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                <td>
+                  {admin.lastLogin
+                    ? new Date(admin.lastLogin).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })
+                    : "Never"}
+                </td>
+                <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                   <button className={styles.actionBtn} onClick={() => openEditModal(admin)}>
                     <Edit size={16} />
                   </button>
-                  {admin.role !== 'SUPER_ADMIN' && (
+                  {admin.role !== "SUPER_ADMIN" && (
                     <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => handleDeleteAdmin(admin.id)}>
                       <Trash2 size={16} />
                     </button>
@@ -343,10 +373,7 @@ export default function ManageAdminsPage() {
               />
 
               <label>Role</label>
-              <select
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              >
+              <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })}>
                 {ROLES.map((role) => (
                   <option key={role.value} value={role.value}>
                     {role.label} - {role.description}
@@ -372,7 +399,9 @@ export default function ManageAdminsPage() {
                 <button type="button" className={styles.cancelBtn} onClick={() => setShowCreateModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className={styles.saveBtn}>Create</button>
+                <button type="submit" className={styles.saveBtn}>
+                  Create
+                </button>
               </div>
             </form>
           </div>
@@ -395,7 +424,7 @@ export default function ManageAdminsPage() {
               <select
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                disabled={selectedAdmin.role === 'SUPER_ADMIN'}
+                disabled={selectedAdmin.role === "SUPER_ADMIN"}
               >
                 {ROLES.map((role) => (
                   <option key={role.value} value={role.value}>
@@ -403,6 +432,16 @@ export default function ManageAdminsPage() {
                   </option>
                 ))}
               </select>
+
+              {/* ✅ Change Password Field */}
+              <label>Change Password (optional)</label>
+              <input
+                type="password"
+                placeholder="Enter new password"
+                value={formData.newPassword}
+                onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                disabled={selectedAdmin.role === "SUPER_ADMIN"}
+              />
 
               <label>Permissions</label>
               <div className={styles.permissionList}>
@@ -412,7 +451,7 @@ export default function ManageAdminsPage() {
                       type="checkbox"
                       checked={formData.permissions.includes(perm.value)}
                       onChange={() => togglePermission(perm.value)}
-                      disabled={selectedAdmin.role === 'SUPER_ADMIN'}
+                      disabled={selectedAdmin.role === "SUPER_ADMIN"}
                     />
                     {perm.label}
                   </label>
@@ -423,7 +462,7 @@ export default function ManageAdminsPage() {
                 <button type="button" className={styles.cancelBtn} onClick={() => setShowEditModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className={styles.saveBtn} disabled={selectedAdmin.role === 'SUPER_ADMIN'}>
+                <button type="submit" className={styles.saveBtn} disabled={selectedAdmin.role === "SUPER_ADMIN"}>
                   Update
                 </button>
               </div>

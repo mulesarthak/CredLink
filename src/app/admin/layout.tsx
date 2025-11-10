@@ -12,7 +12,6 @@ import {
   Menu,
   X,
   LifeBuoy ,
-  ChevronRight,
   LogOut,
   Home,
   
@@ -51,7 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   );
 
   useEffect(() => {
-    checkAuth();
+    checkAuth(); 
   }, []);
 
   const checkAuth = async () => {

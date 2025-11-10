@@ -363,10 +363,12 @@
 .saveBtn {
   background: #4f46e5;
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
   font-weight: 500;
+  line-height: 1.1;
+  white-space: nowrap;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -378,10 +380,12 @@
 .cancelBtn {
   background: white;
   color: #334155;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
   font-weight: 500;
+  line-height: 1.1;
+  white-space: nowrap;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -393,10 +397,12 @@
 .deleteBtn {
   background: #dc2626;
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
   font-weight: 500;
+  line-height: 1.1;
+  white-space: nowrap;
   cursor: pointer;
   transition: background 0.2s;
 }

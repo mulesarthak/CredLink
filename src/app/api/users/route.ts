@@ -40,7 +40,6 @@ export async function GET() {
         email: true,
         fullName: true,
         phone: true,
-        status: true,
         createdAt: true,
         updatedAt: true
       },
