@@ -230,7 +230,7 @@ const S: Record<string, React.CSSProperties> = {
     maxWidth: 520,
     padding: "10px 12px",
     borderRadius: 8,
-    border: "1px solid rgba(15,23,42,0.06)",
+    border: "1px solid #CBD5E1",
     background: "#fff",
     outline: "none",
     fontSize: 14,
@@ -588,10 +588,20 @@ export default function AccountSettingsPage(): React.JSX.Element {
       <section style={S.hero}>
         <div style={merge(S.heroInner, isMobile ? S.heroInnerMobile : undefined)}>
           <div style={S.heroText}>
-            <h1 style={S.title}>
+            <h1 style={{
+              fontSize: isMobile ? 24 : 28,
+              fontWeight: 700,
+              color: "#111827",
+              margin: 0,
+              lineHeight: 1.05
+            }}>
               Account <span style={S.titleAccent}>Settings</span>
             </h1>
-            <p style={S.lead}>Update your profile, security settings and preferences.</p>
+            <p style={{
+              fontSize: 16,
+              color: "#4B5563",
+              marginTop: 8
+            }}>Update your profile, security settings and preferences.</p>
           </div>
 
           {/* Save Changes Button - Top Right */}
@@ -667,13 +677,23 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
         {/* Form card */}
         <section style={S.card} aria-labelledby="settings-heading">
-          <h3 id="settings-heading" style={S.cardTitle}>
+          <h3 id="settings-heading" style={{
+            fontSize: 16,
+            margin: "0 0 12px",
+            fontWeight: 700,
+            color: "#111827"
+          }}>
             Personal Information
           </h3>
 
           {/* Name row */}
           <div style={merge(S.formRow, S.formRowFirst, isMobile ? S.formRowMobile : undefined)}>
-            <label style={merge(S.formLabel, isMobile ? S.formLabelMobile : undefined)}>Name</label>
+            <label style={merge({
+              width: 170,
+              color: "#4B5563",
+              fontWeight: 600,
+              fontSize: 14
+            }, isMobile ? S.formLabelMobile : undefined)}>Name</label>
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
               <input
                 value={name}
@@ -692,7 +712,12 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
           {/* Account Photo row */}
           <div style={merge(S.formRow, isMobile ? S.formRowMobile : undefined)}>
-            <label style={merge(S.formLabel, isMobile ? S.formLabelMobile : undefined)}>Account Photo</label>
+            <label style={merge({
+              width: 170,
+              color: "#4B5563",
+              fontWeight: 600,
+              fontSize: 14
+            }, isMobile ? S.formLabelMobile : undefined)}>Account Photo</label>
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
               <div style={S.smallPreview}>
                 {accountPhoto ? (
@@ -715,7 +740,12 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
           {/* Email row */}
           <div style={merge(S.formRow, isMobile ? S.formRowMobile : undefined)}>
-            <label style={merge(S.formLabel, isMobile ? S.formLabelMobile : undefined)}>Email</label>
+            <label style={merge({
+              width: 170,
+              color: "#4B5563",
+              fontWeight: 600,
+              fontSize: 14
+            }, isMobile ? S.formLabelMobile : undefined)}>Email</label>
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
               <div style={S.inputStatic}>{email || "your@email.com"}</div>
               <button className="change-email" style={S.smallBtn} onClick={() => setShowEmailModal(true)}>
@@ -726,7 +756,12 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
           {/* Password row */}
           <div style={merge(S.formRow, isMobile ? S.formRowMobile : undefined)}>
-            <label style={merge(S.formLabel, isMobile ? S.formLabelMobile : undefined)}>Password</label>
+            <label style={merge({
+              width: 170,
+              color: "#4B5563",
+              fontWeight: 600,
+              fontSize: 14
+            }, isMobile ? S.formLabelMobile : undefined)}>Password</label>
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
               <input
                 value={password}
@@ -749,7 +784,12 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
           {/* Delete row */}
           <div style={merge(S.formRow, isMobile ? S.formRowMobile : undefined)}>
-            <label style={merge(S.formLabel, isMobile ? S.formLabelMobile : undefined)}>Delete</label>
+            <label style={merge({
+              width: 170,
+              color: "#4B5563",
+              fontWeight: 600,
+              fontSize: 14
+            }, isMobile ? S.formLabelMobile : undefined)}>Delete</label>
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
               <button
                 style={merge(S.delete, deleteHover.hovered ? S.deleteHover : undefined)}

@@ -40,6 +40,7 @@ export async function PUT(req: NextRequest) {
             selectedDesign,
             selectedColor,
             selectedFont,
+            displayTypes,
             profileImage,
             bannerImage,
             bio,
@@ -76,6 +77,12 @@ export async function PUT(req: NextRequest) {
         if (selectedDesign !== undefined) updateData.selectedDesign = selectedDesign;
         if (selectedColor !== undefined) updateData.selectedColor = selectedColor;
         if (selectedFont !== undefined) updateData.selectedFont = selectedFont;
+        if (displayTypes !== undefined) {
+            // Convert array to JSON string for storage
+            updateData.displayTypes = Array.isArray(displayTypes) 
+                ? JSON.stringify(displayTypes) 
+                : displayTypes;
+        }
         if (profileImage !== undefined) updateData.profileImage = profileImage;
         if (bannerImage !== undefined) updateData.bannerImage = bannerImage;
         if (bio !== undefined) updateData.bio = bio;

@@ -38,7 +38,7 @@ interface Contact {
 
 // Enhanced sample contact data (Keeping this data structure)
 const contactsData: Contact[] = [
-  { id: 1, name: "Leo Garcia", title: "Full Stack Developer", company: "CredLink", tags: ["Personal"], associatedCard: "Personal", dateAdded: "2024-10-30", email: "leo@credlink.com", phone: "+1 (555) 123-4567", location: "Mumbai, India", lastInteraction: "2024-10-29", activityStatus: "active" },
+  { id: 1, name: "Leo Garcia", title: "Full Stack Developer", company: "MyKard", tags: ["Personal"], associatedCard: "Personal", dateAdded: "2024-10-30", email: "leo@mykard.com", phone: "+1 (555) 123-4567", location: "Mumbai, India", lastInteraction: "2024-10-29", activityStatus: "active" },
   { id: 2, name: "John Smith", title: "Software Engineer", company: "Tech Corp", tags: ["Tech"], associatedCard: "Work", dateAdded: "2024-10-25", email: "john@techcorp.com", phone: "+1 (555) 234-5678", location: "San Francisco, CA", lastInteraction: "2024-10-28", activityStatus: "active" },
   { id: 3, name: "Sarah Johnson", title: "Marketing Manager", company: "Creative Agency", tags: ["Marketing"], associatedCard: "Business", dateAdded: "2024-10-20", email: "sarah@creative.com", phone: "+1 (555) 345-6789", location: "New York, NY", lastInteraction: "2024-10-15", activityStatus: "inactive" },
   { id: 4, name: "Mike Davis", title: "Product Designer", company: "Design Studio", tags: ["Design"], associatedCard: "Creative", dateAdded: "2024-10-15", email: "mike@designstudio.com", phone: "+1 (555) 456-7890", location: "Austin, TX", lastInteraction: "2024-10-30", activityStatus: "active" },
@@ -295,7 +295,7 @@ export default function DashboardContactPage() {
                     {/* Filter: Desktop Only in Header */}
                     {!isSidebarOpen && (
                       <div className={styles.desktopOnly}>
-                        <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown style={{zIndex: 10000}}>
+                        <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown>
                           <button 
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
                             className={styles.filterButton}
@@ -428,7 +428,7 @@ export default function DashboardContactPage() {
             <div className={styles.controlsFlexContainer}>
               <div className={styles.controlsGroup}>
                 <div className={styles.controlsInnerFlex}>
-                  <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown style={{zIndex: 10000}}>
+                  <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown>
                     <button 
                       onClick={() => setIsFilterOpen(!isFilterOpen)}
                       className={styles.filterButton}
@@ -847,7 +847,14 @@ export default function DashboardContactPage() {
                       <div className={styles.requestActions}>
                         <button 
                           onClick={() => handleApproveRequest(request.id)}
-                          className={styles.requestApproveButton}
+                          style={{
+                            background: 'linear-gradient(to bottom right, #1e3a8a, #2563eb)',
+                            color: 'white',
+                            padding: '8px 16px',
+                            borderRadius: '8px',
+                            fontWeight: '500',
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                          }}
                         >
                           Approve
                         </button>

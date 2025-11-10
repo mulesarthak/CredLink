@@ -16,6 +16,7 @@ import {
   FiPhone,
   FiLinkedin,
   FiGlobe,
+  
 } from "react-icons/fi";
 import DigitalCardPreview, { DigitalCardProps } from "@/components/cards/DigitalCardPreview";
 import {
@@ -28,21 +29,10 @@ import {
   BarChart3,
   Users,
   Eye,
+  
 } from "lucide-react";
 import Link from "next/link";
 import QRCode from "react-qr-code";
-import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 // ----------------- Card Type Definition -----------------
 interface Card {
@@ -130,7 +120,7 @@ const CardDetailsPage = () => {
   const card = cards.find((c) => c.id === cardId);
 
   const mockUserData = {
-    cardUrl: `https://credlink.com/hi/XXXX`,
+    cardUrl: `https://mykard.com/hi/XXXX`,
   };
 
   const copyToClipboard = async (text: string) => {
@@ -160,6 +150,7 @@ const CardDetailsPage = () => {
   };
 
   const shareProfile = async () => {
+    console.log('Navigator share available:', !!navigator.share);
     if (navigator.share) {
       await navigator.share({
         title: "My Digital Card",
@@ -167,6 +158,7 @@ const CardDetailsPage = () => {
         url: mockUserData.cardUrl,
       });
     } else {
+      // Fallback for browsers that don't support Web Share API
       copyToClipboard(mockUserData.cardUrl);
       alert("Link copied to clipboard!");
     }
@@ -184,11 +176,6 @@ const CardDetailsPage = () => {
         fill: true,
       },
     ],
-  };
-
-  const lineOptions = {
-    responsive: true,
-    plugins: { legend: { display: false } },
   };
 
   const [file, setFile] = useState<File | null>(null);
@@ -251,7 +238,7 @@ const CardDetailsPage = () => {
                 </button>
               ))}
             </div>
-            <div className="flex justify-end">
+            <div className={styles.editCardWrapper}>
               <Link href="/dashboard/edit">
                 <button className={styles.editCardBtn}>
                   <FiEdit size={16} />
@@ -359,7 +346,24 @@ const CardDetailsPage = () => {
 
                 <div className={styles.analyticsCard}>
                   <h4>Engagement Trends</h4>
-                  <Line data={lineData} options={lineOptions} />
+                  <div style={{ height: '200px', display: 'flex', alignItems: 'flex-end', gap: '8px', padding: '20px 0' }}>
+                    {lineData.datasets[0].data.map((value, index) => (
+                      <div key={index} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: `${(value / 100) * 100}%` }}
+                          transition={{ duration: 0.8, delay: index * 0.1 }}
+                          style={{
+                            width: '100%',
+                            backgroundColor: '#2563eb',
+                            borderRadius: '4px 4px 0 0',
+                            minHeight: '10px'
+                          }}
+                        />
+                        <span style={{ fontSize: '12px', color: '#6b7280' }}>{lineData.labels[index]}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -436,7 +440,7 @@ const CardDetailsPage = () => {
                     <div className={styles.settingsControl}>
                       <input
                         type="text"
-                        defaultValue="https://credlink.com/hi/XXXX"
+                        defaultValue="https://mykard.com/hi/XXXX"
                         className={styles.settingsInput}
                       />
                     </div>

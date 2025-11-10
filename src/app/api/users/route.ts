@@ -8,10 +8,14 @@ const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'your-secret-key'
 // Get all users
 export async function GET() {
   try {
+    console.log('🔍 GET /api/users - Starting...');
     const cookieStore = await cookies()
     const token = cookieStore.get('admin_token')?.value
 
+    console.log('🍪 Admin token:', token ? 'Present' : 'Missing');
+
     if (!token) {
+      console.log('❌ No admin token found');
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
@@ -21,11 +25,15 @@ export async function GET() {
       permissions: string[]
     }
 
+    console.log('✅ Decoded token:', decoded);
+
     // Check if admin has permission to view users
     if (!decoded.adminId) {
+      console.log('❌ No adminId in token');
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
+    console.log('📊 Fetching users from database...');
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -40,9 +48,10 @@ export async function GET() {
       }
     })
 
+    console.log(`✅ Found ${users.length} users`);
     return NextResponse.json({ users })
   } catch (error) {
-    console.error('Get users error:', error)
+    console.error('❌ Get users error:', error)
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 })
   }
 }

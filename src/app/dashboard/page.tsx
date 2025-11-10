@@ -113,12 +113,20 @@ const Dashboard = () => {
           }}
           whileTap={{ scale: 0.97 }}
           onClick={() => router.push("/dashboard/create")}
-          className="relative flex items-center justify-center gap-3 px-12 py-5 text-lg font-medium text-white rounded-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group min-w-[280px]"
+          style={{
+            background: 'linear-gradient(to bottom right, #1e3a8a, #2563eb)',
+            color: 'white',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            fontWeight: '500',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out"></div>
-          <FiPlus className="text-xl relative z-10" />
-          <span className="relative z-10">Create New Card</span>
+          <FiPlus size={16} />
+          Create New Card
         </motion.button>
       </div>
 

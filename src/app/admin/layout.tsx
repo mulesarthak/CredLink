@@ -13,8 +13,9 @@ import {
   LifeBuoy ,
   LogOut,
   Home,
-  Tag,
+  
   Layers,
+  Tag
 } from "lucide-react";
 import styles from "./admin.module.css";
 
@@ -28,12 +29,12 @@ const allNavigation = [
   { name: "Dashboard", href: "/admin", icon: Home, permission: null },
   { name: "Users", href: "/admin/users", icon: Users, permission: "MANAGE_USERS" },
   { name: "Manage Admins", href: "/admin/manage-admins", icon: Shield, permission: "MANAGE_ADMINS" },
-  { name: "Profiles", href: "/admin/profiles", icon: Users, permission: "MANAGE_PROFILES" },
+  // { name: "Profiles", href: "/admin/profiles", icon: Users, permission: "MANAGE_PROFILES" },
   { name: "Categories", href: "/admin/categories", icon: Tag, permission: "MANAGE_CATEGORIES" },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3, permission: "VIEW_ANALYTICS" },
-  { name: "Settings", href: "/admin/dashboard/adminsetting", icon: Settings, permission: "MANAGE_SETTINGS" },
-  { name: "Support", href: "/admin/support", icon: LifeBuoy , permission: null },
-];
+   { name: "Support", href: "/admin/support", icon: LifeBuoy , permission: null },
+  { name: "Settings", href: "/admin/settings", icon: Settings, permission: "MANAGE_SETTINGS" },
+ ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -123,9 +124,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
 
           <div className={styles.navFooter}>
-            <Link href="/" className={styles.footerLink}>
+            {/* <Link href="/" className={styles.footerLink}>
               <Home /> Back to Site
-            </Link>
+            </Link> */}
 
             <button onClick={handleLogout} className={styles.footerLogout}>
               <LogOut /> Sign Out

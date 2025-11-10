@@ -49,6 +49,7 @@ export default function AdminLoginPage() {
       }
 
       toast.success('Login successful!')
+      localStorage.setItem('token', result.token)
       router.push('/admin/dashboard')
     } catch (error) {
       console.error('Login error:', error)
