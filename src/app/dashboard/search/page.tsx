@@ -235,7 +235,7 @@ export default function SearchPage() {
               <div className={styles.cardGrid}>
             {filtered.map((p) => (
               <article 
-                key={p.id} 
+                key={`${p.username}-${idx}`} 
                 className={styles.profileCard}
                 style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}

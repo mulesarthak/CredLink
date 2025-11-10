@@ -100,7 +100,7 @@ export default function LoginPage() {
       <div className="auth-card">
         <div className="auth-header">
           <Link href="/" className="block">
-            <h1 className="auth-logo">CredLink</h1>
+            <h1 className="auth-logo">MyKard</h1>
           </Link>
           <h2 className="auth-title">
             Sign in to your account

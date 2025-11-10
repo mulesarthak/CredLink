@@ -120,7 +120,7 @@ const CardDetailsPage = () => {
   const card = cards.find((c) => c.id === cardId);
 
   const mockUserData = {
-    cardUrl: `https://credlink.com/hi/XXXX`,
+    cardUrl: `https://mykard.com/hi/XXXX`,
   };
 
   const copyToClipboard = async (text: string) => {
@@ -440,7 +440,7 @@ const CardDetailsPage = () => {
                     <div className={styles.settingsControl}>
                       <input
                         type="text"
-                        defaultValue="https://credlink.com/hi/XXXX"
+                        defaultValue="https://mykard.com/hi/XXXX"
                         className={styles.settingsInput}
                       />
                     </div>

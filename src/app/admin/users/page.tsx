@@ -16,6 +16,8 @@ interface User {
   email: string;
   fullName: string;
   phone: string | null;
+  city?: string;
+  category?: string;
   status: string | null;
   createdAt: string;
   updatedAt: string;
@@ -28,8 +30,76 @@ export default function UsersPage() {
     search: "",
     status: "all",
   });
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deletingUser, setDeletingUser] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<Partial<User>>({
+    email: "",
+    fullName: "",
+    phone: "",
+    city: "",
+    category: "",
+    status: "",
+  });
 
-  // ✅ Fetching data from backend
+  const dummyUsers: User[] = [
+    {
+      id: "1",
+      email: "alice@example.com",
+      fullName: "Alice Johnson",
+      phone: "+1 555-0101",
+      city: "San Francisco",
+      category: "Engineering",
+      status: "active",
+      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: "2",
+      email: "bob@example.com",
+      fullName: "Bob Smith",
+      phone: null,
+      city: "New York",
+      category: "Product",
+      status: "inactive",
+      createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: "3",
+      email: "carol@example.com",
+      fullName: "Carol Lee",
+      phone: "+1 555-0103",
+      city: "Austin",
+      category: "Design",
+      status: "blocked",
+      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: "4",
+      email: "dan@example.com",
+      fullName: "Dan Miller",
+      phone: "+1 555-0104",
+      city: "Seattle",
+      category: "Engineering",
+      status: "active",
+      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: "5",
+      email: "eva@example.com",
+      fullName: "Eva Brown",
+      phone: "+1 555-0105",
+      city: "Chicago",
+      category: "Marketing",
+      status: "inactive",
+      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+  ];
+
+  // ✅ Fetch users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -69,6 +139,50 @@ export default function UsersPage() {
 
     return searchMatch;
   });
+
+  // ✅ Actions (Edit / Delete / More)
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
+    setEditForm({
+      email: user.email,
+      fullName: user.fullName,
+      phone: user.phone || "",
+      city: user.city || "",
+      category: user.category || "",
+      status: user.status || ""
+    });
+  };
+  
+  const handleDelete = (id: string) => setDeletingUser(id);
+
+  const confirmDelete = async () => {
+    if (!deletingUser) return;
+    try {
+      // TODO: Call DELETE /api/users/${deletingUser}
+      setUsers(users.filter(user => user.id !== deletingUser));
+    } catch (error) {
+      console.error("Delete failed:", error);
+    } finally {
+      setDeletingUser(null);
+    }
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+
+    try {
+      // TODO: Call PUT /api/users/${editingUser.id}
+      setUsers(users.map(user => 
+        user.id === editingUser.id 
+          ? { ...user, ...editForm } 
+          : user
+      ));
+      setEditingUser(null);
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -113,7 +227,7 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* ===== Loading State ===== */}
+      {/* ===== Loading / Empty ===== */}
       {loading ? (
         <p className={styles.loadingText}>Loading users...</p>
       ) : filteredUsers.length === 0 ? (
@@ -128,6 +242,8 @@ export default function UsersPage() {
                   <th>Full Name</th>
                   <th>Email</th>
                   <th>Phone</th>
+                  <th>City</th>
+                  <th>Category</th>
                   <th>Status</th>
                   <th>Created</th>
                   <th>Actions</th>
@@ -139,6 +255,8 @@ export default function UsersPage() {
                     <td>{user.fullName}</td>
                     <td>{user.email}</td>
                     <td>{user.phone || "N/A"}</td>
+                    <td>{user.city}</td>
+                    <td>{user.category}</td>
                     <td>
                       <span
                         className={`${styles.statusBadge} ${
@@ -155,9 +273,14 @@ export default function UsersPage() {
                     <td>{new Date(user.createdAt).toLocaleDateString()}</td>
                     <td>
                       <div className={styles.actionBtns}>
-                        <Edit className={styles.editIcon} />
-                        <Trash2 className={styles.deleteIcon} />
-                        <MoreHorizontal className={styles.moreIcon} />
+                        <Edit
+                          className={styles.editIcon}
+                          onClick={() => handleEdit(user)}
+                        />
+                        <Trash2
+                          className={styles.deleteIcon}
+                          onClick={() => handleDelete(user.id)}
+                        />
                       </div>
                     </td>
                   </tr>
@@ -175,6 +298,12 @@ export default function UsersPage() {
                     <h3>{user.fullName}</h3>
                     <p>{user.email}</p>
                     <p>{user.phone || "N/A"}</p>
+                    <p>
+                      <strong>City:</strong> {user.city}
+                    </p>
+                    <p>
+                      <strong>Category:</strong> {user.category}
+                    </p>
                   </div>
                   <span
                     className={`${styles.statusBadge} ${
@@ -188,20 +317,131 @@ export default function UsersPage() {
                     {user.status}
                   </span>
                 </div>
+
                 <div className={styles.userCardBottom}>
                   <p className={styles.createdDate}>
                     Joined: {new Date(user.createdAt).toLocaleDateString()}
                   </p>
                   <div className={styles.mobileActions}>
-                    <Edit className={styles.editIcon} />
-                    <Trash2 className={styles.deleteIcon} />
-                    <MoreHorizontal className={styles.moreIcon} />
+                    <Edit
+                      className={styles.editIcon}
+                      onClick={() => handleEdit(user)}
+                    />
+                    <Trash2
+                      className={styles.deleteIcon}
+                      onClick={() => handleDelete(user.id)}
+                    />
                   </div>
                 </div>
               </div>
             ))}
           </div>
         </>
+      )}
+      {/* Edit Modal */}
+      {editingUser && (
+        <div className={styles.modalBackdrop}>
+          <div className={styles.modal}>
+            <h2>Edit User</h2>
+            <form onSubmit={handleEditSubmit} className={styles.editForm}>
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label> Full Name</label>
+                  <input
+                    value={editForm.fullName}
+                    onChange={(e) => setEditForm({...editForm, fullName: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label> Email</label>
+                  <input
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label> Phone</label>
+                  <input
+                    type="tel"
+                    value={editForm.phone || ''}
+                    onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label> City</label>
+                  <input
+                    value={editForm.city}
+                    onChange={(e) => setEditForm({...editForm, city: e.target.value})}
+                  />
+                </div>
+              </div>
+              
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label> Category</label>
+                  <input
+                    value={editForm.category}
+                    onChange={(e) => setEditForm({...editForm, category: e.target.value})}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label> Status</label>
+                  <select
+                    value={editForm.status || ''}
+                    onChange={(e) => setEditForm({...editForm, status: e.target.value})}
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="blocked">Blocked</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className={styles.modalActions}>
+                <button 
+                  type="button" 
+                  onClick={() => setEditingUser(null)}
+                  className={styles.cancelBtn}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className={styles.saveBtn}>
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingUser && (
+        <div className={styles.modalBackdrop}>
+          <div className={styles.modal}>
+            <h2>Confirm Delete</h2>
+            <p>Are you sure you want to delete this user?</p>
+            <div className={styles.modalActions}>
+              <button 
+                className={styles.cancelBtn}
+                onClick={() => setDeletingUser(null)}
+              >
+                Cancel
+              </button>
+              <button 
+                className={styles.deleteBtn}
+                onClick={confirmDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
