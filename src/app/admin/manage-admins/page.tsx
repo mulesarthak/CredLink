@@ -115,10 +115,17 @@ export default function ManageAdminsPage() {
         body: JSON.stringify(formData),
       });
 
-      const result = await response.json();
+      let result: any = null;
+      try {
+        result = await response.json();
+      } catch {
+        // Non-JSON response (likely HTML). Fallback to text for debugging and avoid crashing.
+        const text = await response.text();
+        result = { error: text };
+      }
 
       if (!response.ok) {
-        toast.error(result.error || "Failed to create admin");
+        toast.error(result?.error || "Failed to create admin");
         return;
       }
 
@@ -148,10 +155,16 @@ export default function ManageAdminsPage() {
         }),
       });
 
-      const result = await response.json();
+      let result: any = null;
+      try {
+        result = await response.json();
+      } catch {
+        const text = await response.text();
+        result = { error: text };
+      }
 
       if (!response.ok) {
-        toast.error(result.error || "Failed to update admin");
+        toast.error(result?.error || "Failed to update admin");
         return;
       }
 
@@ -172,8 +185,14 @@ export default function ManageAdminsPage() {
       const response = await fetch(`/api/admin/manage/${adminId}`, { method: "DELETE" });
 
       if (!response.ok) {
-        const result = await response.json();
-        toast.error(result.error || "Failed to delete admin");
+        let result: any = null;
+        try {
+          result = await response.json();
+        } catch {
+          const text = await response.text();
+          result = { error: text };
+        }
+        toast.error(result?.error || "Failed to delete admin");
         return;
       }
 

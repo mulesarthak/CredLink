@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+
 import {
   Users,
   Settings,
@@ -13,12 +14,8 @@ import {
   LifeBuoy ,
   ChevronRight,
   LogOut,
-  Home,
-<<<<<<< HEAD
+  Home,  Layers,
   Tag,
-=======
-  Layers,
->>>>>>> upstream/main
 } from "lucide-react";
 import styles from "./admin.module.css";
 
