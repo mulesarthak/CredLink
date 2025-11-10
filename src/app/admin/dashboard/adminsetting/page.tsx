@@ -91,6 +91,8 @@ export default function AdminSettingsPage() {
   const [editingUser, setEditingUser] = useState<AppUser | null>(null);
   const [form, setForm] = useState({
     name: "",
+    password: "",
+    phoneNumber: "",
     email: "",
     role: "Admin" as AppUser["role"],
     status: "active" as AppUser["status"],
@@ -116,7 +118,18 @@ export default function AdminSettingsPage() {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       return toast.error("Passwords do not match");
     }
-
+   
+const response = await fetch("/api/admin/profile/update", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: admin?.id,
+      password: passwordData.currentPassword,
+      newPassword: passwordData.newPassword,
+    }),
+  });
     setSaving(true);
     await new Promise((res) => setTimeout(res, 900));
     toast.success("Password updated successfully");
@@ -412,6 +425,24 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className={input}
                   placeholder="john@example.com"
+                />
+              </div>
+              <div>
+                <label className={label}>Phone Number</label>
+                <input
+                  value={form.phoneNumber}
+                  onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+                  className={input}
+                  placeholder="+91 1234567890"
+                />
+              </div>
+              <div>
+                <label className={label}>Password</label>
+                <input
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  className={input}
+                  placeholder="password"
                 />
               </div>
               <div>
