@@ -298,7 +298,7 @@ const OnboardingPage: React.FC = () => {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  const handleContinue = () => {
+  const handleContinue = async() => {
     if (step === 1 && !formData.name.trim()) {
       alert('Please enter your name to continue.');
       return;
@@ -326,7 +326,25 @@ const OnboardingPage: React.FC = () => {
 
     if (step < 10) setStep(step + 1);
     else {
-      setShowPartyPopup(true);
+      try{
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/profile/update', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        });
+        const data = await response.json();
+        console.log(data);
+        if (!response.ok) {
+          throw new Error('Failed to update profile');
+        }
+        setShowPartyPopup(true);
+      }catch(error){
+        console.log(error);
+      }
     }
   };
 
