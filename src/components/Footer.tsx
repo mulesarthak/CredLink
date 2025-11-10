@@ -84,7 +84,7 @@ export default function Footer() {
                 letterSpacing: '-0.02em',
                 margin: 0
               }}>
-               MyKard
+               CredLink
               </h3>
               <p style={{
                 fontSize: '0.875rem',
@@ -380,68 +380,15 @@ export default function Footer() {
                 ))}
             </div>
             {/* Newsletter */}
-            <p style={{
-              fontSize: '0.875rem',
-              color: '#9CA3AF',
-              marginBottom: '0.75rem',
-              textAlign: 'center'
-            }}>
-              Stay updated with our latest news
-            </p>
+           
             <div style={{
               display: 'flex',
               justifyContent: 'center',
               gap: '0.5rem',
               maxWidth: '100%'
             }}>
-              <input
-                type="email"
-                placeholder="Your email"
-                style={{
-                  flex: 1,
-                  padding: '0.75rem 1rem',
-                  fontSize: '0.875rem',
-                  color: '#2C3E50',
-                  background: 'white',
-                  border: '1px solid rgba(0, 102, 255, 0.3)',
-                  borderRadius: '10px',
-                  outline: 'none',
-                  transition: 'all 0.2s ease'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#0066FF';
-                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 102, 255, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(0, 102, 255, 0.3)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-                suppressHydrationWarning
-              />
-              <button
-                style={{
-                  padding: '0.75rem 1.25rem',
-                  background: 'linear-gradient(135deg, #0066FF 0%, #00D2FF 100%)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '0.875rem',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 102, 255, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-                suppressHydrationWarning
-              >
-                Subscribe
-              </button>
+              
+              
             </div>
           </div>
         </div>
@@ -470,31 +417,12 @@ export default function Footer() {
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
             }}>
-              MyKard
+              CredLink
             </span>
             . All rights reserved.
           </p>
           
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}>
-            <div style={{
-              width: '8px',
-              height: '8px',
-              background: 'linear-gradient(135deg, #0066FF 0%, #00D2FF 100%)',
-              borderRadius: '50%',
-              animation: 'pulse 2s ease-in-out infinite'
-            }} />
-            <p style={{
-              fontSize: '0.875rem',
-              color: '#9CA3AF',
-              margin: 0
-            }}>
-              Built with ❤️ for professionals worldwide
-            </p>
-          </div>
+          
         </div>
       </div>
       <style>{`
