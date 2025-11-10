@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'you
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
@@ -19,7 +19,7 @@ export async function PATCH(
     }
 
     const decoded = verify(token, JWT_SECRET) as { userId: string };
-    const cardId = params.id;
+    const { id: cardId } = await params;
 
     // Find existing card
     const existingCard = await prisma.card.findUnique({
@@ -235,7 +235,7 @@ export async function PATCH(
 // DELETE card
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
@@ -246,7 +246,7 @@ export async function DELETE(
     }
 
     const decoded = verify(token, JWT_SECRET) as { userId: string };
-    const cardId = params.id;
+    const { id: cardId } = await params;
 
     // Find existing card
     const existingCard: any = await prisma.card.findUnique({
