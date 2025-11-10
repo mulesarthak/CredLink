@@ -9,6 +9,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import styles from "./users.module.css";
+import { he } from "zod/v4/locales";
 
 interface User {
   id: string;
@@ -103,7 +104,9 @@ export default function UsersPage() {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        setUsers(dummyUsers);
+        const res = await fetch("/api/users");
+        const data = await res.json();
+        setUsers(data.users || []);
       } catch (error) {
         console.error("Error fetching users:", error);
       } finally {
