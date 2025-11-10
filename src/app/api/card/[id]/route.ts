@@ -4,10 +4,10 @@ import { prisma } from "@/lib/prisma";
 // GET single card by ID (public)
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const cardId = params.id;
+    const { id: cardId } = await params;
 
     const card = await prisma.card.findUnique({
       where: { id: cardId },

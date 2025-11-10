@@ -233,7 +233,7 @@ export default function SearchPage() {
               </p>
 
               <div className={styles.cardGrid}>
-            {filtered.map((p) => (
+            {filtered.map((p, idx) => (
               <article 
                 key={`${p.username}-${idx}`} 
                 className={styles.profileCard}
