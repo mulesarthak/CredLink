@@ -182,7 +182,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           {/* Social Row */}
           <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}> 
             {/* Mail */}
-            <a href={`mailto:${email || 'example@credlink.com'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <a href={`mailto:${email || 'example@mykard.com'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 4h16v16H4z" opacity="0"/>
                 <path d="M4 8l8 5 8-5"/>
@@ -200,7 +200,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
             </a>
             {/* Globe */}
-            <a href={website || 'https://credlink.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <a href={website || 'https://mykard.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="2" y1="12" x2="22" y2="12"/>
@@ -934,7 +934,7 @@ const EditPage = () => {
   const [affiliation, setAffiliation] = useState('');
   const [title, setTitle] = useState('Software Designer'); // Added default
   const [department, setDepartment] = useState('');
-  const [company, setCompany] = useState('CredLink'); // Added default
+  const [company, setCompany] = useState('MyKard'); // Added default
   const [headline, setHeadline] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -950,7 +950,7 @@ const EditPage = () => {
   // --- NEW STATE for DigitalCardPreview ---
   const [skills, setSkills] = useState('SEO, Content Creation, Analytics');
   const [portfolio, setPortfolio] = useState('Case Study 1, Project X');
-  const [experience, setExperience] = useState('Lead Marketer @ CredLink (2023-Present)');
+  const [experience, setExperience] = useState('Lead Marketer @ MyKard (2023-Present)');
   const [linkedin, setLinkedin] = useState('https://linkedin.com/in/yaasnick');
   const [website, setWebsite] = useState('https://yaasnick.com');
   // --- ADDED NEW STATE ---
@@ -967,6 +967,10 @@ const EditPage = () => {
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
+  const [existingCardId, setExistingCardId] = useState<string | null>(null);
 
   const hexToRgb = (hex: string) => {
     // Ensure hex is valid
@@ -1160,6 +1164,95 @@ const EditPage = () => {
     ));
   };
   // --- END NEW HANDLER FUNCTIONS ---
+
+  // Save card function
+  const handleSaveCard = async () => {
+    try {
+      setIsSaving(true);
+
+      // Validate required fields
+      const fullName = `${prefix} ${firstName} ${middleName} ${lastName} ${suffix}`.trim();
+      const finalName = cardName || fullName;
+      
+      if (!finalName) {
+        setIsPopupOpen(true);
+        setPopupMessage('Please enter at least your first name or a card name.');
+        setIsSaving(false);
+        return;
+      }
+
+      // Create FormData
+      const formData = new FormData();
+      
+      // Add all the card fields
+      formData.append('fullName', finalName);
+      if (firstName) formData.append('firstName', firstName);
+      if (middleName) formData.append('middleName', middleName);
+      if (lastName) formData.append('lastName', lastName);
+      if (prefix) formData.append('prefix', prefix);
+      if (suffix) formData.append('suffix', suffix);
+      if (preferredName) formData.append('preferredName', preferredName);
+      if (maidenName) formData.append('maidenName', maidenName);
+      if (pronouns) formData.append('pronouns', pronouns);
+      if (title) formData.append('title', title);
+      if (company) formData.append('company', company);
+      if (department) formData.append('department', department);
+      if (affiliation) formData.append('affiliation', affiliation);
+      if (headline) formData.append('headline', headline);
+      if (accreditations) formData.append('accreditations', accreditations);
+      if (email) formData.append('email', email);
+      if (phone) formData.append('phone', phone);
+      if (emailLink) formData.append('emailLink', emailLink);
+      if (phoneLink) formData.append('phoneLink', phoneLink);
+      if (cardLocation) formData.append('location', cardLocation);
+      if (linkedin) formData.append('linkedinUrl', linkedin);
+      if (website) formData.append('websiteUrl', website);
+      if (cardName) formData.append('cardName', cardName);
+      if (cardType) formData.append('cardType', cardType);
+      if (selectedDesign) {
+        console.log('🎨 Sending selectedDesign:', selectedDesign);
+        formData.append('selectedDesign', selectedDesign);
+      }
+      if (selectedColor1) formData.append('selectedColor', selectedColor1);
+      if (selectedFont) formData.append('selectedFont', selectedFont);
+      if (about) formData.append('bio', about);
+      
+      formData.append('status', 'draft');
+
+      // Add image files if they exist
+      if (profileImageFile) {
+        formData.append('profileImage', profileImageFile);
+      }
+      
+      if (bannerImageFile) {
+        formData.append('bannerImage', bannerImageFile);
+      }
+
+      // Make API call
+      const response = await fetch('/api/card/create', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create card');
+      }
+
+      // Success!
+      setExistingCardId(data.card.id);
+      setIsPopupOpen(true);
+      setPopupMessage('Card created successfully! 🎉');
+
+    } catch (error: any) {
+      console.error('Error saving card:', error);
+      setIsPopupOpen(true);
+      setPopupMessage(error.message || 'Failed to save card. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Function to render the appropriate template based on selectedDesign
   const renderTemplatePreview = () => {
@@ -1402,6 +1495,7 @@ const EditPage = () => {
                     if (e.target.files && e.target.files[0]) {
                       const file = e.target.files[0];
                       setBannerImage(URL.createObjectURL(file));
+                      setBannerImageFile(file);
                     }
                   }}
                 />
@@ -1450,6 +1544,7 @@ const EditPage = () => {
                     if (e.target.files && e.target.files[0]) {
                       const file = e.target.files[0];
                       setProfileImage(URL.createObjectURL(file));
+                      setProfileImageFile(file);
                     }
                   }}
                 />
@@ -2054,7 +2149,7 @@ const EditPage = () => {
                 <textarea
                   value={experience}
                   onChange={(e) => setExperience(e.target.value)}
-                  placeholder="e.g. Lead Marketer @ CredLink (2023-Present)"
+                  placeholder="e.g. Lead Marketer @ MyKard (2023-Present)"
                   rows={3}
                   style={{
                     width: '100%',
@@ -2402,25 +2497,27 @@ const EditPage = () => {
             }}>
               Cancel
             </button>
-            <button style={{
-              backgroundColor: selectedColor1,
+            <button 
+              onClick={handleSaveCard}
+              disabled={isSaving}
+              style={{
+              backgroundColor: isSaving ? '#999' : selectedColor1,
               border: 'none',
               borderRadius: '8px',
               padding: '10px 20px',
               fontSize: 'clamp(13px, 3.5vw, 16px)',
               fontWeight: 'bold',
               color: 'white',
-              cursor: 'pointer',
+              cursor: isSaving ? 'not-allowed' : 'pointer',
               outline: 'none',
               flex: '1',
               minWidth: '100px'
             }}>
-              Save
+              {isSaving ? 'Saving...' : 'Save'}
             </button>
           </div>
         </div>
-}
-      </div>
+}</div>
 
       {/* --- NEWLY ADDED: "Add Field" Modal --- */}
       {isModalOpen && (

@@ -1,5 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 // ====================================================================
 // START: DigitalCardPreview Component (Modified to accept theme)
@@ -87,6 +89,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
         </div>
       </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </div>
   );
 
@@ -248,16 +251,16 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       </div>
 
       {activePanel && (
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20 }} onClick={() => setActivePanel(null)}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setActivePanel(null)}>
           <div
             onClick={(e) => e.stopPropagation()}
-            style={{ width: isMobile ? '100%' : 'calc(100% - 24px)', maxWidth: 520, height: isMobile ? '100%' : 'auto', maxHeight: isMobile ? '100%' : '80%', background: '#fff', borderRadius: isMobile ? 0 : 16, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }}
+            style={{ width: isMobile ? '100%' : 520, height: isMobile ? '100%' : 'auto', maxHeight: isMobile ? '100%' : '80vh', background: '#fff', borderRadius: isMobile ? 0 : 16, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }}
           >
             <div style={{ background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, color: '#fff', padding: isMobile ? '16px' : '18px', textAlign: 'center' }}>
               <div style={{ fontSize: 20, fontWeight: 800 }}>{activePanel}</div>
             </div>
             <button onClick={() => setActivePanel(null)} aria-label="Close" style={{ position: 'absolute', top: 10, right: 10, width: 36, height: 36, borderRadius: 9999, border: 'none', background: 'rgba(0,0,0,0.6)', color: '#fff', cursor: 'pointer', zIndex: 10 }}>×</button>
-            <div style={{ padding: 16, background: isMobile ? '#f3f4f6' : '#fff', overflowY: 'auto', height: isMobile ? 'calc(100% - 72px)' : 'auto' }}>
+            <div style={{ padding: 16, background: isMobile ? '#f3f4f6' : '#fff', overflowY: 'auto', height: isMobile ? 'calc(100% - 72px)' : 'auto', maxHeight: 'calc(80vh - 72px)' }}>
               {renderPanelContent(activePanel)}
             </div>
           </div>
@@ -306,6 +309,7 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
           {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
         </div>
       </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </div>
   );
 
@@ -341,8 +345,7 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
     <div style={{
       width: "360px", borderRadius: "12px", overflow: "hidden",
       boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)", fontFamily: fontFamily,
-      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `3px solid ${themeColor1}`,
-      position: 'relative'
+      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `3px solid ${themeColor1}`
     }}>
       {/* Cover Image Section */}
       <div style={{
@@ -390,7 +393,7 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
             border: "1px solid rgba(255, 255, 255, 0.4)"
           }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.63A2 2 0 01 3.08 2h3a2 2 0 01 2 1.72 12.84 12.84 0 00 .7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 00 6 6l1.27-1.27a2 2 0 01 2.11-.45 12.84 12.84 0 00 2.81.7A2 2 0 01 22 16.92z"/>
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
             </svg>
           </a>
           <a href={linkedin} style={{
@@ -446,15 +449,14 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
       </div>
 
       {activePanel && (
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20 }} onClick={() => setActivePanel(null)}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setActivePanel(null)}>
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
               background: '#fff',
               borderRadius: 16,
-              width: isMobile ? '100%' : 'calc(100% - 24px)',
-              maxWidth: 520,
-              maxHeight: isMobile ? '100%' : '80%',
+              maxWidth: isMobile ? '90vw' : 400,
+              maxHeight: isMobile ? '80vh' : 500,
               overflow: 'hidden',
               boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
             }}
@@ -508,6 +510,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
           {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
         </div>
       </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </div>
   );
 
@@ -544,7 +547,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
       width: "360px", borderRadius: "20px", overflow: "hidden",
       boxShadow: "0 12px 32px rgba(0, 0, 0, 0.15)", fontFamily: fontFamily,
       background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
-      border: "1px solid rgba(255,255,255,0.2)", backdropFilter: "blur(10px)", position: 'relative'
+      border: "1px solid rgba(255,255,255,0.2)", backdropFilter: "blur(10px)"
     }}>
       {/* Cover Image Section */}
       <div style={{
@@ -593,7 +596,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
           <a href={`mailto:${email}`} style={{
             padding: "12px", borderRadius: "12px", background: `${themeColor1}10`,
             border: `1px solid ${themeColor1}30`, textDecoration: "none",
-            display: "flex", alignItems: "center", gap: "8px", color: "#FFFFFF", fontSize: "12px", fontWeight: 600
+            display: "flex", alignItems: "center", gap: "8px", color: themeColor1, fontSize: "12px", fontWeight: 600
           }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
@@ -604,19 +607,19 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
           <a href={`tel:${phone}`} style={{
             padding: "12px", borderRadius: "12px", background: `${themeColor1}10`,
             border: `1px solid ${themeColor1}30`, textDecoration: "none",
-            display: "flex", alignItems: "center", gap: "8px", color: "#FFFFFF", fontSize: "12px", fontWeight: 600
+            display: "flex", alignItems: "center", gap: "8px", color: themeColor1, fontSize: "12px", fontWeight: 600
           }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" style={{ marginRight: 2 }}>
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
             </svg>
             Call
           </a>
           <a href={linkedin} style={{
             padding: "12px", borderRadius: "12px", background: `${themeColor1}10`,
             border: `1px solid ${themeColor1}30`, textDecoration: "none",
-            display: "flex", alignItems: "center", gap: "8px", color: "#FFFFFF", fontSize: "12px", fontWeight: 600
+            display: "flex", alignItems: "center", gap: "8px", color: themeColor1, fontSize: "12px", fontWeight: 600
           }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" style={{ marginRight: 2 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/>
             </svg>
             LinkedIn
@@ -624,7 +627,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
           <a href={website} style={{
             padding: "12px", borderRadius: "12px", background: `${themeColor1}10`,
             border: `1px solid ${themeColor1}30`, textDecoration: "none",
-            display: "flex", alignItems: "center", gap: "8px", color: "#FFFFFF", fontSize: "12px", fontWeight: 600
+            display: "flex", alignItems: "center", gap: "8px", color: themeColor1, fontSize: "12px", fontWeight: 600
           }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10"/>
@@ -666,15 +669,14 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
       </div>
 
       {activePanel && (
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20 }} onClick={() => setActivePanel(null)}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setActivePanel(null)}>
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
               background: '#fff',
               borderRadius: 16,
-              width: isMobile ? '100%' : 'calc(100% - 24px)',
-              maxWidth: 520,
-              maxHeight: isMobile ? '100%' : '80%',
+              maxWidth: isMobile ? '90vw' : 400,
+              maxHeight: isMobile ? '80vh' : 500,
               overflow: 'hidden',
               boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
             }}
@@ -728,6 +730,7 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
           {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
         </div>
       </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </div>
   );
 
@@ -763,7 +766,7 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
     <div style={{
       width: "360px", borderRadius: "4px", overflow: "hidden",
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", fontFamily: fontFamily,
-      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `1px solid #e5e5e5`, position: 'relative'
+      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `1px solid #e5e5e5`
     }}>
       <div style={{
         height: "120px", 
@@ -792,8 +795,8 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
           )}
         </div>
         <div style={{ marginLeft: "16px", color: "white", position: "relative", zIndex: 2 }}>
-          {name && <h3 style={{ margin: "0 0 4px", fontSize: "18px", fontWeight: 600, color: "#FFFFFF" }}>{name}</h3>}
-          {title && <p style={{ margin: "0", fontSize: "13px", opacity: 0.9, color: "#FFFFFF" }}>{title}</p>}
+          {name && <h3 style={{ margin: "0 0 4px", fontSize: "18px", fontWeight: 600 }}>{name}</h3>}
+          {title && <p style={{ margin: "0", fontSize: "13px", opacity: 0.9 }}>{title}</p>}
         </div>
       </div>
       
@@ -810,36 +813,25 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
               flex: 1, padding: "10px", background: themeColor1, textDecoration: "none",
               display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "11px", fontWeight: 600
             }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" style={{ marginRight: 6 }}>
-                <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
-                <path d="M4 8l8 5 8-5"/>
-              </svg>
+              EMAIL
             </a>
             <a href={`tel:${phone}`} style={{
               flex: 1, padding: "10px", background: themeColor1, textDecoration: "none",
               display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "11px", fontWeight: 600
             }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" style={{ marginRight: 6 }}>
-                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.63A2 2 0 013.08 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
-              </svg>
+              CALL
             </a>
             <a href={linkedin} style={{
               flex: 1, padding: "10px", background: themeColor1, textDecoration: "none",
               display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "11px", fontWeight: 600
             }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" style={{ marginRight: 6 }}>
-                <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/>
-              </svg>
+              LINKEDIN
             </a>
             <a href={website} style={{
               flex: 1, padding: "10px", background: themeColor1, textDecoration: "none",
               display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "11px", fontWeight: 600
             }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" style={{ marginRight: 6 }}>
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
-              </svg>
+              WEBSITE
             </a>
           </div>
         </div>
@@ -875,15 +867,232 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
       </div>
 
       {activePanel && (
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20 }} onClick={() => setActivePanel(null)}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setActivePanel(null)}>
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
               background: '#fff',
               borderRadius: 16,
-              width: isMobile ? '100%' : 'calc(100% - 24px)',
-              maxWidth: 520,
-              maxHeight: isMobile ? '100%' : '80%',
+              maxWidth: isMobile ? '90vw' : 400,
+              maxHeight: isMobile ? '80vh' : 500,
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+            }}
+          >
+            <div style={{ padding: isMobile ? 12 : 16, borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h3 style={{ margin: 0, color: '#111827', fontWeight: 700 }}>{activePanel}</h3>
+              <button onClick={() => setActivePanel(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
+            </div>
+            <div style={{ maxHeight: isMobile ? 'calc(80vh - 60px)' : 400, overflow: 'auto' }}>
+              {renderPanelContent(activePanel)}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Blend Template
+const BlendCardPreview: React.FC<DigitalCardProps> = ({
+  name = "", title = "", company = "", location = "", about = "", photo = "", cover = "",
+  email = "", phone = "", linkedin = "", website = "", themeColor1, themeColor2, fontFamily,
+  skills = "", portfolio = "", experience = "", services = "", review = ""
+}) => {
+  const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
+  
+  type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
+  const [activePanel, setActivePanel] = useState<Section | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 768);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  // Updated to use props
+  const skillsList = skills.split(',').map((s) => s.trim()).filter(Boolean);
+  const portfolioList = portfolio.split(',').map((s) => s.trim()).filter(Boolean);
+  const experienceList = experience.split(',').map((s) => s.trim()).filter(Boolean);
+  const servicesList = services.split(',').map((s) => s.trim()).filter(Boolean);
+  const reviewList = review.split(',').map((s) => s.trim()).filter(Boolean);
+
+  const renderItem = (title: string, subtitle?: string) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: themeColor1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
+        <div>
+          <div style={{ fontWeight: 700, color: '#111827' }}>{title}</div>
+          {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
+        </div>
+      </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+  );
+
+  const renderPanelContent = (section: Section) => {
+    if (section === 'Skills') {
+      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      return (
+        <div style={{ padding: isMobile ? 12 : 16 }}>
+          {items.map((it, idx) => renderItem(it))}
+        </div>
+      );
+    }
+    if (section === 'Services') {
+      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Portfolio') {
+      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Experience') {
+      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    if (section === 'Review') {
+      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+    }
+    return null;
+  };
+  
+  return (
+    <div style={{
+      width: "360px", borderRadius: "24px", overflow: "hidden",
+      boxShadow: "0 16px 40px rgba(0, 0, 0, 0.12)", fontFamily: fontFamily,
+      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, position: "relative"
+    }}>
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: "200px",
+        background: cover ? `url(${cover})` : `linear-gradient(135deg, ${themeColor1}20, ${themeColor2}20)`,
+        backgroundSize: cover ? "cover" : "auto",
+        backgroundPosition: cover ? "center" : "initial",
+        borderRadius: "24px 24px 0 0"
+      }}>
+        {/* Overlay for better content readability when cover image is present */}
+        {cover && (
+          <div style={{
+            position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+            background: `linear-gradient(135deg, ${themeColor1}40, ${themeColor2}40)`,
+            borderRadius: "24px 24px 0 0"
+          }}></div>
+        )}
+      </div>
+      
+      <div style={{ padding: "32px", paddingTop: "220px", position: "relative", zIndex: 1 }}>
+        <div style={{ textAlign: "center", marginBottom: "24px" }}>
+          <div style={{
+            width: "90px", height: "90px", borderRadius: "50%", overflow: "hidden",
+            margin: "0 auto 16px", background: photo ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            border: "4px solid white", boxShadow: "0 8px 24px rgba(0,0,0,0.1)"
+          }}>
+            {photo ? (
+              <img src={photo} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <span style={{ fontSize: "36px", fontWeight: 700, color: "white" }}>{firstLetter}</span>
+            )}
+          </div>
+          {name && <h3 style={{ margin: "0 0 8px", fontSize: "26px", fontWeight: 700, color: "#FFFFFF" }}>{name}</h3>}
+          {title && <p style={{ margin: "0 0 4px", fontSize: "16px", color: "#FFFFFF", fontWeight: 600, opacity: 0.95 }}>{title}</p>}
+          {company && <p style={{ margin: "0 0 8px", fontSize: "14px", color: "#FFFFFF" }}>{company}</p>}
+          {location && <p style={{ margin: "0", fontSize: "13px", color: "#FFFFFF" }}>{location}</p>}
+        </div>
+        
+        <div style={{
+          background: `linear-gradient(135deg, ${themeColor1}08, ${themeColor2}08)`,
+          borderRadius: "16px", padding: "20px", marginBottom: "20px",
+          border: `1px solid ${themeColor1}20`
+        }}>
+          <p style={{ fontSize: "13px", lineHeight: 1.6, color: "#FFFFFF", margin: "0", textAlign: "center", opacity: 0.9 }}>{about}</p>
+        </div>
+        
+        <div style={{ display: "flex", gap: "8px" }}>
+          <a href={`mailto:${email}`} style={{
+            flex: 1, padding: "14px", borderRadius: "12px", 
+            background: `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+            textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center",
+            color: "white", fontSize: "12px", fontWeight: 600, boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: "6px" }}>
+              <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
+              <path d="M4 8l8 5 8-5"/>
+            </svg>
+            Email
+          </a>
+          <a href={`tel:${phone}`} style={{
+            flex: 1, padding: "14px", borderRadius: "12px", 
+            background: `linear-gradient(135deg, ${themeColor2}, ${themeColor1})`,
+            textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center",
+            color: "white", fontSize: "12px", fontWeight: 600, boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: "6px" }}>
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+            </svg>
+            Call
+          </a>
+        </div>
+        
+        <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+          <a href={linkedin} style={{
+            flex: 1, padding: "12px", borderRadius: "12px", background: `${themeColor1}15`,
+            border: `1px solid ${themeColor1}30`, textDecoration: "none",
+            display: "flex", alignItems: "center", justifyContent: "center", color: themeColor1, fontSize: "11px", fontWeight: 600
+          }}>
+            LinkedIn
+          </a>
+          <a href={website} style={{
+            flex: 1, padding: "12px", borderRadius: "12px", background: `${themeColor1}15`,
+            border: `1px solid ${themeColor1}30`, textDecoration: "none",
+            display: "flex", alignItems: "center", justifyContent: "center", color: themeColor1, fontSize: "11px", fontWeight: 600
+          }}>
+            Website
+          </a>
+        </div>
+
+        {/* Pills Section */}
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
+          {[
+            { text: "Services" },
+            { text: "Portfolio" },
+            { text: "Skills" },
+            { text: "Experience" },
+            { text: "Review" },
+          ].map((b) => (
+            <button
+              key={b.text}
+              onClick={() => setActivePanel(b.text as Section)}
+              style={{
+                padding: "8px 14px",
+                background: "rgba(255, 255, 255, 0.2)",
+                color: "#FFFFFF",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                borderRadius: "12px",
+                fontSize: "13px",
+                fontWeight: 600,
+                cursor: "pointer",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.04)",
+              }}
+            >
+              {b.text}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {activePanel && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setActivePanel(null)}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#fff',
+              borderRadius: 16,
+              maxWidth: isMobile ? '90vw' : 400,
+              maxHeight: isMobile ? '80vh' : 500,
               overflow: 'hidden',
               boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
             }}
@@ -914,6 +1123,10 @@ interface ExtraField {
 }
 
 const EditPage = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const cardId = searchParams.get('id');
+  
   const [activeTab, setActiveTab] = useState('Display');
   const [selectedColor, setSelectedColor] = useState('#145dfd');
   const [selectedColor1, setSelectedColor1] = useState('#145dfd');
@@ -1021,6 +1234,83 @@ const EditPage = () => {
       setHexValue2(selectedColor2);
     }
   }, [selectedColor2]);
+
+  // Fetch card data if editing existing card
+  useEffect(() => {
+    const fetchCardData = async () => {
+      if (!cardId) return;
+
+      try {
+        setIsLoading(true);
+        console.log('🔍 Fetching card for edit:', cardId);
+        
+        const response = await fetch(`/api/card/${cardId}`, {
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch card');
+        }
+
+        const data = await response.json();
+        
+        if (data.success && data.card) {
+          console.log('✅ Loaded card for editing:', data.card);
+          const card = data.card;
+          
+          // Populate all form fields with card data
+          setFirstName(card.fullName || card.firstName || '');
+          setMiddleName(card.middleName || '');
+          setLastName(card.lastName || '');
+          setPrefix(card.prefix || '');
+          setSuffix(card.suffix || '');
+          setPreferredName(card.preferredName || '');
+          setMaidenName(card.maidenName || '');
+          setPronouns(card.pronouns || '');
+          setEmail(card.email || '');
+          setPhone(card.phone || '');
+          setEmailLink(card.emailLink || '');
+          setPhoneLink(card.phoneLink || '');
+          setTitle(card.title || '');
+          setCompany(card.company || '');
+          setDepartment(card.department || '');
+          setAffiliation(card.affiliation || '');
+          setHeadline(card.headline || '');
+          setAccreditations(card.accreditations || '');
+          setCardLocation(card.location || '');
+          setAbout(card.bio || card.about || card.description || '');
+          setCardDescription(card.description || '');
+          setSkills(card.skills || '');
+          setPortfolio(card.portfolio || '');
+          setExperience(card.experience || '');
+          setServices(card.services || '');
+          setReviews(card.reviews || card.review || '');
+          setLinkedin(card.linkedinUrl || card.linkedin || '');
+          setWebsite(card.websiteUrl || card.website || '');
+          setProfileImage(card.profileImage || card.photo || null);
+          setBannerImage(card.coverImage || card.cover || card.bannerImage || null);
+          setSelectedDesign(card.selectedDesign || 'Classic');
+          setSelectedColor1(card.selectedColor || card.selectedColor1 || '#145dfd');
+          setSelectedColor2(card.selectedColor2 || '#145dfd');
+          setSelectedFont(card.selectedFont || 'Arial, sans-serif');
+          setCardName(card.cardName || '');
+          setCardType(card.cardType || 'Personal');
+          setExistingCardId(card.id);
+          
+          toast.success('Card loaded for editing');
+        } else {
+          toast.error('Card not found');
+        }
+      } catch (error: any) {
+        console.error('❌ Error loading card:', error);
+        toast.error(error.message || 'Failed to load card');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCardData();
+  }, [cardId]);
 
   const handleRChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const r = Number(e.target.value);
@@ -1217,7 +1507,7 @@ const EditPage = () => {
       if (cardName) formData.append('cardName', cardName);
       if (cardType) formData.append('cardType', cardType);
       if (selectedDesign) formData.append('selectedDesign', selectedDesign);
-      if (selectedColor) formData.append('selectedColor', selectedColor);
+      if (selectedColor1) formData.append('selectedColor', selectedColor1);
       if (selectedFont) formData.append('selectedFont', selectedFont);
       if (about) formData.append('bio', about);
       if (cardDescription) formData.append('description', cardDescription);
@@ -1233,22 +1523,37 @@ const EditPage = () => {
         formData.append('bannerImage', bannerImageFile);
       }
 
+      // Determine if we're updating or creating
+      const isUpdating = existingCardId || cardId;
+      const endpoint = isUpdating 
+        ? `/api/card/update/${existingCardId || cardId}` 
+        : '/api/card/create';
+      const method = isUpdating ? 'PATCH' : 'POST';
+
+      console.log(`${isUpdating ? '🔄 Updating' : '✨ Creating'} card...`);
+
       // Make API call
-      const response = await fetch('/api/card/create', {
-        method: 'POST',
+      const response = await fetch(endpoint, {
+        method: method,
         body: formData,
+        credentials: 'include',
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create card');
+        throw new Error(data.error || `Failed to ${isUpdating ? 'update' : 'create'} card`);
       }
 
       // Success!
       setExistingCardId(data.card.id);
       setIsPopupOpen(true);
-      setPopupMessage('Card created successfully! 🎉');
+      setPopupMessage(isUpdating ? 'Card updated successfully! 🎉' : 'Card created successfully! 🎉');
+      
+      // If we just created a card, update the URL to include the ID
+      if (!isUpdating && data.card.id) {
+        router.push(`/dashboard/edit?id=${data.card.id}`);
+      }
 
     } catch (error: any) {
       console.error('Error saving card:', error);
@@ -1290,6 +1595,8 @@ const EditPage = () => {
         return <ModernCardPreview {...commonProps} />;
       case 'Sleek':
         return <SleekCardPreview {...commonProps} />;
+      case 'Blend':
+        return <BlendCardPreview {...commonProps} />;
       case 'Classic':
       default:
         return <DigitalCardPreview {...commonProps} />;
@@ -1304,7 +1611,7 @@ const EditPage = () => {
             <div>
               <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '20px', color: '#333' }}>Design</h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '30px' }}>
-                {[ 'Classic', 'Flat', 'Modern', 'Sleek'].map((design, index) => (
+                {['Classic', 'Flat', 'Modern', 'Sleek', 'Blend'].map((design, index) => (
                   <div
                     key={design}
                     onClick={() => {
@@ -1327,7 +1634,21 @@ const EditPage = () => {
                       backgroundColor: 'white'
                     }}
                   >
-                    
+                    {index > 0 && (
+                      <span style={{
+                        position: 'absolute',
+                        top: '5px',
+                        right: '5px',
+                        backgroundColor: '#145dfd',
+                        color: 'white',
+                        fontSize: '10px',
+                        fontWeight: 'bold',
+                        padding: '2px 6px',
+                        borderRadius: '5px'
+                      }}>
+                        PRO
+                      </span>
+                    )}
                     <div style={{
                       width: '100%',
                       maxWidth: '80px',
@@ -1494,7 +1815,7 @@ const EditPage = () => {
             
             <div style={{ marginBottom: '30px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#333' }}>
-                Cover Image
+                Cover Image <span style={{ backgroundColor: selectedColor1, color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '3px 6px', borderRadius: '5px', marginLeft: '8px' }}>PRO</span>
               </h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '15px' }}>
                 <input
@@ -1536,7 +1857,7 @@ const EditPage = () => {
             
             <div style={{ marginBottom: '30px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#333' }}>
-                Profile Photo
+                Profile Photo <span style={{ backgroundColor: selectedColor1, color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '3px 6px', borderRadius: '5px', marginLeft: '8px' }}>PRO</span>
               </h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '15px' }}>
                 <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#eee', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -1582,7 +1903,7 @@ const EditPage = () => {
 
             <div style={{ marginBottom: '40px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#333' }}>
-                Color
+                Color <span style={{ backgroundColor: selectedColor1, color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '3px 6px', borderRadius: '5px', marginLeft: '8px' }}>PRO</span>
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1788,7 +2109,7 @@ const EditPage = () => {
 
 
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Upload Document</label>
+              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Upload Resume</label>
               <input
                 type="file"
                 accept=".pdf,.doc,.docx"
@@ -1819,7 +2140,7 @@ const EditPage = () => {
                 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="17" x2="12" y2="11"></line><line x1="9" y1="14" x2="12" y2="11"></line><line x1="15" y1="14" x2="12" y2="11"></line></svg>
-                {resumeFile ? resumeFile.name : 'Upload Document'}
+                {resumeFile ? resumeFile.name : 'Upload Resume'}
               </button>
             </div>
 
@@ -1839,9 +2160,12 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     Email
                   </span>
-                  {/* blank space */}
+                  <span style={{ cursor: 'pointer', color: '#888' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </span>
                 </div>
                 <input
                   type="email"
@@ -1860,7 +2184,7 @@ const EditPage = () => {
                     marginBottom: '10px'
                   }}
                 />
-                {/* <input
+                <input
                   type="text"
                   placeholder="Link Box"
                   value={emailLink}
@@ -1874,7 +2198,7 @@ const EditPage = () => {
                     boxSizing: 'border-box',
                     outline: 'none',
                   }}
-                /> */}
+                />
               </div>
 
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white' }}>
@@ -1883,9 +2207,12 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                     Phone
                   </span>
-                  {/* blank space */}
+                  <span style={{ cursor: 'pointer', color: '#888' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </span>
                 </div>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '10px', flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '8px', padding: '10px', backgroundColor: '#f8f8f8', flex: '1', minWidth: '150px' }}>
@@ -1922,7 +2249,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                {/* <input
+                <input
                   type="text"
                   placeholder="Link Box"
                   value={phoneLink}
@@ -1936,7 +2263,7 @@ const EditPage = () => {
                     boxSizing: 'border-box',
                     outline: 'none',
                   }}
-                /> */}
+                />
               </div>
 
               {/* ====================================================== */}
@@ -1950,14 +2277,12 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     Services
                   </span>
-                  <button 
-                    onClick={() => { setIsPopupOpen(true); setPopupMessage('By adding a comma, you can add another thing in the field'); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}
-                  >
-                    <span style={{ fontWeight: 700, fontSize: 14, color: 'inherit' }}>i</span>
-                  </button>
+                  <span style={{ cursor: 'pointer', color: '#888' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </span>
                 </div>
                 <textarea
                   value={services}
@@ -1984,14 +2309,12 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                     Portfolio
                   </span>
-                  <button 
-                    onClick={() => { setIsPopupOpen(true); setPopupMessage('By adding a comma, you can add another thing in the field'); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}
-                  >
-                    <span style={{ fontWeight: 700, fontSize: 14, color: 'inherit' }}>i</span>
-                  </button>
+                  <span style={{ cursor: 'pointer', color: '#888' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </span>
                 </div>
                 <textarea
                   value={portfolio}
@@ -2018,14 +2341,12 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     Skills
                   </span>
-                  <button 
-                    onClick={() => { setIsPopupOpen(true); setPopupMessage('By adding a comma, you can add another thing in the field'); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}
-                  >
-                    <span style={{ fontWeight: 700, fontSize: 14, color: 'inherit' }}>i</span>
-                  </button>
+                  <span style={{ cursor: 'pointer', color: '#888' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </span>
                 </div>
                 <textarea
                   value={skills}
@@ -2052,14 +2373,12 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
                     Experience
                   </span>
-                  <button 
-                    onClick={() => { setIsPopupOpen(true); setPopupMessage('By adding a comma, you can add another thing in the field'); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}
-                  >
-                    <span style={{ fontWeight: 700, fontSize: 14, color: 'inherit' }}>i</span>
-                  </button>
+                  <span style={{ cursor: 'pointer', color: '#888' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </span>
                 </div>
                 <textarea
                   value={experience}
@@ -2086,14 +2405,12 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                     Review
                   </span>
-                  <button 
-                    onClick={() => { setIsPopupOpen(true); setPopupMessage('By adding a comma, you can add another thing in the field'); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}
-                  >
-                    <span style={{ fontWeight: 700, fontSize: 14, color: 'inherit' }}>i</span>
-                  </button>
+                  <span style={{ cursor: 'pointer', color: '#888' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </span>
                 </div>
                 <textarea
                   value={reviews}
@@ -2120,9 +2437,12 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill={selectedColor1}><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
                     LinkedIn
                   </span>
-                  {/* blank space */}
+                  <span style={{ cursor: 'pointer', color: '#888' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </span>
                 </div>
                 <input
                   type="text"
@@ -2148,9 +2468,16 @@ const EditPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={selectedColor1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="2" y1="12" x2="22" y2="12"/>
+                      <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
+                    </svg>
                     Website
                   </span>
-                  {/* blank space */}
+                  <span style={{ cursor: 'pointer', color: '#888' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </span>
                 </div>
                 <input
                   type="text"
@@ -2175,7 +2502,7 @@ const EditPage = () => {
 
 
               {/* --- NEWLY ADDED: Render Extra Fields --- */}
-              {/* <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '15px', marginTop: '30px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '15px', marginTop: '30px' }}>
                 <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0', color: '#333' }}>Additional Fields <span style={{ fontSize: '14px', color: '#888', fontWeight: 'normal' }}>(?)</span></h3>
               </div>
               {extraFields.map((field) => (
@@ -2208,12 +2535,12 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-              ))} */}
+              ))}
               {/* --- END Render Extra Fields --- */}
 
 
               {/* --- NEWLY ADDED: Add Field Button --- */}
-              {/* <button
+              <button
                 onClick={() => setIsModalOpen(true)}
                 style={{
                   backgroundColor: 'transparent',
@@ -2235,7 +2562,7 @@ const EditPage = () => {
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Add Field
-              </button> */}
+              </button>
               {/* --- END Add Field Button --- */}
 
             </div>
@@ -2565,41 +2892,6 @@ const EditPage = () => {
       )}
       {/* --- END Modal --- */}
 
-      {isPopupOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '10px',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
-            zIndex: 1001,
-            textAlign: 'center',
-            maxWidth: '300px',
-          }}
-          onClick={() => setIsPopupOpen(false)}
-        >
-          <p style={{ margin: '0 0 15px', fontSize: '15px', color: '#333' }}>{popupMessage}</p>
-          <button
-            onClick={() => setIsPopupOpen(false)}
-            style={{
-              backgroundColor: selectedColor1,
-              color: 'white',
-              border: 'none',
-              padding: '8px 15px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: 'bold',
-            }}
-          >
-            Got it!
-          </button>
-        </div>
-      )}
     </div>
   );
 };

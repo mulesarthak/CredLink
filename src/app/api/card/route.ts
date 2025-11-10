@@ -32,6 +32,13 @@ export async function GET(req: NextRequest) {
       }
     });
 
+    console.log('📊 Fetched cards for user:', decoded.userId);
+    console.log('📋 Number of cards:', cards.length);
+    if (cards.length > 0) {
+      console.log('🎨 First card design:', cards[0].selectedDesign);
+      console.log('🔍 First card data:', JSON.stringify(cards[0], null, 2));
+    }
+
     return NextResponse.json({ 
       success: true,
       cards,

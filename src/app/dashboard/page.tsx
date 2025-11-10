@@ -1,6 +1,6 @@
  "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -11,28 +11,74 @@ import DigitalCardPreview, { DigitalCardProps } from "@/components/cards/Digital
 
 // ----------------- Card Type Definition -----------------
 interface Card {
-  id: number;
-  name: string;
-  title: string;
-  company: string;
-  location: string;
-  about: string;
-  skills: string;
-  portfolio: string;
-  experience: string;
-  photo: string;
-  cover: string;
-  email: string;
-  phone: string;
-  linkedin: string;
-  website: string;
+  id: string | number;
+  fullName?: string;
+  name?: string;
+  title?: string;
+  company?: string;
+  location?: string;
+  about?: string;
+  bio?: string;
+  description?: string;
+  skills?: string;
+  portfolio?: string;
+  experience?: string;
+  photo?: string;
+  profileImage?: string;
+  cover?: string;
+  coverImage?: string;
+  email?: string;
+  phone?: string;
+  linkedin?: string;
+  linkedinUrl?: string;
+  website?: string;
+  websiteUrl?: string;
+  selectedDesign?: string;
+  selectedColor?: string;
+  selectedFont?: string;
 }
 
 // ----------------- Main Dashboard -----------------
 const Dashboard = () => {
   const router = useRouter();
   const { user, isAuthenticated, logout, isLoading } = useAuth();
+ const [cardsData, setCardsData] = useState<Card[]>([]);
+ const [isLoadingCards, setIsLoadingCards] = useState(false);
 
+ useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      fetchCards();
+    }
+ }, [isAuthenticated, isLoading]);
+
+ const fetchCards = async () => {
+   try {
+    setIsLoadingCards(true);
+    const response = await fetch('/api/card', {
+      method: 'GET',
+      credentials: 'include', // Important: include cookies
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (data.success) {
+      console.log('✅ Fetched cards:', data.cards);
+      console.log('🎨 Design values:', data.cards.map((c: any) => ({ id: c.id, design: c.selectedDesign })));
+      setCardsData(data.cards);
+      toast.success(`Loaded ${data.count} card(s)`);
+    } else {
+      toast.error(data.error || 'Failed to fetch cards');
+    }
+   } catch (error: any) {
+     console.error('Error fetching cards:', error);
+     toast.error(error.message || 'Failed to fetch cards');
+   } finally {
+     setIsLoadingCards(false);
+   }
+  };
   const cards: Card[] = [
     {
       id: 1,
@@ -132,37 +178,91 @@ const Dashboard = () => {
 
       {/* Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-14 justify-items-center mt-4">
-        {cards.map((card) => (
-          <Link key={card.id} href={`/cards/${card.id}`}>
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 100, damping: 20, delay: card.id * 0.1 }}
-              whileHover={{
-                scale: 1.02,
-                y: -4,
-              }}
-              className="transition-all duration-300 cursor-pointer"
-            >
-              <DigitalCardPreview
-                name={card.name}
-                title={card.title}
-                company={card.company}
-                location={card.location}
-                about={card.about}
-                skills={card.skills}
-                portfolio={card.portfolio}
-                experience={card.experience}
-                photo={card.photo}
-                cover={card.cover}
-                email={card.email}
-                phone={card.phone}
-                linkedin={card.linkedin}
-                website={card.website}
-              />
-            </motion.div>
-          </Link>
-        ))}
+        {isLoadingCards ? (
+          <div className="col-span-full text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-green mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading cards...</p>
+          </div>
+        ) : cardsData.length > 0 ? (
+          cardsData.map((card, index) => {
+            const actualDesign = card.selectedDesign || 'Classic';
+            console.log(`🎨 Card ${card.id}: Design = "${actualDesign}" | From DB: "${card.selectedDesign}"`);
+            
+            return (
+              <motion.div
+                key={card.id}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 100, damping: 20, delay: index * 0.1 }}
+                whileHover={{
+                  scale: 1.02,
+                  y: -4,
+                }}
+                className="transition-all duration-300 cursor-pointer"
+                onClick={() => router.push(`/cards/${card.id}`)}
+              >
+                <DigitalCardPreview
+                  name={card.fullName || card.name || ''}
+                  title={card.title || ''}
+                  company={card.company || ''}
+                  location={card.location || ''}
+                  about={card.bio || card.about || card.description || ''}
+                  skills={card.skills || ''}
+                  portfolio={card.portfolio || ''}
+                  experience={card.experience || ''}
+                  photo={card.profileImage || card.photo || ''}
+                  cover={card.coverImage || card.cover || ''}
+                  email={card.email || ''}
+                  phone={card.phone || ''}
+                  linkedin={card.linkedinUrl || card.linkedin || ''}
+                  website={card.websiteUrl || card.website || ''}
+                  design={actualDesign}
+                />
+              </motion.div>
+            );
+          })
+        ) : (
+          <>
+            <div className="col-span-full text-center py-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 border border-yellow-300 rounded-lg text-yellow-800 text-sm">
+                <span>⚠️</span>
+                <span>Showing demo cards - No cards found in database</span>
+              </div>
+            </div>
+            {cards.map((card, idx) => (
+              <motion.div
+                key={card.id}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 100, damping: 20, delay: idx * 0.1 }}
+                whileHover={{
+                  scale: 1.02,
+                  y: -4,
+                }}
+                className="transition-all duration-300 cursor-pointer"
+                onClick={() => router.push(`/cards/${card.id}`)}
+              >
+                <DigitalCardPreview
+                  name={card.name || ''}
+                  title={card.title || ''}
+                  company={card.company || ''}
+                  location={card.location || ''}
+                  about={card.about || ''}
+                  skills={card.skills || ''}
+                  portfolio={card.portfolio || ''}
+                  experience={card.experience || ''}
+                  photo={card.photo || ''}
+                  cover={card.cover || ''}
+                  email={card.email || ''}
+                  phone={card.phone || ''}
+                  linkedin={card.linkedin || ''}
+                  website={card.website || ''}
+                  design="Classic"
+                />
+              </motion.div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );
