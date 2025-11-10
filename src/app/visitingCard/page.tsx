@@ -166,7 +166,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           {/* Social Row */}
           <div style={{ display: "flex", gap: "10px", marginTop: "2px" }}>
             {/* Mail */}
-            <a href={`mailto:${email || 'example@credlink.com'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#3B82F6", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <a href={`mailto:${email || 'example@MyKard.com'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#3B82F6", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 4h16v16H4z" opacity="0"/>
                 <path d="M4 8l8 5 8-5"/>
@@ -184,7 +184,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
             </a>
             {/* Globe */}
-            <a href={website || 'https://credlink.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#0ea5e9", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <a href={website || 'https://MyKard.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#0ea5e9", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="2" y1="12" x2="22" y2="12"/>
@@ -257,12 +257,12 @@ export default function VisitingCardPage() {
       <DigitalCardPreview 
         name="John Doe"
         title="Digital Marketer"
-        company="CredLink"
+        company="MyKard"
         location="Mumbai, India"
         about="Crafting engaging content & SEO strategies"
         skills="SEO, Content Creation, Analytics"
         portfolio="https://example.com/portfolio"
-        experience="Lead Marketer @ CredLink (2023-Present)"
+        experience="Lead Marketer @ MyKard (2023-Present)"
         photo=""
         cover=""
         email="john.doe@example.com"

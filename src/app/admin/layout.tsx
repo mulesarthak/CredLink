@@ -94,7 +94,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className={styles.logoIcon}>
               <Shield />
             </div>
-            <span className={styles.logoText}>CredLink Admin</span>
+            <span className={styles.logoText}>MyKard Admin</span>
           </Link>
           
           {/* Mobile close button */}

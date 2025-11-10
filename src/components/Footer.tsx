@@ -84,7 +84,7 @@ export default function Footer() {
                 letterSpacing: '-0.02em',
                 margin: 0
               }}>
-                CredLink
+                MyKard
               </h3>
               <p style={{
                 fontSize: '0.875rem',
@@ -280,7 +280,7 @@ export default function Footer() {
               alignItems: 'center',
               gap: '1rem'
             }}>
-              {[{"Icon": Mail, "text": "hello@credlink.com", "href": "mailto:hello@credlink.com"}, {"Icon": Phone, "text": "+1 (555) 123-4567", "href": "tel:+15551234567"}, {"Icon": MapPin, "text": "San Francisco, CA", "href": "#"}]
+              {[{"Icon": Mail, "text": "hello@MyKard.com", "href": "mailto:hello@MyKard.com"}, {"Icon": Phone, "text": "+1 (555) 123-4567", "href": "tel:+15551234567"}, {"Icon": MapPin, "text": "San Francisco, CA", "href": "#"}]
                 .map((item, idx) => (
                   <a
                     key={idx}
@@ -470,7 +470,7 @@ export default function Footer() {
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
             }}>
-              CredLink
+              MyKard
             </span>
             . All rights reserved.
           </p>

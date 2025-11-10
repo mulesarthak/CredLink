@@ -103,7 +103,7 @@ export default function AdminSettingsPage() {
     // Mock current admin
     const mock: AdminData = {
       id: "1",
-      email: "admin@credlink.com",
+      email: "admin@MyKard.com",
       fullName: "Admin User",
       role: "Admin", // change to test: "Super Admin" | "Admin" | "Sub Admin"
     };

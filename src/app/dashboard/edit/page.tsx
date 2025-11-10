@@ -186,7 +186,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
             <div
               onClick={() => {
                 if (email) window.location.href = `mailto:${email}`;
-                else window.location.href = 'mailto:example@credlink.com';
+                else window.location.href = 'mailto:example@MyKard.com';
               }}
               style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer" }}
             >
@@ -217,7 +217,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
             </div>
             {/* Globe */}
             <div
-              onClick={() => window.open(website || 'https://credlink.com', '_blank', 'noopener noreferrer')}
+              onClick={() => window.open(website || 'https://MyKard.com', '_blank', 'noopener noreferrer')}
               style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer" }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -319,7 +319,7 @@ const EditPage = () => {
   const [affiliation, setAffiliation] = useState('');
   const [title, setTitle] = useState('Software Designer'); // Added default
   const [department, setDepartment] = useState('');
-  const [company, setCompany] = useState('CredLink'); // Added default
+  const [company, setCompany] = useState('MyKard'); // Added default
   const [headline, setHeadline] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -335,7 +335,7 @@ const EditPage = () => {
   // --- NEW STATE for DigitalCardPreview ---
   const [skills, setSkills] = useState('SEO, Content Creation, Analytics');
   const [portfolio, setPortfolio] = useState('Case Study 1, Project X');
-  const [experience, setExperience] = useState('Lead Marketer @ CredLink (2023-Present)');
+  const [experience, setExperience] = useState('Lead Marketer @ MyKard (2023-Present)');
   const [linkedin, setLinkedin] = useState('https://linkedin.com/in/yaasnick');
   const [website, setWebsite] = useState('https://yaasnick.com');
   // --- ADDED NEW STATE ---
@@ -1292,7 +1292,7 @@ const EditPage = () => {
                 <textarea
                   value={experience}
                   onChange={(e) => setExperience(e.target.value)}
-                  placeholder="e.g. Lead Marketer @ CredLink (2023-Present)"
+                  placeholder="e.g. Lead Marketer @ MyKard (2023-Present)"
                   rows={3}
                   style={{
                     width: '100%',

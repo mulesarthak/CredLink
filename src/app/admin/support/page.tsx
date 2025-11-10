@@ -144,7 +144,7 @@ export default function SupportPage() {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: #667eea; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
-              <h1>CredLink Support</h1>
+              <h1>MyKard Support</h1>
               <p>${statusMessage}</p>
             </div>
             <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 8px 8px;">
@@ -152,17 +152,17 @@ export default function SupportPage() {
               <p>Your support ticket regarding: <strong>${ticket.subject}</strong> has been updated.</p>
               <p><strong>New Status:</strong> <span style="display: inline-block; background: ${statusColor}; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin: 10px 0;">${newStatus}</span></p>
               ${newStatus === 'Resolved' ? 
-                '<p>Thank you for using CredLink support. If you have any other questions, feel free to create a new ticket.</p>' :
+                '<p>Thank you for using MyKard support. If you have any other questions, feel free to create a new ticket.</p>' :
                 '<p>Our team is continuing to work on your request. We\'ll keep you updated on any progress.</p>'
               }
               <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd; color: #666; font-size: 14px;">
                 <p><strong>Ticket ID:</strong> #${ticket.id}</p>
-                <p>© ${new Date().getFullYear()} CredLink. All rights reserved.</p>
+                <p>© ${new Date().getFullYear()} MyKard. All rights reserved.</p>
               </div>
             </div>
           </div>
         `,
-        text: `Hello ${ticket.userName},\n\nYour support ticket regarding: ${ticket.subject} has been updated.\n\nNew Status: ${newStatus}\n\nTicket ID: #${ticket.id}\n\nBest regards,\nCredLink Support Team`
+        text: `Hello ${ticket.userName},\n\nYour support ticket regarding: ${ticket.subject} has been updated.\n\nNew Status: ${newStatus}\n\nTicket ID: #${ticket.id}\n\nBest regards,\nMyKard Support Team`
       };
 
       // Send email notification
@@ -229,7 +229,7 @@ export default function SupportPage() {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: #667eea; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
-              <h1>CredLink Support</h1>
+              <h1>MyKard Support</h1>
               <p>We've replied to your support ticket</p>
             </div>
             <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 8px 8px;">
@@ -242,12 +242,12 @@ export default function SupportPage() {
               <p>If you have any additional questions, please don't hesitate to contact us.</p>
               <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd; color: #666; font-size: 14px;">
                 <p><strong>Ticket ID:</strong> #${ticket.id}</p>
-                <p>© ${new Date().getFullYear()} CredLink. All rights reserved.</p>
+                <p>© ${new Date().getFullYear()} MyKard. All rights reserved.</p>
               </div>
             </div>
           </div>
         `,
-        text: `Hello ${ticket.userName},\n\nOur support team has replied to your ticket regarding: ${ticket.subject}\n\nSupport Team Reply:\n${replyText}\n\nTicket ID: #${ticket.id}\n\nBest regards,\nCredLink Support Team`
+        text: `Hello ${ticket.userName},\n\nOur support team has replied to your ticket regarding: ${ticket.subject}\n\nSupport Team Reply:\n${replyText}\n\nTicket ID: #${ticket.id}\n\nBest regards,\nMyKard Support Team`
       };
 
       // Use EmailJS or similar service for sending emails

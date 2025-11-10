@@ -46,14 +46,14 @@ export default function SupportPage() {
         cardVariant: "highlight",
         action: {
           type: "link",
-          label: "support@credlink.com",
-          href: "mailto:support@credlink.com",
+          label: "support@MyKard.com",
+          href: "mailto:support@MyKard.com",
         },
       },
       {
         title: "Schedule a Call",
         description:
-          "Speak with a CredLink specialist about onboarding, billing, or enterprise access.",
+          "Speak with a MyKard specialist about onboarding, billing, or enterprise access.",
         icon: Phone,
         accentClass: "text-[#FF6B35]",
         action: {
@@ -69,7 +69,7 @@ export default function SupportPage() {
   const faqs = useMemo<Faq[]>(
     () => [
       {
-        q: "How do I verify my profile on CredLink?",
+        q: "How do I verify my profile on MyKard?",
         a: "From your dashboard, open Profile Settings and upload the required documents. Our team reviews submissions within 24 hours and you’ll receive an email once verification is complete.",
       },
       {
@@ -132,7 +132,7 @@ export default function SupportPage() {
         const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nTopic: ${topic}\n\n${message}`);
 
         // Open email client as fallback
-        window.location.href = `mailto:support@credlink.com?subject=${subject}&body=${body}`;
+        window.location.href = `mailto:support@MyKard.com?subject=${subject}&body=${body}`;
         
         setSubmitStatus('success');
         // Reset form after success
@@ -160,7 +160,7 @@ export default function SupportPage() {
         'Our live chat system is currently being upgraded for a better experience!\n\n' +
         'In the meantime, you can:\n' +
         '• Use the contact form below\n' +
-        '• Email us directly at support@credlink.com\n' +
+        '• Email us directly at support@MyKard.com\n' +
         '• Call us at +1 (415) 555-0134\n\n' +
         'Would you like to scroll to the contact form?'
       );
@@ -188,10 +188,10 @@ export default function SupportPage() {
             We're here to help
           </div>
           <h1 className="gradient-text text-4xl font-bold md:text-5xl">
-            CredLink Support & Help Centre
+            MyKard Support & Help Centre
           </h1>
           <p className="mx-auto max-w-3xl text-lg text-[var(--text-secondary)]">
-            Whether you’re building a digital identity, managing team memberships, or monitoring engagement analytics, the CredLink support team is ready around the clock to keep you moving forward.
+            Whether you’re building a digital identity, managing team memberships, or monitoring engagement analytics, the MyKard support team is ready around the clock to keep you moving forward.
           </p>
         </header>
 
@@ -242,7 +242,7 @@ export default function SupportPage() {
               Frequently Asked Questions
             </h2>
             <p className="mt-2 text-[var(--text-secondary)]">
-              Quick answers to the most common questions about your CredLink workspace and profile.
+              Quick answers to the most common questions about your MyKard workspace and profile.
             </p>
           </div>
 
@@ -366,7 +366,7 @@ export default function SupportPage() {
 
               <div className="flex flex-col gap-4 border-t border-gray-100 pt-6 text-left md:flex-row md:items-center md:justify-between">
                 <p className="text-sm text-[var(--text-secondary)]">
-                  By submitting, you consent to CredLink contacting you at the email provided.
+                  By submitting, you consent to MyKard contacting you at the email provided.
                 </p>
                 <button 
                   type="submit" 
@@ -387,7 +387,7 @@ export default function SupportPage() {
               Still looking for something else?
             </h3>
             <p className="mt-3 text-[var(--text-secondary)]">
-              Explore the CredLink knowledge base for tutorials, product announcements, and best-practice guides curated for your role.
+              Explore the MyKard knowledge base for tutorials, product announcements, and best-practice guides curated for your role.
             </p>
             <button
               className="btn btn-primary glow mt-6"
@@ -434,7 +434,7 @@ export default function SupportPage() {
                 </button>
               </div>
               <p className="text-[var(--text-secondary)] leading-relaxed">
-                Connect with our support team for instant help with your CredLink account, billing questions, or technical issues.
+                Connect with our support team for instant help with your MyKard account, billing questions, or technical issues.
               </p>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-800">

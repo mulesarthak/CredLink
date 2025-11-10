@@ -32,7 +32,7 @@ export async function uploadToCloudinary(
     cloudinary.uploader.upload_stream(
       {
         resource_type: 'auto',
-        folder: options.folder || 'credlink',
+        folder: options.folder || 'MyKard',
         public_id: options.public_id,
         transformation: options.transformation,
       },
@@ -58,7 +58,7 @@ export async function uploadFromUrl(
 ) {
   try {
     const result = await cloudinary.uploader.upload(imageUrl, {
-      folder: options.folder || 'credlink',
+      folder: options.folder || 'MyKard',
       public_id: options.public_id,
       transformation: options.transformation,
     })
