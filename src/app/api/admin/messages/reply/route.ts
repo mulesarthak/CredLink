@@ -42,7 +42,6 @@ export async function POST(req: NextRequest) {
         status: 'REPLIED' as any,
         read: false,
         tag: 'SUPPORT' as any,
-        topic: (original as any)?.topic ? `Re: ${(original as any).topic}` : 'Support',
       },
     });
 

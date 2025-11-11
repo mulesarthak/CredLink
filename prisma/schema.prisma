@@ -90,6 +90,7 @@ model AdminSession {
 model Message {
   id         String        @id @default(cuid())
   text       String        @db.Text
+  topic      String        @default("Other")
   senderId   String
   receiverId String
   status     MessageStatus @default(PENDING)

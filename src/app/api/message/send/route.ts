@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await req.json().catch(() => ({}));
-    const { message, receiverId, topic, status, tag, read } = data ?? {};
+    const { message, receiverId, status, tag, read } = data ?? {};
 
     if (!message || typeof message !== "string" || !message.trim()) {
         return NextResponse.json(
@@ -64,7 +64,6 @@ export async function POST(req: NextRequest) {
                 // Persist new fields with sensible defaults
                 status: (typeof status === 'string' ? status : 'PENDING') as any,
                 read: typeof read === 'boolean' ? read : false,
-               topic: (typeof topic === 'string' ? topic : 'Other') as any,
                tag: (typeof tag === 'string' ? (tag as string).toUpperCase() : 'SUPPORT') as any,
             },
         });
