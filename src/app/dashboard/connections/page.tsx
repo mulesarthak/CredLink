@@ -14,9 +14,10 @@ if (typeof document !== 'undefined') {
 */
 
 import { Search, Filter, Download, Plus, ChevronDown, MoreHorizontal, Phone, Mail, MessageCircle, Calendar, TrendingUp, Users, Activity, Zap, Star, Clock, MapPin, Send, X } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface Contact {
-  id: number;
+  id: string; // Changed to string to match backend API
   name: string;
   title: string;
   company: string;
@@ -36,22 +37,20 @@ interface Contact {
   isIncomingRequest?: boolean;
 }
 
-// Enhanced sample contact data (Keeping this data structure)
+// Enhanced sample contact data (Keeping this data structure for existing connections)
 const contactsData: Contact[] = [
-  { id: 1, name: "Leo Garcia", title: "Full Stack Developer", company: "MyKard", tags: ["Personal"], associatedCard: "Personal", dateAdded: "2024-10-30", email: "leo@mykard.com", phone: "+1 (555) 123-4567", location: "Mumbai, India", lastInteraction: "2024-10-29", activityStatus: "active" },
-  { id: 2, name: "John Smith", title: "Software Engineer", company: "Tech Corp", tags: ["Tech"], associatedCard: "Work", dateAdded: "2024-10-25", email: "john@techcorp.com", phone: "+1 (555) 234-5678", location: "San Francisco, CA", lastInteraction: "2024-10-28", activityStatus: "active" },
-  { id: 3, name: "Sarah Johnson", title: "Marketing Manager", company: "Creative Agency", tags: ["Marketing"], associatedCard: "Business", dateAdded: "2024-10-20", email: "sarah@creative.com", phone: "+1 (555) 345-6789", location: "New York, NY", lastInteraction: "2024-10-15", activityStatus: "inactive" },
-  { id: 4, name: "Mike Davis", title: "Product Designer", company: "Design Studio", tags: ["Design"], associatedCard: "Creative", dateAdded: "2024-10-15", email: "mike@designstudio.com", phone: "+1 (555) 456-7890", location: "Austin, TX", lastInteraction: "2024-10-30", activityStatus: "active" },
-  { id: 5, name: "Emily Chen", title: "Data Scientist", company: "Analytics Inc", tags: ["Professional"], associatedCard: "Professional", dateAdded: "2024-10-10", email: "emily@analytics.com", phone: "+1 (555) 567-8901", location: "Seattle, WA", lastInteraction: "2024-10-25", activityStatus: "active" },
-  { id: 6, name: "Alex Rodriguez", title: "Sales Director", company: "Sales Solutions", tags: ["Business"], associatedCard: "Business", dateAdded: "2024-10-05", email: "alex@sales.com", phone: "+1 (555) 678-9012", location: "Miami, FL", lastInteraction: "2024-09-20", activityStatus: "inactive" },
-  { id: 7, name: "Lisa Wang", title: "UX Researcher", company: "User Labs", tags: ["Creative"], associatedCard: "Creative", dateAdded: "2024-09-30", email: "lisa@userlabs.com", phone: "+1 (555) 789-0123", location: "Portland, OR", lastInteraction: "2024-10-28", activityStatus: "active" },
-  { id: 8, name: "David Brown", title: "DevOps Engineer", company: "Cloud Systems", tags: ["Technical"], associatedCard: "Technical", dateAdded: "2024-10-12", email: "david@cloudsys.com", phone: "+1 (555) 890-1234", location: "Denver, CO", lastInteraction: "2024-10-26", activityStatus: "new" }
+  { id: "1", name: "Leo Garcia", title: "Full Stack Developer", company: "MyKard", tags: ["Personal"], associatedCard: "Personal", dateAdded: "2024-10-30", email: "leo@mykard.com", phone: "+1 (555) 123-4567", location: "Mumbai, India", lastInteraction: "2024-10-29", activityStatus: "active" },
+  { id: "2", name: "John Smith", title: "Software Engineer", company: "Tech Corp", tags: ["Tech"], associatedCard: "Work", dateAdded: "2024-10-25", email: "john@techcorp.com", phone: "+1 (555) 234-5678", location: "San Francisco, CA", lastInteraction: "2024-10-28", activityStatus: "active" },
+  { id: "3", name: "Sarah Johnson", title: "Marketing Manager", company: "Creative Agency", tags: ["Marketing"], associatedCard: "Business", dateAdded: "2024-10-20", email: "sarah@creative.com", phone: "+1 (555) 345-6789", location: "New York, NY", lastInteraction: "2024-10-15", activityStatus: "inactive" },
+  { id: "4", name: "Mike Davis", title: "Product Designer", company: "Design Studio", tags: ["Design"], associatedCard: "Creative", dateAdded: "2024-10-15", email: "mike@designstudio.com", phone: "+1 (555) 456-7890", location: "Austin, TX", lastInteraction: "2024-10-30", activityStatus: "active" },
+  { id: "5", name: "Emily Chen", title: "Data Scientist", company: "Analytics Inc", tags: ["Professional"], associatedCard: "Professional", dateAdded: "2024-10-10", email: "emily@analytics.com", phone: "+1 (555) 567-8901", location: "Seattle, WA", lastInteraction: "2024-10-25", activityStatus: "active" },
+  { id: "6", name: "Alex Rodriguez", title: "Sales Director", company: "Sales Solutions", tags: ["Business"], associatedCard: "Business", dateAdded: "2024-10-05", email: "alex@sales.com", phone: "+1 (555) 678-9012", location: "Miami, FL", lastInteraction: "2024-09-20", activityStatus: "inactive" },
+  { id: "7", name: "Lisa Wang", title: "UX Researcher", company: "User Labs", tags: ["Creative"], associatedCard: "Creative", dateAdded: "2024-09-30", email: "lisa@userlabs.com", phone: "+1 (555) 789-0123", location: "Portland, OR", lastInteraction: "2024-10-28", activityStatus: "active" },
+  { id: "8", name: "David Brown", title: "DevOps Engineer", company: "Cloud Systems", tags: ["Technical"], associatedCard: "Technical", dateAdded: "2024-10-12", email: "david@cloudsys.com", phone: "+1 (555) 890-1234", location: "Denver, CO", lastInteraction: "2024-10-26", activityStatus: "new" }
 ];
 
-const connectionRequestsData: Contact[] = [
-  { id: 9, name: "New User 1", title: "Developer", company: "Tech Inc", tags: ["Tech"], associatedCard: "Work", dateAdded: "2024-11-01", connectionStatus: "pending", isIncomingRequest: true },
-  { id: 10, name: "New User 2", title: "Designer", company: "Design Co", tags: ["Design"], associatedCard: "Creative", dateAdded: "2024-11-02", connectionStatus: "pending", isIncomingRequest: true }
-];
+// Mock data removed - now fetched from backend
+// const connectionRequestsData: Contact[] = [];
 
 export default function DashboardContactPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -59,16 +58,18 @@ export default function DashboardContactPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedSortOption, setSelectedSortOption] = useState('a-z');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  const [showContactInfo, setShowContactInfo] = useState<{[key: number]: {type: 'phone' | 'email' | null}}>({});
-  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [showContactInfo, setShowContactInfo] = useState<{[key: string]: {type: 'phone' | 'email' | null}}>({});
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [contactsList, setContactsList] = useState<Contact[]>(contactsData);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [messageModal, setMessageModal] = useState<{isOpen: boolean, contact: Contact | null}>({isOpen: false, contact: null});
   const [messageText, setMessageText] = useState('');
-  const [connectionRequests, setConnectionRequests] = useState<Contact[]>(connectionRequestsData);
+  const [connectionRequests, setConnectionRequests] = useState<Contact[]>([]);
   const [activeTab, setActiveTab] = useState<'connections' | 'requests'>('connections');
+  const [loading, setLoading] = useState(false);
+  const [requestsLoading, setRequestsLoading] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
 
   // Handle direct message - open message modal
@@ -125,8 +126,50 @@ export default function DashboardContactPage() {
     };
   }, [isFilterOpen]);
 
+  // Fetch connection requests from backend
+  useEffect(() => {
+    const fetchConnectionRequests = async () => {
+      try {
+        setRequestsLoading(true);
+        const response = await fetch('/api/users/connections?type=received', {
+          credentials: 'include',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch connection requests');
+        }
+        
+        const data = await response.json();
+        
+        // Map backend data to frontend Contact structure
+        const mappedRequests: Contact[] = (data.requests || []).map((request: any) => ({
+          id: request.id,
+          name: request.sender?.fullName || 'Unknown User',
+          title: request.sender?.title || 'No Title',
+          company: request.sender?.company || 'No Company',
+          tags: ['Professional'],
+          associatedCard: 'Professional',
+          dateAdded: new Date(request.createdAt).toISOString().split('T')[0],
+          email: request.sender?.email,
+          connectionStatus: 'pending',
+          isIncomingRequest: true,
+          activityStatus: 'new' as const
+        }));
+        
+        setConnectionRequests(mappedRequests);
+      } catch (error) {
+        console.error('Error fetching connection requests:', error);
+        toast.error('Failed to load connection requests');
+      } finally {
+        setRequestsLoading(false);
+      }
+    };
+    
+    fetchConnectionRequests();
+  }, []);
+
   // Handle showing contact info
-  const handleContactInfo = (contactId: number, type: 'phone' | 'email') => {
+  const handleContactInfo = (contactId: string, type: 'phone' | 'email') => {
     setShowContactInfo(prev => ({
       ...prev,
       [contactId]: { type: prev[contactId]?.type === type ? null : type }
@@ -134,7 +177,7 @@ export default function DashboardContactPage() {
   };
 
   // Handle delete connection
-  const handleDeleteConnection = (contactId: number) => {
+  const handleDeleteConnection = (contactId: string) => {
     setContactsList(prev => prev.filter(contact => contact.id !== contactId));
     setOpenDropdown(null);
   };
@@ -211,16 +254,60 @@ export default function DashboardContactPage() {
     }
   };
 
-  const handleApproveRequest = (contactId: number) => {
-    const request = connectionRequests.find(c => c.id === contactId);
-    if (request) {
-      setContactsList(prev => [...prev, {...request, connectionStatus: 'connected'}]);
-      setConnectionRequests(prev => prev.filter(c => c.id !== contactId));
+  const handleApproveRequest = async (contactId: string) => {
+    try {
+      const response = await fetch(`/api/users/connections/${contactId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ action: 'accept' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to approve connection request');
+      }
+
+      const data = await response.json();
+      
+      // Find the request and move it to connections
+      const request = connectionRequests.find(c => c.id === contactId);
+      if (request) {
+        setContactsList(prev => [...prev, {...request, connectionStatus: 'connected'}]);
+        setConnectionRequests(prev => prev.filter(c => c.id !== contactId));
+        toast.success(`Connection with ${request.name} approved!`);
+      }
+    } catch (error: any) {
+      console.error('Error approving connection request:', error);
+      toast.error(error.message || 'Failed to approve connection request');
     }
   };
 
-  const handleRejectRequest = (contactId: number) => {
-    setConnectionRequests(prev => prev.filter(c => c.id !== contactId));
+  const handleRejectRequest = async (contactId: string) => {
+    try {
+      const response = await fetch(`/api/users/connections/${contactId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ action: 'reject' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to reject connection request');
+      }
+
+      const data = await response.json();
+      
+      // Remove the request from the list
+      const request = connectionRequests.find(c => c.id === contactId);
+      setConnectionRequests(prev => prev.filter(c => c.id !== contactId));
+      
+      if (request) {
+        toast.success(`Connection request from ${request.name} rejected`);
+      }
+    } catch (error: any) {
+      console.error('Error rejecting connection request:', error);
+      toast.error(error.message || 'Failed to reject connection request');
+    }
   };
 
   return (
@@ -669,7 +756,7 @@ export default function DashboardContactPage() {
               <div className={styles.cardsViewContainer}>
                 <div className={styles.cardsWrapper}>
                   <div className={styles.cardsGrid}>
-                    {sortedContacts.map((contact) => (
+                    {sortedContacts.map((contact, index) => (
                       <div
                         key={contact.id}
                         className={styles.cardGroup}
@@ -684,18 +771,18 @@ export default function DashboardContactPage() {
                             
                             {/* Front of Card */}
                             <div className={`${styles.cardFace} ${styles.backfaceHidden} ${
-                              contact.id % 4 === 1 ? styles.cardFront1 :
-                              contact.id % 4 === 2 ? styles.cardFront2 :
-                              contact.id % 4 === 3 ? styles.cardFront3 :
+                              index % 4 === 1 ? styles.cardFront1 :
+                              index % 4 === 2 ? styles.cardFront2 :
+                              index % 4 === 3 ? styles.cardFront3 :
                               styles.cardFront4
                             }`}>
                               
                               {/* Decorative Elements */}
                               <div className={styles.cardDecorativeElement}>
                                 <div className={`${styles.cardCircle} ${
-                                  contact.id % 4 === 1 ? styles.circle1 :
-                                  contact.id % 4 === 2 ? styles.circle2 :
-                                  contact.id % 4 === 3 ? styles.circle3 :
+                                  index % 4 === 1 ? styles.circle1 :
+                                  index % 4 === 2 ? styles.circle2 :
+                                  index % 4 === 3 ? styles.circle3 :
                                   styles.circle4
                                 }`}></div>
                               </div>
@@ -722,9 +809,9 @@ export default function DashboardContactPage() {
 
                             {/* Back of Card - Different templates based on contact ID */}
                             <div className={`${styles.cardFace} ${styles.backfaceHidden} ${styles.rotateY180} ${
-                              contact.id % 4 === 1 ? styles.cardBack1 :
-                              contact.id % 4 === 2 ? styles.cardBack2 :
-                              contact.id % 4 === 3 ? styles.cardBack3 :
+                              index % 4 === 1 ? styles.cardBack1 :
+                              index % 4 === 2 ? styles.cardBack2 :
+                              index % 4 === 3 ? styles.cardBack3 :
                               styles.cardBack4
                             }`}>
                               <div className={styles.cardBackCenter}>

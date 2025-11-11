@@ -702,6 +702,7 @@
 
 .tableBody {
   /* Removed 'divide-y divide-gray-200' as it's better handled by .tableRow border */
+  background-color: transparent;
 }
 
 .tableRow {
@@ -1499,7 +1500,14 @@
 }
 
 .cardBackActionButtonSecondary {
-  composes: cardBackActionButton;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
   background-color: transparent;
   border: 1px solid white;
   color: white;

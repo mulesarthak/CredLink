@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, Filter } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -21,85 +21,110 @@ type Profile = {
   views?: number;
 };
 
-const SAMPLE_PROFILES: Profile[] = [
-  {
-    id: "1",
-    username: "john",
-    name: "John Doe",
-    city: "New York",
-    company: "Tech Corp",
-    designation: "Full Stack Developer",
-    category: "Technology",
-    verified: true,
-    reviews: 18,
-    views: 1250,
-  },
-  {
-    id: "2",
-    username: "jane",
-    name: "Jane Smith",
-    city: "Los Angeles",
-    company: "Marketing Pro",
-    designation: "Digital Marketing Expert",
-    category: "Marketing",
-    verified: false,
-    reviews: 4,
-    views: 890,
-  },
-  {
-    id: "3",
-    username: "alex",
-    name: "Alex Kumar",
-    city: "Mumbai",
-    company: "Design Studio",
-    designation: "UI/UX Designer",
-    category: "Design",
-    verified: true,
-    reviews: 32,
-    views: 2100,
-  },
-  {
-    id: "4",
-    username: "maria",
-    name: "Maria Garcia",
-    city: "Madrid",
-    company: "ConsultCo",
-    designation: "Business Consultant",
-    category: "Consulting",
-    verified: false,
-    reviews: 0,
-    views: 120,
-  },
-  { id: "1", username: "john", name: "John Doe", city: "New York", company: "Tech Corp", designation: "Full Stack Developer", category: "Technology", reviews: 18, views: 1250 },
-  { id: "2", username: "jane", name: "Jane Smith", city: "Los Angeles", company: "Marketing Pro", designation: "Digital Marketing Expert", category: "Marketing", reviews: 4, views: 890 },
-  { id: "3", username: "alex", name: "Alex Kumar", city: "Mumbai", company: "Design Studio", designation: "UI/UX Designer", category: "Design", reviews: 32, views: 2100 },
-  { id: "4", username: "maria", name: "Maria Garcia", city: "Madrid", company: "ConsultCo", designation: "Business Consultant", category: "Consulting", reviews: 0, views: 120 },
-  { id: "5", username: "li", name: "Li Wei", city: "Beijing", company: "NextGen AI", designation: "Machine Learning Engineer", category: "AI", reviews: 45, views: 3300 },
-  { id: "6", username: "emma", name: "Emma Brown", city: "London", company: "HealthFirst", designation: "Healthcare Analyst", category: "Healthcare", reviews: 11, views: 870 },
-];
-
 export default function SearchPage() {
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  
+  // Dummy data for testing when API returns empty results
+  const dummyProfiles: Profile[] = [
+    { id: "1", username: "arnav_wasnik", name: "Arnav Wasnik", designation: "Frontend Developer", company: "BoostNow Solutions", city: "Nagpur", category: "Technology", verified: true, views: 245 },
+    { id: "2", username: "sarthak_patil", name: "Sarthak Patil", designation: "Backend Engineer", company: "CredLink", city: "Pune", category: "Engineering", verified: true, views: 189 },
+    { id: "3", username: "rohan_sharma", name: "Rohan Sharma", designation: "UI/UX Designer", company: "FigmaWorks", city: "Mumbai", category: "Design", verified: true, views: 312 }
+  ];
+  const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [connectionName, setConnectionName] = useState("");
+  const [connectingUserId, setConnectingUserId] = useState<string | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
 
-  const handleConnect = (name: string) => {
-    setConnectionName(name);
-    setShowModal(true);
+  // Fetch users from backend
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/profile/getuser", {
+          credentials: "include",
+        });
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch users");
+        }
+
+        const data = await response.json();
+        
+        // Map database fields to frontend Profile type
+        const mappedProfiles: Profile[] = (data.users || []).map((user: any) => ({
+          id: user.id,
+          username: user.username || "user",
+          name: user.fullName || `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Unknown User",
+          city: user.location || "Unknown",
+          company: user.company || undefined,
+          designation: user.title || undefined,
+          category: user.department || undefined,
+          verified: user.status === "active",
+          reviews: 0, // Not in schema
+          views: user.views || 0,
+        }));
+
+        // Use dummy data if API returns empty results
+        if (mappedProfiles.length === 0) {
+          setProfiles(dummyProfiles);
+        } else {
+          setProfiles(mappedProfiles);
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        toast.error("Failed to load users");
+        // Use dummy data on error as fallback
+        setProfiles(dummyProfiles);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  const handleConnect = async (userId: string, name: string) => {
+    try {
+      setConnectingUserId(userId);
+      const response = await fetch("/api/users/connections", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ receiverId: userId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to connect");
+      }
+
+      setConnectionName(name);
+      setShowModal(true);
+      toast.success(`Connection request sent to ${name}!`);
+    } catch (error: any) {
+      console.error("Connection error:", error);
+      toast.error(error.message || "Failed to send connection request");
+    } finally {
+      setConnectingUserId(null);
+    }
   };
 
   const categories = useMemo(() => {
     const set = new Set<string>();
-    SAMPLE_PROFILES.forEach((p) => p.category && set.add(p.category));
+    profiles.forEach((p) => p.category && set.add(p.category));
     return Array.from(set);
-  }, []);
+  }, [profiles]);
 
+  const hasQuery = query.trim().length > 0;
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return SAMPLE_PROFILES.filter((p) => {
+    if (!q) return [];
+    return profiles.filter((p) => {
       const hay = `${p.name} ${p.designation ?? ""} ${p.company ?? ""} ${p.category ?? ""} ${p.city}`.toLowerCase();
 
       if (q && !hay.includes(q)) return false;
@@ -107,7 +132,7 @@ export default function SearchPage() {
 
       return true;
     }).slice(0, 6);
-  }, [query, category]);
+  }, [query, category, profiles]);
 
   return (
     <div className={styles.container}>
@@ -116,9 +141,7 @@ export default function SearchPage() {
         onClose={() => setShowModal(false)}
         title="Connection Request Sent"
         message={
-          <p style={{ fontSize: 14, color: "#475569", lineHeight: 1.5 }}>
-            Your connection request has been sent to <span style={{ fontWeight: 600, color: "#111827" }}>{connectionName}</span>. They'll be notified and can accept your request.
-          </p>
+          <>Your connection request has been sent to <span style={{ fontWeight: 600, color: "#111827" }}>{connectionName}</span>. They will be notified and can accept or reject your request.</>
         }
         primaryText="Close"
       />
@@ -200,19 +223,37 @@ export default function SearchPage() {
                 ))}
               </select>
             </div>
+
+            {/* Clear Filters */}
+            <button
+              onClick={() => {
+                setCategory("")
+              }}
+              className="mt-6 text-sm font-semibold text-blue-600 hover:text-blue-700"
+            >
+              Clear all filters
+            </button>
           </div>
         </div>
 
         {/* RESULTS */}
         <div className={styles.resultsContainer}>
-          <p className={styles.resultsCount}>
-            Showing <span>{filtered.length}</span> result{filtered.length !== 1 ? "s" : ""}
-          </p>
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+          ) : (
+            <>
+              {hasQuery && (
+                <p className={styles.resultsCount}>
+                  Showing <span>{filtered.length}</span> result{filtered.length !== 1 ? "s" : ""}
+                </p>
+              )}
 
-          <div className={styles.cardGrid}>
-            {filtered.map((p, idx) => (
+              <div className={styles.cardGrid}>
+            {filtered.map((p, index) => (
               <article 
-                key={`${p.username}-${idx}`} 
+                key={`${p.username}-${index}`} 
                 className={styles.profileCard}
                 style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
@@ -231,8 +272,12 @@ export default function SearchPage() {
                       </div>
                     </div>
 
-                    <button onClick={(e) => { e.stopPropagation(); handleConnect(p.name); }} className={styles.connectBtn}>
-                      Connect
+                    <button 
+                      onClick={() => handleConnect(p.id, p.name)} 
+                      disabled={connectingUserId === p.id}
+                      className={styles.connectBtn}
+                    >
+                      {connectingUserId === p.id ? "Connecting..." : "Connect"}
                     </button>
                   </div>
 
@@ -247,12 +292,14 @@ export default function SearchPage() {
                 </div>
               </article>
             ))}
-          </div>
-        </div>
+              </div>
 
-        {filtered.length === 0 && (
-          <div className="text-center py-10 text-gray-500">No results found. Try changing filters.</div>
-        )}
+              {hasQuery && filtered.length === 0 && (
+                <div className="text-center py-10 text-gray-500">No results found. Try changing filters.</div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

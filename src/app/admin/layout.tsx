@@ -11,11 +11,11 @@ import {
   Menu,
   X,
   LifeBuoy ,
-  ChevronRight,
   LogOut,
   Home,
-  Tag,
+  
   Layers,
+  Tag
 } from "lucide-react";
 import styles from "./admin.module.css";
 
@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   );
 
   useEffect(() => {
-    checkAuth();
+    checkAuth(); 
   }, []);
 
   const checkAuth = async () => {

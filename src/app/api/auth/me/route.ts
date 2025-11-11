@@ -24,28 +24,58 @@ export async function GET() {
       fullName: string
     }
 
-    // Get user from database
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+    // Get user from database (only if active)
+    const user = await prisma.user.findFirst({
+      where: { 
+        id: decoded.userId,
+        isActive: true
+      },
       select: {
         id: true,
         email: true,
         fullName: true,
         phone: true,
+        username: true,
+        firstName: true,
+        middleName: true,
+        lastName: true,
+        prefix: true,
+        suffix: true,
+        preferredName: true,
+        maidenName: true,
+        pronouns: true,
+        title: true,
+        company: true,
+        department: true,
+        affiliation: true,
+        headline: true,
+        accreditations: true,
+        emailLink: true,
+        phoneLink: true,
+        location: true,
+        cardName: true,
+        cardType: true,
+        selectedDesign: true,
+        selectedColor: true,
+        selectedFont: true,
         profileImage: true,
+        bannerImage: true,
+        bio: true,
+        status: true,
+        views: true,
         createdAt: true,
-        updatedAt: true
-      } as any
+        updatedAt: true,
+      }
     })
 
     if (!user) {
       return NextResponse.json(
-        { error: 'User not found' },
+        { error: 'User not found or account is deleted' },
         { status: 404 }
       )
     }
 
-    console.log('🔍 Auth API: Returning user data:', user);
+   // console.log('🔍 Auth API: Returning user data:', user);
     return NextResponse.json({ user })
   } catch (error) {
     console.error('Get current user error:', error)

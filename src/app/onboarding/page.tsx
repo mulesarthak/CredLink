@@ -279,6 +279,7 @@ const OnboardingPage: React.FC = () => {
   const [showPartyPopup, setShowPartyPopup] = useState(false);
   const [formData, setFormData] = useState({
     photo: "",
+    photoFile: null as File | null,
     name: "",
     title: "",
     company: "",
@@ -298,7 +299,7 @@ const OnboardingPage: React.FC = () => {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  const handleContinue = () => {
+  const handleContinue = async() => {
     if (step === 1 && !formData.name.trim()) {
       alert('Please enter your name to continue.');
       return;
@@ -326,7 +327,68 @@ const OnboardingPage: React.FC = () => {
 
     if (step < 10) setStep(step + 1);
     else {
-      setShowPartyPopup(true);
+      try{
+        // Create FormData for card creation
+        const cardFormData = new FormData();
+        
+        // Map onboarding form data to card fields
+        cardFormData.append('fullName', formData.name || '');
+        cardFormData.append('title', formData.title || '');
+        cardFormData.append('company', formData.company || '');
+        cardFormData.append('location', formData.location || '');
+        cardFormData.append('bio', formData.about || '');
+        
+        // Combine skills, portfolio, and experience into description
+        const descriptionParts = [];
+        if (formData.skills) descriptionParts.push(`Skills: ${formData.skills}`);
+        if (formData.portfolio) descriptionParts.push(`Portfolio: ${formData.portfolio}`);
+        if (formData.experience) descriptionParts.push(`Experience: ${formData.experience}`);
+        if (descriptionParts.length > 0) {
+          cardFormData.append('description', descriptionParts.join('\n\n'));
+        }
+        
+        // Set default card properties
+        cardFormData.append('cardType', 'Personal');
+        cardFormData.append('selectedDesign', 'Classic');
+        cardFormData.append('selectedColor', '#145dfd');
+        cardFormData.append('selectedFont', 'Arial, sans-serif');
+        cardFormData.append('status', 'draft');
+        
+        // Handle profile image upload if provided
+        if (formData.photoFile) {
+          cardFormData.append('profileImage', formData.photoFile);
+        } else if (formData.photo && formData.photo.startsWith('data:')) {
+          // Fallback: convert data URL to File if file object not available
+          try {
+            const response = await fetch(formData.photo);
+            const blob = await response.blob();
+            const file = new File([blob], 'profile.jpg', { type: blob.type || 'image/jpeg' });
+            cardFormData.append('profileImage', file);
+          } catch (error) {
+            console.error('Error processing profile image:', error);
+            // Continue without image if conversion fails
+          }
+        }
+        
+        // Create card using card creation API
+        const response = await fetch('/api/card/create', {
+          method: 'POST',
+          credentials: 'include', // Include cookies for authentication
+          body: cardFormData,
+        });
+        
+        const data = await response.json();
+        console.log('Card creation response:', data);
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to create card');
+        }
+        
+        setShowPartyPopup(true);
+      }catch(error: any){
+        console.error('Error creating card:', error);
+        alert(error.message || 'Failed to create card. Please try again.');
+      }
     }
   };
 
@@ -653,7 +715,7 @@ const OnboardingPage: React.FC = () => {
                     if (file) {
                       const reader = new FileReader();
                       reader.onloadend = () => {
-                        setFormData({ ...formData, photo: reader.result as string });
+                        setFormData({ ...formData, photo: reader.result as string, photoFile: file });
                       };
                       reader.readAsDataURL(file);
                     }

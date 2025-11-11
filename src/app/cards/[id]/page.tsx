@@ -1,9 +1,10 @@
 "use client";
 
 import styles from "./carddetail.module.css";
-import React, { useState, useRef } from "react";
-import { useParams } from "next/navigation";
+import React, { useState, useRef, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-hot-toast";
 import {
   FiDownload,
   FiCopy,
@@ -16,6 +17,7 @@ import {
   FiPhone,
   FiLinkedin,
   FiGlobe,
+  
 } from "react-icons/fi";
 import DigitalCardPreview, { DigitalCardProps } from "@/components/cards/DigitalCardPreview";
 import {
@@ -28,41 +30,46 @@ import {
   BarChart3,
   Users,
   Eye,
+  
 } from "lucide-react";
 import Link from "next/link";
 import QRCode from "react-qr-code";
-import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 // ----------------- Card Type Definition -----------------
 interface Card {
-  id: number;
-  name: string;
-  title: string;
-  company: string;
-  location: string;
-  about: string;
-  skills: string;
-  portfolio: string;
-  experience: string;
-  photo: string;
-  cover: string;
-  email: string;
-  phone: string;
-  linkedin: string;
-  website: string;
-  views: string;
-  boost: "Active" | "Inactive";
+  id: string;
+  fullName?: string;
+  name?: string;
+  title?: string;
+  company?: string;
+  location?: string;
+  about?: string;
+  bio?: string;
+  description?: string;
+  skills?: string;
+  portfolio?: string;
+  experience?: string;
+  photo?: string;
+  profileImage?: string;
+  cover?: string;
+  coverImage?: string;
+  email?: string;
+  phone?: string;
+  linkedin?: string;
+  linkedinUrl?: string;
+  website?: string;
+  websiteUrl?: string;
+  selectedDesign?: string;
+  selectedColor?: string;
+  selectedFont?: string;
+  views?: number;
+  boost?: "Active" | "Inactive";
+  user?: {
+    id: string;
+    fullName: string;
+    username: string;
+    email: string;
+  };
 }
 
 // ----------------- Card Preview -----------------
@@ -76,20 +83,21 @@ const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
       style={{ maxWidth: '360px' }}
     >
       <DigitalCardPreview
-        name={card.name}
-        title={card.title}
-        company={card.company}
-        location={card.location}
-        about={card.about}
-        skills={card.skills}
-        portfolio={card.portfolio}
-        experience={card.experience}
-        photo={card.photo}
-        cover={card.cover}
-        email={card.email}
-        phone={card.phone}
-        linkedin={card.linkedin}
-        website={card.website}
+        name={card.fullName || card.name || ''}
+        title={card.title || ''}
+        company={card.company || ''}
+        location={card.location || ''}
+        about={card.bio || card.about || card.description || ''}
+        skills={card.skills || ''}
+        portfolio={card.portfolio || ''}
+        experience={card.experience || ''}
+        photo={card.profileImage || card.photo || ''}
+        cover={card.coverImage || card.cover || ''}
+        email={card.email || ''}
+        phone={card.phone || ''}
+        linkedin={card.linkedinUrl || card.linkedin || ''}
+        website={card.websiteUrl || card.website || ''}
+        design={card.selectedDesign || 'Classic'}
       />
     </motion.div>
   );
@@ -98,39 +106,55 @@ const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
 // ----------------- Main Page -----------------
 const CardDetailsPage = () => {
   const params = useParams();
-  const cardId = parseInt(params.id as string);
-  const [activeTab, setActiveTab] = useState<"share" | "settings" | "analytics">("settings"); // Set to 'settings' to match the image
+  const router = useRouter();
+  const cardId = params.id as string;
+  const [activeTab, setActiveTab] = useState<"share" | "settings" | "analytics">("settings");
   const [searchIndexing, setSearchIndexing] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [shareMethod, setShareMethod] = useState<"qr" | "link">("link"); // Set to 'link' to match the settings image context
+  const [shareMethod, setShareMethod] = useState<"qr" | "link">("link");
+  const [card, setCard] = useState<Card | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const qrRef = useRef<HTMLDivElement>(null);
 
-  const cards: Card[] = [
-    {
-      id: 1,
-      name: "Josh Hazelwood",
-      title: "Software Designer",
-      company: "BoostNow LLP",
-      location: "California, USA",
-      about: "Crafting innovative software solutions and user experiences with modern design principles",
-      skills: "React, TypeScript, UI/UX Design, Figma, Node.js",
-      portfolio: "Mobile App Redesign, E-commerce Platform, Design System",
-      experience: "Senior Software Designer @ BoostNow LLP (2022-Present), UI Designer @ TechCorp (2020-2022)",
-      photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
-      cover: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&h=200&fit=crop",
-      email: "josh.hazelwood@boostnow.com",
-      phone: "+1-555-0123",
-      linkedin: "https://linkedin.com/in/joshhazelwood",
-      website: "https://joshhazelwood.dev",
-      views: "234",
-      boost: "Active",
-    },
-  ];
-  const card = cards.find((c) => c.id === cardId);
+  // Fetch card data from API
+  useEffect(() => {
+    const fetchCard = async () => {
+      try {
+        setIsLoading(true);
+        console.log('🔍 Fetching card with ID:', cardId);
+        
+        const response = await fetch(`/api/card/${cardId}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch card');
+        }
+
+        const data = await response.json();
+        
+        if (data.success && data.card) {
+          console.log('✅ Fetched card:', data.card);
+          setCard(data.card);
+        } else {
+          toast.error('Card not found');
+          router.push('/dashboard');
+        }
+      } catch (error: any) {
+        console.error('❌ Error fetching card:', error);
+        toast.error(error.message || 'Failed to load card');
+        router.push('/dashboard');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (cardId) {
+      fetchCard();
+    }
+  }, [cardId, router]);
 
   const mockUserData = {
-    cardUrl: `https://mykard.com/hi/XXXX`,
+    cardUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/cards/${cardId}`,
   };
 
   const copyToClipboard = async (text: string) => {
@@ -160,6 +184,7 @@ const CardDetailsPage = () => {
   };
 
   const shareProfile = async () => {
+    console.log('Navigator share available:', !!navigator.share);
     if (navigator.share) {
       await navigator.share({
         title: "My Digital Card",
@@ -167,6 +192,7 @@ const CardDetailsPage = () => {
         url: mockUserData.cardUrl,
       });
     } else {
+      // Fallback for browsers that don't support Web Share API
       copyToClipboard(mockUserData.cardUrl);
       alert("Link copied to clipboard!");
     }
@@ -184,11 +210,6 @@ const CardDetailsPage = () => {
         fill: true,
       },
     ],
-  };
-
-  const lineOptions = {
-    responsive: true,
-    plugins: { legend: { display: false } },
   };
 
   const [file, setFile] = useState<File | null>(null);
@@ -211,6 +232,17 @@ const CardDetailsPage = () => {
   const triggerFileInput = () => {
     document.getElementById('qrLogoUpload')?.click();
   };
+
+  if (isLoading) {
+    return (
+      <div className={`${styles.pageContainer} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-green mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading card...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!card)
     return (
@@ -252,7 +284,7 @@ const CardDetailsPage = () => {
               ))}
             </div>
             <div className={styles.editCardWrapper}>
-              <Link href="/dashboard/edit">
+              <Link href={`/dashboard/edit?id=${cardId}`}>
                 <button className={styles.editCardBtn}>
                   <FiEdit size={16} />
                   Edit Card
@@ -344,9 +376,9 @@ const CardDetailsPage = () => {
                 </h3>
 
                 <div className={styles.statsGrid}>
-                  {[{ label: "Total Views", value: "1,230", icon: Eye },
-                  { label: "Shares", value: "540", icon: Share2 },
-                  { label: "Contacts", value: "312", icon: Users }].map((s, i) => (
+                  {[{ label: "Total Views", value: card.views?.toString() || "0", icon: Eye },
+                  { label: "Shares", value: "0", icon: Share2 },
+                  { label: "Contacts", value: "0", icon: Users }].map((s, i) => (
                     <div key={i} className={styles.statCard}>
                       <div className={styles.statIcon}>
                         <s.icon className="w-6 h-6" />
@@ -359,7 +391,24 @@ const CardDetailsPage = () => {
 
                 <div className={styles.analyticsCard}>
                   <h4>Engagement Trends</h4>
-                  <Line data={lineData} options={lineOptions} />
+                  <div style={{ height: '200px', display: 'flex', alignItems: 'flex-end', gap: '8px', padding: '20px 0' }}>
+                    {lineData.datasets[0].data.map((value, index) => (
+                      <div key={index} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: `${(value / 100) * 100}%` }}
+                          transition={{ duration: 0.8, delay: index * 0.1 }}
+                          style={{
+                            width: '100%',
+                            backgroundColor: '#2563eb',
+                            borderRadius: '4px 4px 0 0',
+                            minHeight: '10px'
+                          }}
+                        />
+                        <span style={{ fontSize: '12px', color: '#6b7280' }}>{lineData.labels[index]}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -389,7 +438,7 @@ const CardDetailsPage = () => {
                     <div className={styles.settingsControl}>
                       <input
                         type="text"
-                        defaultValue="Personal"
+                        defaultValue={card.fullName || card.name || 'Personal'}
                         className={styles.settingsInput}
                       />
                     </div>
@@ -436,8 +485,9 @@ const CardDetailsPage = () => {
                     <div className={styles.settingsControl}>
                       <input
                         type="text"
-                        defaultValue="https://mykard.com/hi/XXXX"
+                        defaultValue={mockUserData.cardUrl}
                         className={styles.settingsInput}
+                        readOnly
                       />
                     </div>
                   </div>

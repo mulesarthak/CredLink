@@ -31,13 +31,40 @@ export default function LoginPage() {
     }
     setLoading(true)
     setError('')
-    
-    // Simulate login process
-    setTimeout(() => {
-      console.log('Login attempt:', { email, password })
-      alert('Login functionality will be implemented with backend integration')
+    try {
+      console.log('email', email)
+      console.log('password', password)
+      // Send login payload to backend JSON API (email + password)
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          password,
+        }),
+      })
+
+      
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setError(data?.error || 'Login failed. Please try again.')
+        return
+      }
+      const data = await res.json().catch(() => ({}))
+      if (data?.token) {
+        localStorage.setItem('token', data.token)
+      }
+      // On success, redirect to onboarding if first-time login, otherwise dashboard
+      if (data?.needsOnboarding) {
+        window.location.href = '/onboarding'
+      } else {
+        window.location.href = '/dashboard'
+      }
+    } catch {
+      setError('Login failed. Please try again.')
+    } finally {
       setLoading(false)
-    }, 1000)
+    }
   }
 
   return (
