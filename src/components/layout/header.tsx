@@ -212,7 +212,7 @@ export function Header() {
                       </Link>
 
                       <Link
-                        href="/profile"
+                        href="/dashboard/settings"
                         onClick={() => setIsDropdownOpen(false)}
                         style={{
                           display: "flex",
