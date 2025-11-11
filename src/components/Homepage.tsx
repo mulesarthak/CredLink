@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
+import Header from './Header';
 import '../app/globals.css';
 
 export default function Homepage() {
@@ -10,14 +11,19 @@ export default function Homepage() {
 
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ 
-      background: 'linear-gradient(135deg, var(--background-light-blue) 0%, var(--background-purple-light) 50%, var(--background) 100%)'
+      background: 'linear-gradient(135deg, var(--background-light-blue) 0%, var(--background-purple-light) 50%, var(--background) 100%)',
+      maxWidth: '100vw',
+      width: '100%'
     }}>
+      {/* Header */}
+      <Header />
+      
       {/* Hero Section */}
       <section className="section flex items-center px-4 sm:px-6 lg:px-12" style={{ 
         background: 'transparent',
-        minHeight: '100vh',
-        paddingTop: '2rem',
-        paddingBottom: '2rem',
+        minHeight: '100vh', // Use full viewport height
+        paddingTop: '1rem', // Minimal top padding to use available space
+        paddingBottom: '1rem',
         position: 'relative',
         overflow: 'hidden'
       }}>
@@ -39,8 +45,8 @@ export default function Homepage() {
         <div style={{
           position: 'absolute',
           top: '10%',
-          right: '-15%',
-          width: '55%',
+          right: '-10%',
+          width: '50%',
           height: '100%',
           background: 'linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(103, 58, 183, 0.08) 100%)',
           borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
@@ -81,17 +87,26 @@ export default function Homepage() {
               position: 'relative'
             }}>
               <h1 className="heading-1" style={{ 
-                color: 'var(--foreground)'
+                color: 'var(--foreground)',
+                fontWeight: '600'
               }}>
-                The Future of Business Cards – <span className="gradient-text">Digital & Free</span>
+                More Than a Card — <span className="gradient-text">It's How Connections Begin.</span>
               </h1>
               
               <p className="body-large" style={{ 
                 color: 'var(--text-primary)',
-                maxWidth: '540px'
+                maxWidth: '540px',
+                marginBottom: '1rem'
               }}>
-                Your all-in-one solution to create, customize, and share digital business cards with ease.
+                Turn every introduction into an opportunity with your personal MyKard — meet people, connect instantly, and stay remembered.
               </p>
+              {/* <p className="body-text" style={{ 
+                color: 'var(--text-secondary)',
+                maxWidth: '520px',
+                marginBottom: '2rem'
+              }}>
+                Join thousands of professionals who've revolutionized their networking approach. No more lost cards, outdated information, or missed opportunities – just seamless, modern connections that drive real business results.
+              </p> */}
               
               <div className="flex flex-wrap gap-4">
                 <Link href="/auth/signup" className="text-white rounded-full transition-all" style={{ 
@@ -109,223 +124,50 @@ export default function Homepage() {
                 }}>
                   Get Started
                 </Link>
-                <Link href="/how-it-works" className="rounded-full transition-all" style={{ 
-                  paddingLeft: '2.5rem',
-                  paddingRight: '2.5rem',
-                  paddingTop: '1rem',
-                  paddingBottom: '1rem',
-                  fontWeight: '600',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  color: 'var(--primary-purple)',
-                  border: '2px solid rgba(108, 93, 184, 0.3)',
-                  backdropFilter: 'blur(10px)',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  textDecoration: 'none'
-                }}>
-                  <span>Learn More</span>
-                </Link>
+                
               </div>
             </div>
 
-            {/* Right Side - Enhanced Digital Cards Showcase */}
-            <div className="relative flex justify-center items-center order-1 lg:order-2" style={{ minHeight: '400px', overflow: 'hidden' }}>
+            {/* Right Side - Front Image */}
+            <div className="relative flex justify-center items-center order-1 lg:order-2" style={{ minHeight: '500px', overflow: 'visible' }}>
               <div className="relative" style={{ maxWidth: '500px', width: '100%' }}>
-                {/* Background Glow Effects */}
-                <div 
-                  style={{
-                    position: 'absolute',
-                    top: '10%',
-                    right: '20%',
-                    width: '300px',
-                    height: '300px',
-                    background: 'radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%)',
-                    borderRadius: '50%',
-                    filter: 'blur(40px)',
-                    animation: 'pulse 4s ease-in-out infinite'
-                  }}
-                ></div>
                 
-                {/* Modern Digital Cards Showcase */}
+                {/* Front Image */}
                 <div 
                   style={{
                     width: '100%',
-                    height: '500px',
+                    height: 'auto',
+                    maxHeight: '70vh', // Reduced height to ensure full visibility
                     position: 'relative',
-                    animation: 'fadeInUp 1.2s ease-out 0.3s both'
+                    animation: 'fadeInUp 1.2s ease-out 0.3s both',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '1rem 0' // Reduced padding to maximize image space
                   }}
                 >
-                  {/* Central Phone Mockup */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      width: '180px',
-                      height: '360px',
-                      background: 'linear-gradient(145deg, #1f2937 0%, #111827 100%)',
-                      borderRadius: '25px',
-                      padding: '8px',
-                      boxShadow: '0 25px 50px rgba(0, 0, 0, 0.3)',
-                      zIndex: 5,
-                      animation: 'float 6s ease-in-out infinite'
-                    }}
-                  >
-                    {/* Phone Screen */}
-                    <div 
+                  <div style={{
+                    maxWidth: '500px',
+                    maxHeight: '150vh', // Further increased height for much larger image
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: '20px',
+                    filter: 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.15))',
+                    background: 'transparent'
+                  }}>
+                    <img
+                      src="/assets/final.png"
+                      alt="MyKard Digital Business Card"
                       style={{
                         width: '100%',
-                        height: '100%',
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        borderRadius: '18px',
-                        padding: '20px 15px',
-                        position: 'relative',
-                        overflow: 'hidden'
+                        height: 'auto',
+                        objectFit: 'contain',
+                        background: 'transparent',
+                        mixBlendMode: 'multiply', // This will help remove white background
+                        borderRadius: '20px'
                       }}
-                    >
-                      {/* Profile Circle */}
-                      <div style={{ 
-                        width: '50px', 
-                        height: '50px', 
-                        background: 'rgba(255,255,255,0.9)', 
-                        borderRadius: '50%', 
-                        margin: '0 auto 15px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '20px',
-                        fontWeight: 'bold',
-                        color: '#667eea'
-                      }}>JS</div>
-                      
-                      {/* Name and Title */}
-                      <div style={{ textAlign: 'center', color: 'white', marginBottom: '20px' }}>
-                        <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '4px' }}>John Smith</div>
-                        <div style={{ fontSize: '10px', opacity: 0.8 }}>Senior Designer</div>
-                      </div>
-                      
-                      {/* Contact Buttons */}
-                      <div style={{ display: 'flex', gap: '8px', marginBottom: '15px' }}>
-                        <div style={{ flex: 1, height: '25px', background: 'rgba(255,255,255,0.2)', borderRadius: '12px' }}></div>
-                        <div style={{ flex: 1, height: '25px', background: 'rgba(255,255,255,0.2)', borderRadius: '12px' }}></div>
-                      </div>
-                      
-                      {/* Social Icons */}
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                        {[1,2,3,4].map(i => (
-                          <div key={i} style={{ 
-                            width: '20px', 
-                            height: '20px', 
-                            background: 'rgba(255,255,255,0.3)', 
-                            borderRadius: '50%' 
-                          }}></div>
-                        ))}
-                      </div>
-                    </div>
+                    />
                   </div>
-
-                  {/* Floating Card 1 - Top Left */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '20px',
-                      left: '20px',
-                      width: '140px',
-                      height: '90px',
-                      background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
-                      borderRadius: '12px',
-                      boxShadow: '0 20px 40px rgba(255, 107, 107, 0.3)',
-                      transform: 'rotate(-8deg)',
-                      animation: 'float 8s ease-in-out infinite',
-                      zIndex: 3,
-                      padding: '12px'
-                    }}
-                  >
-                    <div style={{ color: 'white' }}>
-                      <div style={{ width: '25px', height: '25px', background: 'rgba(255,255,255,0.3)', borderRadius: '50%', marginBottom: '8px' }}></div>
-                      <div style={{ fontSize: '11px', fontWeight: 'bold' }}>Alex Chen</div>
-                      <div style={{ fontSize: '9px', opacity: 0.8 }}>Product Manager</div>
-                    </div>
-                  </div>
-
-                  {/* Floating Card 2 - Top Right */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '60px',
-                      right: '10px',
-                      width: '140px',
-                      height: '90px',
-                      background: 'linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)',
-                      borderRadius: '12px',
-                      boxShadow: '0 20px 40px rgba(78, 205, 196, 0.3)',
-                      transform: 'rotate(12deg)',
-                      animation: 'float 8s ease-in-out infinite 2s',
-                      zIndex: 2,
-                      padding: '12px'
-                    }}
-                  >
-                    <div style={{ color: 'white' }}>
-                      <div style={{ width: '25px', height: '25px', background: 'rgba(255,255,255,0.3)', borderRadius: '50%', marginBottom: '8px' }}></div>
-                      <div style={{ fontSize: '11px', fontWeight: 'bold' }}>Sarah Wilson</div>
-                      <div style={{ fontSize: '9px', opacity: 0.8 }}>Marketing Lead</div>
-                    </div>
-                  </div>
-
-                  {/* Floating Card 3 - Bottom */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: '40px',
-                      left: '60px',
-                      width: '140px',
-                      height: '90px',
-                      background: 'linear-gradient(135deg, #a8e6cf 0%, #88d8a3 100%)',
-                      borderRadius: '12px',
-                      boxShadow: '0 20px 40px rgba(168, 230, 207, 0.3)',
-                      transform: 'rotate(-5deg)',
-                      animation: 'float 8s ease-in-out infinite 4s',
-                      zIndex: 1,
-                      padding: '12px'
-                    }}
-                  >
-                    <div style={{ color: '#2d5a3d' }}>
-                      <div style={{ width: '25px', height: '25px', background: 'rgba(45,90,61,0.2)', borderRadius: '50%', marginBottom: '8px' }}></div>
-                      <div style={{ fontSize: '11px', fontWeight: 'bold' }}>Mike Johnson</div>
-                      <div style={{ fontSize: '9px', opacity: 0.8 }}>Developer</div>
-                    </div>
-                  </div>
-
-                  {/* Floating Elements */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '50px',
-                      right: '200px',
-                      width: '40px',
-                      height: '40px',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      borderRadius: '50%',
-                      animation: 'pulse 3s ease-in-out infinite',
-                      opacity: 0.7
-                    }}
-                  ></div>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: '100px',
-                      left: '20px',
-                      width: '25px',
-                      height: '25px',
-                      background: 'linear-gradient(135deg, #a8e6cf 0%, #88d8a3 100%)',
-                      borderRadius: '50%',
-                      animation: 'pulse 3s ease-in-out infinite 1s',
-                      opacity: 0.6
-                    }}
-                  ></div>
                 </div>
               </div>
             </div>
@@ -334,7 +176,7 @@ export default function Homepage() {
       </section>
 
       {/* Search Bar Section */}
-      <section id="search" className="section px-4 sm:px-6 lg:px-12 py-12 lg:py-20" style={{ background: 'transparent' }}>
+      <section id="find-digital-card" className="section px-4 sm:px-6 lg:px-12 py-12 lg:py-20" style={{ background: 'transparent' }}>
         <div className="container mx-auto max-w-4xl">
           <div className="card card-elevated" style={{ 
             background: 'var(--gradient-light)',
@@ -346,19 +188,27 @@ export default function Homepage() {
               <h2 className="heading-3" style={{ 
                 color: 'var(--primary-blue)', 
                 fontSize: '2rem', 
-                fontWeight: '700',
+                fontWeight: '500',
                 marginBottom: '0.75rem',
                 lineHeight: '1.2'
               }}>
-                Find Your Digital Card
+                Connect With People
               </h2>
-              <p className="body-text" style={{ 
+              {/* <p className="body-text" style={{ 
                 color: 'var(--text-secondary)',
                 fontSize: '1.05rem',
-                maxWidth: '500px',
+                maxWidth: '600px',
+                margin: '0 auto 1rem auto'
+              }}>
+                Discover and connect with professionals worldwide through our comprehensive digital card directory. Search by name, company, industry, location, or expertise to find the right connections for your business growth.
+              </p> */}
+              <p className="body-text" style={{ 
+                color: 'var(--text-secondary)',
+                fontSize: '0.95rem',
+                maxWidth: '580px',
                 margin: '0 auto'
               }}>
-                Search for professionals by name, company, or industry
+                Access verified professional profiles, view portfolios, and connect instantly with industry leaders, potential clients, and business partners in your network.
               </p>
             </div>
             <div className="relative" style={{ maxWidth: '700px', margin: '0 auto' }}>
@@ -390,7 +240,6 @@ export default function Homepage() {
                     fontSize: '1rem',
                     color: 'var(--primary-purple)'
                   }}
-                  suppressHydrationWarning
                 />
                 <button 
                   className="absolute text-white rounded-full transition-all"
@@ -407,7 +256,6 @@ export default function Homepage() {
                     cursor: 'pointer',
                     border: 'none'
                   }}
-                  suppressHydrationWarning
                 >
                   Search
                 </button>
@@ -438,7 +286,6 @@ export default function Homepage() {
                       border: '1px solid var(--background-light-blue)',
                       cursor: 'pointer'
                     }}
-                    suppressHydrationWarning
                   >
                     {tag}
                   </button>
@@ -450,7 +297,7 @@ export default function Homepage() {
       </section>
 
       {/* What is Digital Business Card */}
-      <section className="section px-6 lg:px-12" style={{ 
+      <section id="what-is-digital-card" className="section px-6 lg:px-12" style={{ 
         background: 'transparent',
         paddingTop: '5rem',
         paddingBottom: '5rem'
@@ -483,27 +330,39 @@ export default function Homepage() {
             <div>
               <h2 className="heading-2" style={{ 
                 color: '#110032ff',
-                marginBottom: '1.5rem'
+                marginBottom: '1.5rem',
+                fontWeight: '500'
               }}>
-                What is a <span style={{
+               MyKard isn’t just a<span style={{
                   background: 'var(--gradient-primary)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'
-                }}>Digital Business Card?</span>
+                }}> digital card </span>
               </h2>
               <p className="body-large" style={{ 
                 color: '#64748B',
                 marginBottom: '1.5rem'
               }}>
-                A digital business card lets you share your contact info, social links, and professional details instantly — all in one tap or scan.
+               MyKard is your all-in-one digital identity and networking card — a smart, shareable profile that brings together everything about you in one link.
+Whether you’re a student, freelancer, professional, or business owner, MyKard helps you connect, get discovered, and grow your network effortlessly.
+
+No more lost visiting cards or scattered links — just one personal link or QR that lets anyone know who you are, what you do, and how to reach you.
+
+
               </p>
               <p className="body-text" style={{ 
                 color: '#647488 ',
+                marginBottom: '1rem'
+              }}>
+                Made in India, for the world — MyKard is the modern way to network, connect, and build your personal brand.
+              </p>
+              {/* <p className="body-text" style={{ 
+                color: '#647488 ',
                 marginBottom: '2rem'
               }}>
-                Say goodbye to paper cards — connect smartly and sustainably.
-              </p>
+                Perfect for professionals, entrepreneurs, and businesses looking to make lasting impressions while staying ahead in the digital age.
+              </p> */}
               <Link href="/auth/signup" className="text-white rounded-full transition-all" style={{ 
                 paddingLeft: '2.5rem',
                 paddingRight: '2.5rem',
@@ -577,7 +436,7 @@ export default function Homepage() {
                       {item.stat}
                     </h3>
                     <p style={{
-                      color: '#cbd5e1',
+                      color: '#000000',
                       fontSize: '0.95rem',
                       fontWeight: '500',
                       margin: 0
@@ -593,7 +452,7 @@ export default function Homepage() {
       </section>
 
       {/* Build Credibility That Converts */}
-      <section id="features" className="section px-6 lg:px-12" style={{ 
+      <section id="build-credibility" className="section px-6 lg:px-12" style={{ 
         background: 'transparent',
         paddingTop: '5rem',
         paddingBottom: '5rem'
@@ -637,7 +496,8 @@ export default function Homepage() {
         <div className="container mx-auto text-center" style={{ position: 'relative', zIndex: 10 }}>
           <h2 className="heading-2" style={{ 
             color: '#0c0000ff',
-            marginBottom: '1rem'
+            marginBottom: '1rem',
+            fontWeight: '500'
           }}>
             Build Credibility That <span style={{
               background: 'var(--gradient-primary)',
@@ -648,11 +508,18 @@ export default function Homepage() {
           </h2>
           <p className="body-large" style={{ 
             color: '#1c2e44ff',
-            maxWidth: '42rem',
+            maxWidth: '48rem',
+            margin: '0 auto 1.5rem auto'
+          }}>
+            Make every introduction memorable. With MyKard, you’re not just sharing contact info — you’re showcasing your identity, credibility, and personal brand.
+          </p>
+          {/* <p className="body-text" style={{ 
+            color: '#64748B',
+            maxWidth: '46rem',
             margin: '0 auto 3rem auto'
           }}>
-            Showcase your expertise and build trust with powerful credibility features
-          </p>
+            From verified professional badges and client testimonials to portfolio showcases and achievement highlights, our platform provides everything you need to demonstrate your expertise and build lasting trust with prospects and clients.
+          </p> */}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -801,33 +668,41 @@ export default function Homepage() {
         }}></div>
 
         <div className="container mx-auto" style={{ position: 'relative', zIndex: 2 }}>
-          <h2 className="heading-2 text-center mb-16" style={{ color: '#000000', textShadow: '0 0 15px rgba(0, 0, 0, 0.1)' }}>Why Every Professional Needs a <span className="gradient-text">Digital Business Card</span></h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <h2 className="heading-2 text-center mb-16" style={{ color: '#000000', textShadow: '0 0 15px rgba(0, 0, 0, 0.1)', fontWeight: '500' }}>Why Every Professional Needs a <span className="gradient-text">MyKard</span></h2>
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />,
-                title: 'Control Every Detail — From Branding to Job Titles',
-                desc: 'Manage your design, colors, and details anytime.'
+                title: 'Smart Digital Card',
+                desc: 'Create a beautiful, shareable profile that works like a mini LinkedIn — your photo, bio, skills, and social links, all in one place.'
               },
               {
-                icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />,
-                title: 'Share Your Digital Card Anywhere',
-                desc: 'QR code, WhatsApp, email, or link — share it anywhere instantly.'
+                title: 'Share Instantly — Anywhere',
+                desc: 'No app needed. Share your MyKard via QR, link, or message. Works across any device — no downloads, no hassle.'
               },
               {
-                icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />,
-                title: 'Integrate Your Card With Popular Apps',
-                desc: 'Connect seamlessly with your CRM or contact manager.'
+                title: 'Grow Your Network Effortlessly',
+                desc: 'Discover professionals, entrepreneurs, and creators nearby or in your industry. Connect instantly and keep your network updated.'
               },
               {
-                icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />,
-                title: 'Designed for Privacy and Security',
-                desc: 'Enterprise-grade data protection and easy admin control.'
+                title: 'Always Up to Date',
+                desc: 'No more reprinting cards. Update your info anytime — and your contacts always have the latest version automatically.'
+              },
+              {
+                title: 'One Card, Many Uses',
+                desc: 'Use it at events, meetings, online bios, resumes, and even WhatsApp or email signatures. Your single link replaces everything.'
+              },
+              {
+                title: 'Smart Insights',
+                desc: 'Know who viewed or saved your card, track engagement, and see how your network grows over time.'
+              },
+              {
+                title: 'Built for Everyone',
+                desc: 'From students and freelancers to founders and CEOs — MyKard helps you share who you are and what you do, beautifully.'
               }
             ].map((feature, idx) => (
               <div 
                 key={idx} 
-                className="card p-8 flex flex-col items-center text-center transition-all duration-300 ease-in-out"
+                className="card p-6 flex flex-col items-center text-center transition-all duration-300 ease-in-out"
                 style={{
                   background: 'white', // Darker card background
                   borderRadius: '1.5rem',
@@ -846,27 +721,6 @@ export default function Homepage() {
                   e.currentTarget.style.border = '1px solid rgba(99, 102, 241, 0.2)';
                 }}
               >
-                <div 
-                  className="w-16 h-16 rounded-full flex items-center justify-center mb-6 relative overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)', // Blue gradient for icon background
-                    boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.3), 0 0 20px rgba(59, 130, 246, 0.6)',
-                    transition: 'all 0.3s ease-in-out'
-                  }}
-                >
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    {feature.icon}
-                  </svg>
-                  {/* Pulsing light effect */}
-                  <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)',
-                    opacity: 0,
-                    animation: 'iconPulse 2s infinite ease-out',
-                    animationDelay: `${idx * 0.2}s`
-                  }}></div>
-                </div>
                 <h3 className="text-xl font-semibold mb-3" style={{ color: '#334155' }}>{feature.title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed" style={{ color: 'grey' }}>{feature.desc}</p>
               </div>
@@ -880,7 +734,7 @@ export default function Homepage() {
       {/* FAQ Section */}
       <section id="how-it-works" className="section py-12 lg:py-20 px-4 sm:px-6 lg:px-12" style={{ background: 'var(--background-purple-light)' }}>
         <div className="container mx-auto max-w-4xl">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-8 lg:mb-16" style={{ color: '#1A1A2E' }}>How It <span className="gradient-text">Works</span></h2>
+          <h2 className="heading-2 text-center mb-16" style={{ color: '#1A1A2E', fontWeight: '500' }}>How It <span className="gradient-text">Works</span></h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {[
               {
@@ -904,8 +758,8 @@ export default function Homepage() {
                 description: 'Monitor who views your card and generates leads.'
               }
             ].map((card, idx) => (
-              <div key={idx} className="card p-6 text-center" style={{ boxShadow: '0 10px 20px rgba(0,0,0,0.05)' }}>
-                <div className="mx-auto mb-4 w-20 h-20 flex items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)', color: '#fff' }}>
+              <div key={idx} className="card p-6 text-center flex flex-col items-center" style={{ boxShadow: '0 10px 20px rgba(0,0,0,0.05)' }}>
+                <div className="mb-4 w-20 h-20 flex items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)', color: '#fff' }}>
                   {card.icon}
                 </div>
                 <h3 className="text-lg font-semibold mb-2" style={{ color: '#334155' }}>{card.title}</h3>
@@ -919,7 +773,7 @@ export default function Homepage() {
       {/* Final CTA */}
       <section className="section py-12 lg:py-20 px-4 sm:px-6 lg:px-12" style={{ background: 'transparent' }}>
         <div className="container mx-auto text-center flex flex-col items-center">
-          <h2 className="heading-2 mb-6" style={{ color: 'var(--foreground)' }}>Ready to Go Digital?</h2>
+          <h2 className="heading-2 mb-6" style={{ color: 'var(--foreground)', fontWeight: '500' }}>Ready to Go Digital?</h2>
           <p className="body-large mb-8 max-w-2xl mx-auto" style={{ color: 'var(--text-primary)' }}>
             Join millions of professionals who have already made the switch to digital business cards.
           </p>
@@ -930,203 +784,7 @@ export default function Homepage() {
       </section>
 
       {/* Contact Form Section */}
-      <section id="contact" className="section py-16 lg:py-24 px-4 sm:px-6 lg:px-12" style={{ 
-        background: 'linear-gradient(135deg, var(--background-light-blue) 0%, var(--background-purple-light) 100%)'
-      }}>
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-16">
-            <h2 className="heading-2 mb-6" style={{ 
-              color: 'var(--foreground)',
-              fontSize: '3rem',
-              fontWeight: '800'
-            }}>
-              Get In <span style={{
-                background: 'var(--gradient-primary)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}>Touch</span>
-            </h2>
-            
-          </div>
-
-          
-          <div 
-            className="card p-10"
-            style={{
-              background: 'white',
-              borderRadius: '2rem',
-              boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15)',
-              border: '1px solid rgba(99, 102, 241, 0.1)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            {/* Decorative background element */}
-            <div 
-              style={{
-                position: 'absolute',
-                top: '-50%',
-                right: '-50%',
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%)',
-                borderRadius: '50%',
-                zIndex: 0
-              }}
-            ></div>
-            <form className="space-y-6 lg:space-y-8 relative z-10">
-              
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-                <div>
-                  <label 
-                    htmlFor="name" 
-                    className="block text-sm font-semibold mb-3"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-all duration-300"
-                    placeholder="Enter full name"
-                    style={{
-                      fontSize: '16px',
-                      background: '#fafafa',
-                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
-                    }}
-                    suppressHydrationWarning
-                  />
-                </div>
-                <div>
-                  <label 
-                    htmlFor="email" 
-                    className="block text-sm font-semibold mb-3"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-all duration-300"
-                    placeholder="Email Id"
-                    style={{
-                      fontSize: '16px',
-                      background: '#fafafa',
-                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
-                    }}
-                    suppressHydrationWarning
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-                <div>
-                  <label 
-                    htmlFor="company" 
-                    className="block text-sm font-semibold mb-3"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    Company
-                  </label>
-                  <input
-                    type="text"
-                    id="company"
-                    name="company"
-                    className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-all duration-300"
-                    placeholder="Company name"
-                    style={{
-                      fontSize: '16px',
-                      background: '#fafafa',
-                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
-                    }}
-                    suppressHydrationWarning
-                  />
-                </div>
-                <div>
-                  <label 
-                    htmlFor="subject" 
-                    className="block text-sm font-semibold mb-3"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    Subject *
-                  </label>
-                  <select
-                    id="subject"
-                    name="subject"
-                    required
-                    className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-all duration-300"
-                    style={{
-                      fontSize: '16px',
-                      background: '#fafafa',
-                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
-                    }}
-                    suppressHydrationWarning
-                  >
-                    <option value="">Select a topic</option>
-                    <option value="general">General Inquiry</option>
-                    <option value="support">Technical Support</option>
-                    <option value="enterprise">Enterprise Solutions</option>
-                    <option value="partnership">Partnership</option>
-                    <option value="feedback">Feedback</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label 
-                  htmlFor="message" 
-                  className="block text-sm font-semibold mb-3"
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  Message *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={6}
-                  required
-                  className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-all duration-300 resize-vertical"
-                  placeholder="Tell us more about your inquiry, goals, or how we can help you..."
-                  style={{
-                    fontSize: '16px',
-                    background: '#fafafa',
-                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
-                  }}
-                  suppressHydrationWarning
-                ></textarea>
-              </div>
-
-              <div className="text-center pt-4">
-                <button
-                  type="submit"
-                  className="px-12 py-5 text-white font-bold rounded-sm transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1"
-                  style={{
-                    background: 'var(--gradient-primary)',
-                    boxShadow: '0 15px 35px rgba(102, 126, 234, 0.4)',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '18px',
-                    letterSpacing: '0.5px'
-                  }}
-                  suppressHydrationWarning
-                >
-                  Send Message
-                  
-                </button>
-                
-              </div>
-            </form>
-          </div>
-        </div>
-      </section>
+      
 
     </div>
   );
