@@ -90,7 +90,7 @@ function VerifyOtpContent() {
       <div className="auth-card">
         <div className="auth-header">
           <Link href="/" className="block">
-            <h1 className="auth-logo">CredLink</h1>
+            <h1 className="auth-logo">MyKard</h1>
           </Link>
           <h2 className="auth-title">Verify your phone</h2>
           <p className="auth-subtitle">

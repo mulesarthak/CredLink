@@ -66,6 +66,11 @@ export async function PATCH(
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
+    // Check for MANAGE_USERS permission or SUPER_ADMIN role
+    if (decoded.role !== 'SUPER_ADMIN' && !decoded.permissions.includes('MANAGE_USERS')) {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+    }
+
     const body = await req.json()
     const { fullName, phone, password, status, action } = body
 
@@ -77,6 +82,10 @@ export async function PATCH(
     
     // Handle password change
     if (password && password.trim()) {
+      // Validate password length
+      if (password.trim().length < 6) {
+        return NextResponse.json({ error: 'Password must be at least 6 characters long' }, { status: 400 })
+      }
       updateData.password = await hash(password, 12)
     }
     
@@ -134,10 +143,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
-    // Soft delete: Set isActive to false instead of deleting
+    // Soft delete: Set status to inactive instead of deleting
     await prisma.user.update({
       where: { id },
-      data: { isActive: false }
+      data: { status: 'inactive' }
     })
 
     return NextResponse.json({ success: true, message: 'User deleted successfully' })

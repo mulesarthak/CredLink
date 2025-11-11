@@ -33,6 +33,12 @@ export async function GET() {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
+    // Check for MANAGE_USERS permission or SUPER_ADMIN role
+    if (decoded.role !== 'SUPER_ADMIN' && !decoded.permissions.includes('MANAGE_USERS')) {
+      console.log('❌ Insufficient permissions for user management');
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+    }
+
     console.log('📊 Fetching users from database...');
     const users = await prisma.user.findMany({
       select: {
@@ -40,7 +46,9 @@ export async function GET() {
         email: true,
         fullName: true,
         phone: true,
-        isActive: true,
+        status: true,
+        location: true,
+        company: true,
         createdAt: true,
         updatedAt: true
       },
@@ -49,8 +57,21 @@ export async function GET() {
       }
     })
 
+    // Map database fields to frontend expected format
+    const mappedUsers = users.map(user => ({
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      phone: user.phone,
+      city: user.location || '',
+      category: user.company || '',
+      status: user.status || 'active', // Default to active if status is null
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    }))
+
     console.log(`✅ Found ${users.length} users`);
-    return NextResponse.json({ users })
+    return NextResponse.json({ users: mappedUsers })
   } catch (error) {
     console.error('❌ Get users error:', error)
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 })
