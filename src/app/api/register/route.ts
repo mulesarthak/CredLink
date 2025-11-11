@@ -56,38 +56,12 @@ export async function POST(req: NextRequest) {
 
     const existing = await prisma.user.findUnique({ 
       where: { email: normalizedEmail },
-      select: { id: true, email: true, isActive: true }
+      select: { id: true, email: true }
     })
     
-    // If user exists and is active, reject signup
-    if (existing && existing.isActive) {
+    // If user exists, reject signup
+    if (existing) {
       return NextResponse.json({ error: 'User already exists' }, { status: 409 })
-    }
-    
-    // If user exists but is inactive, reactivate the account
-    if (existing && !existing.isActive) {
-      // Update the existing inactive account with new password and details
-      const hashed = await bcrypt.hash(password, 10)
-      const username = await generateUsername(fullName)
-      
-      const reactivatedUser = await prisma.user.update({
-        where: { id: existing.id },
-        data: {
-          password: hashed,
-          fullName,
-          phone: phone || null,
-          username,
-          isActive: true // Reactivate the account
-        },
-        select: { id: true, email: true, fullName: true, username: true, phone: true, createdAt: true },
-      })
-
-      const token = await signToken({ userId: reactivatedUser.id, email: reactivatedUser.email })
-      if(!token){
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-      }
-
-      return NextResponse.json({ ok: true, user: reactivatedUser, token, reactivated: true }, { status: 200 })
     }
 
     const username = await generateUsername(fullName);
