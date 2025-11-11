@@ -39,7 +39,6 @@ model User {
   emailLink        String?
   phoneLink        String?
   location         String?
-  role            String?
   cardName         String?
   cardType         String?   @default("Personal")
   selectedDesign   String?   @default("Classic")
@@ -55,6 +54,8 @@ model User {
   cards            Card[]    @relation("UserCards")
   receivedMessages Message[] @relation("ReceivedMessages")
   sentMessages     Message[] @relation("SentMessages")
+  sentConnections  Connection[] @relation("SentConnections")
+  receivedConnections Connection[] @relation("ReceivedConnections")
 
   @@index([username])
   @@map("users")

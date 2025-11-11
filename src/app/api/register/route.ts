@@ -18,8 +18,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'email, password, and fullName are required' }, { status: 400 })
     }
 
+    // Normalize email to lowercase for consistency
+    const normalizedEmail = email.toLowerCase().trim()
+
     const existing = await prisma.user.findUnique({ 
-      where: { email },
+      where: { email: normalizedEmail },
       select: { id: true, email: true }
     })
     if (existing) {
@@ -64,7 +67,7 @@ export async function POST(req: NextRequest) {
     
     const user = await prisma.user.create({
       data: {
-        email,
+        email: normalizedEmail,
         password: hashed,
         fullName,
         username,

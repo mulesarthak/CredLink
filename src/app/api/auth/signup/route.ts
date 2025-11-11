@@ -15,9 +15,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Normalize email to lowercase for consistency
+    const normalizedEmail = email.toLowerCase().trim()
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     })
 
     if (existingUser) {
@@ -27,8 +30,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate username from email
-    const baseUsername = email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '')
+    // Generate username from normalized email
+    const baseUsername = normalizedEmail.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '')
     let username = baseUsername
     let counter = 1
     
@@ -44,7 +47,7 @@ export async function POST(request: NextRequest) {
     // Create user
     const user = await prisma.user.create({
       data: {
-        email,
+        email: normalizedEmail,
         password: hashedPassword,
         fullName,
         phone: phone || null,
