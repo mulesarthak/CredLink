@@ -33,7 +33,7 @@ export async function PATCH(
     }
 
     // Find the connection request
-    const connectionRequest = await prisma.connections.findUnique({
+    const connectionRequest = await prisma.connection.findUnique({
       where: { id: requestId },
     });
 
@@ -53,7 +53,7 @@ export async function PATCH(
     }
 
     // Update the request status
-    const updatedRequest = await prisma.connections.update({
+    const updatedRequest = await prisma.connection.update({
       where: { id: requestId },
       data: {
         status: action === "accept" ? "ACCEPTED" : "REJECTED",
@@ -124,7 +124,7 @@ export async function DELETE(
     const requestId = params.id;
 
     // Find the connection request
-    const connectionRequest = await prisma.connections.findUnique({
+    const connectionRequest = await prisma.connection.findUnique({
       where: { id: requestId },
     });
 
@@ -175,7 +175,7 @@ export async function DELETE(
     }
 
     // Delete the connection request
-    await prisma.connections.delete({
+    await prisma.connection.delete({
       where: { id: requestId },
     });
 

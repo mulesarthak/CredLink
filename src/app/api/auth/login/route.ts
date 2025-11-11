@@ -22,11 +22,10 @@ export async function POST(request: NextRequest) {
     // Normalize email to lowercase for consistency
     const normalizedEmail = email.toLowerCase().trim()
 
-    // Find user by email (only active users)
+    // Find user by email
     const user = await prisma.user.findFirst({
       where: { 
-        email: normalizedEmail,
-        isActive: true
+        email: normalizedEmail
       }
     })
 

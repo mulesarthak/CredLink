@@ -36,10 +36,10 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    // Soft delete: Set isActive to false instead of deleting
+    // Soft delete: Set status to inactive instead of deleting
     const deactivatedUser = await prisma.user.update({
       where: { id: userId },
-      data: { isActive: false }
+      data: { status: 'inactive' }
     })
 
     return NextResponse.json({
