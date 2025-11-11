@@ -12,13 +12,22 @@ import { useAuth } from "@/lib/hooks/use-auth";
 
 /* ---------- helpers ---------- */
 function useWindowWidth(breakpoint = 760) {
-  const [width, setWidth] = useState<number>(typeof window !== "undefined" ? window.innerWidth : 1200);
+  // Use consistent initial state for SSR (default to desktop)
+  const [width, setWidth] = useState<number>(1200);
+  const [isMounted, setIsMounted] = useState(false);
+  
   useEffect(() => {
+    // Set mounted flag and initial width on client
+    setIsMounted(true);
+    setWidth(window.innerWidth);
+    
     const onResize = () => setWidth(window.innerWidth);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
-  return { width, isMobile: width <= breakpoint };
+  
+  // Return consistent values during SSR
+  return { width, isMobile: isMounted ? width <= breakpoint : false };
 }
 
 function useHover() {
@@ -516,13 +525,46 @@ export default function AccountSettingsPage(): React.JSX.Element {
     setShowPasswordModal(true);
   };
 
-  const finalizeDelete = () => {
-    // placeholder: call backend delete endpoint here
-    console.log("Deleting account", { reasons: deleteReasons, password: deletePassword });
-    setShowPasswordModal(false);
-    setDeletePassword("");
-    setDeleteReasons([]);
-    alert("Account deletion request submitted (mock).");
+  const finalizeDelete = async () => {
+    if (!deletePassword) {
+      alert("Please enter your password");
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/auth/delete-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          password: deletePassword,
+          reasons: deleteReasons
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || 'Failed to delete account');
+        return;
+      }
+
+      setShowPasswordModal(false);
+      setDeletePassword("");
+      setDeleteReasons([]);
+      
+      alert("Your account has been deleted successfully. You will be logged out.");
+      
+      // Redirect to home page after a short delay
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2000);
+    } catch (error) {
+      console.error('Delete account error:', error);
+      alert('Failed to delete account. Please try again.');
+    }
   };
 
   const handleEmailChange = async () => {
@@ -622,6 +664,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
             onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             onClick={() => alert('All changes saved')}
+            suppressHydrationWarning
           >
             Save Changes
           </button>
@@ -706,6 +749,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
                   focusedInput === "name" ? S.inputFocus : undefined
                 )}
                 aria-label="Name"
+                suppressHydrationWarning
               />
             </div>
           </div>
@@ -748,7 +792,12 @@ export default function AccountSettingsPage(): React.JSX.Element {
             }, isMobile ? S.formLabelMobile : undefined)}>Email</label>
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
               <div style={S.inputStatic}>{email || "your@email.com"}</div>
-              <button className="change-email" style={S.smallBtn} onClick={() => setShowEmailModal(true)}>
+              <button 
+                className="change-email" 
+                style={S.smallBtn} 
+                onClick={() => setShowEmailModal(true)}
+                suppressHydrationWarning
+              >
                 Change Email
               </button>
             </div>
@@ -776,7 +825,12 @@ export default function AccountSettingsPage(): React.JSX.Element {
                 )}
                 aria-label="Password"
               />
-              <button className="reset-password" style={S.smallBtn} onClick={() => alert("Trigger reset password flow (mock)")}>
+              <button 
+                className="reset-password" 
+                style={S.smallBtn} 
+                onClick={() => alert("Trigger reset password flow (mock)")}
+                suppressHydrationWarning
+              >
                 Reset Password
               </button>
             </div>
@@ -796,6 +850,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
                 onMouseEnter={deleteHover.onMouseEnter}
                 onMouseLeave={deleteHover.onMouseLeave}
                 onClick={() => setShowDeleteModal(true)}
+                suppressHydrationWarning
               >
                 Delete Account
               </button>
@@ -878,7 +933,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
         <div style={S.modalBackdrop}>
           <div style={S.modal}>
             <h4>Confirm Deletion</h4>
-            <p>Enter your password to permanently delete your account.</p>
+            <p>Enter your password to delete your account. Your data will be preserved but you won't be able to log in.</p>
             <input
               type="password"
               value={deletePassword}

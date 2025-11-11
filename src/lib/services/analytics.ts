@@ -134,6 +134,7 @@ export async function getAnalyticsData(filters: { usersPeriod?: string } = {}) {
     });
 
     const recentUsers = await prisma.user.findMany({
+      where: { isActive: true },
       orderBy: {
         createdAt: 'desc'
       },
@@ -152,7 +153,10 @@ export async function getAnalyticsData(filters: { usersPeriod?: string } = {}) {
     since.setDate(since.getDate() - 10);
 
     const usersLastNDays = await prisma.user.findMany({
-      where: { createdAt: { gte: since } },
+      where: { 
+        isActive: true,
+        createdAt: { gte: since }
+      },
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,

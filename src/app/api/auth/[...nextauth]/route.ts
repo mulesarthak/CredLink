@@ -20,8 +20,12 @@ const handler = NextAuth({
         // Normalize email to lowercase for consistency
         const normalizedEmail = credentials.email.toLowerCase().trim()
 
-        const user = await prisma.user.findUnique({
-          where: { email: normalizedEmail }
+        // Only allow active users to log in
+        const user = await prisma.user.findFirst({
+          where: { 
+            email: normalizedEmail,
+            isActive: true
+          }
         })
 
         if (!user) {

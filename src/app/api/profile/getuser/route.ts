@@ -11,12 +11,13 @@ export async function GET(req: NextRequest) {
                 error: "Unauthorized - User not authenticated" 
             }, { status: 401 });
         }
-        // Fetch all users except the requesting user
+        // Fetch all active users except the requesting user
         const users = await prisma.user.findMany({
             where: {
                 NOT: {
                     id: userId
-                }
+                },
+                isActive: true
             },
             select: {
                 id: true,

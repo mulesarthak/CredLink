@@ -390,6 +390,7 @@ export default function Homepage() {
                     fontSize: '1rem',
                     color: 'var(--primary-purple)'
                   }}
+                  suppressHydrationWarning
                 />
                 <button 
                   className="absolute text-white rounded-full transition-all"
@@ -406,6 +407,7 @@ export default function Homepage() {
                     cursor: 'pointer',
                     border: 'none'
                   }}
+                  suppressHydrationWarning
                 >
                   Search
                 </button>
@@ -436,6 +438,7 @@ export default function Homepage() {
                       border: '1px solid var(--background-light-blue)',
                       cursor: 'pointer'
                     }}
+                    suppressHydrationWarning
                   >
                     {tag}
                   </button>
@@ -996,6 +999,7 @@ export default function Homepage() {
                       background: '#fafafa',
                       boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
                     }}
+                    suppressHydrationWarning
                   />
                 </div>
                 <div>
@@ -1018,6 +1022,7 @@ export default function Homepage() {
                       background: '#fafafa',
                       boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
                     }}
+                    suppressHydrationWarning
                   />
                 </div>
               </div>
@@ -1042,6 +1047,7 @@ export default function Homepage() {
                       background: '#fafafa',
                       boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
                     }}
+                    suppressHydrationWarning
                   />
                 </div>
                 <div>
@@ -1062,6 +1068,7 @@ export default function Homepage() {
                       background: '#fafafa',
                       boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
                     }}
+                    suppressHydrationWarning
                   >
                     <option value="">Select a topic</option>
                     <option value="general">General Inquiry</option>
@@ -1093,6 +1100,7 @@ export default function Homepage() {
                     background: '#fafafa',
                     boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)'
                   }}
+                  suppressHydrationWarning
                 ></textarea>
               </div>
 
@@ -1108,6 +1116,7 @@ export default function Homepage() {
                     fontSize: '18px',
                     letterSpacing: '0.5px'
                   }}
+                  suppressHydrationWarning
                 >
                   Send Message
                   

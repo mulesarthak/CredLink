@@ -21,12 +21,58 @@ export async function POST(request: NextRequest) {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email: normalizedEmail },
+      select: { id: true, email: true, isActive: true }
     })
 
-    if (existingUser) {
+    // If user exists and is active, reject signup
+    if (existingUser && existingUser.isActive) {
       return NextResponse.json(
         { error: 'User with this email already exists' },
         { status: 409 }
+      )
+    }
+    
+    // If user exists but is inactive, reactivate the account
+    if (existingUser && !existingUser.isActive) {
+      const hashedPassword = await bcrypt.hash(password, 10)
+      
+      // Generate username from normalized email
+      const baseUsername = normalizedEmail.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '')
+      let username = baseUsername
+      let counter = 1
+      
+      // Ensure username is unique (check against all users, not just active)
+      while (await prisma.user.findUnique({ where: { username } })) {
+        username = `${baseUsername}${counter}`
+        counter++
+      }
+
+      // Reactivate the account with new password and details
+      const reactivatedUser = await prisma.user.update({
+        where: { id: existingUser.id },
+        data: {
+          password: hashedPassword,
+          fullName,
+          phone: phone || null,
+          username,
+          isActive: true // Reactivate the account
+        },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          phone: true,
+          createdAt: true,
+        },
+      })
+
+      return NextResponse.json(
+        { 
+          message: 'Account reactivated successfully',
+          user: reactivatedUser,
+          reactivated: true
+        },
+        { status: 200 }
       )
     }
 
