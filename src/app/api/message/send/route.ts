@@ -14,13 +14,45 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await req.json().catch(() => ({}));
-    const { message, receiverId, status, tag, read } = data ?? {};
+    const { message, receiverId, topic, status, tag, read } = data ?? {};
 
-    if (!message || typeof message !== "string" || !message.trim() || !receiverId) {
+    if (!message || typeof message !== "string" || !message.trim()) {
         return NextResponse.json(
-            { ok: false, error: "Missing required fields: message and receiverId" },
+            { ok: false, error: "Missing required field: message" },
             { status: 400 }
         );
+    }
+
+    // Ensure sender exists to avoid FK errors
+    const sender = await prisma.user.findUnique({ where: { id: String(senderId) } });
+    if (!sender) {
+        return NextResponse.json(
+            { ok: false, error: "Invalid senderId. User not found." },
+            { status: 400 }
+        );
+    }
+
+    // Resolve receiver: if missing or placeholder, route to admin/support user
+    let resolvedReceiverId = typeof receiverId === 'string' && receiverId.trim() && receiverId !== 'admin123'
+        ? receiverId
+        : undefined;
+    if (!resolvedReceiverId) {
+        const supportUser = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { role: { equals: "SUPER_ADMIN" } },
+                    { role: { equals: "ADMIN" } },
+                    { email: { equals: "admin@credlink.com" } },
+                ],
+            },
+            orderBy: { createdAt: "asc" },
+        });
+        resolvedReceiverId = supportUser?.id;
+    }
+
+    if (!resolvedReceiverId) {
+        // Fallback: route to the sender themselves so the message is persisted and visible
+        resolvedReceiverId = String(senderId);
     }
 
     try {
@@ -28,11 +60,12 @@ export async function POST(req: NextRequest) {
             data: {
                 text: message.trim(),
                 senderId: String(senderId),
-                receiverId: String(receiverId),
+                receiverId: String(resolvedReceiverId),
                 // Persist new fields with sensible defaults
                 status: (typeof status === 'string' ? status : 'PENDING') as any,
                 read: typeof read === 'boolean' ? read : false,
-                tag: (typeof tag === 'string' ? tag : 'PRICING') as any,
+               topic: (typeof topic === 'string' ? topic : 'Other') as any,
+               tag: (typeof tag === 'string' ? (tag as string).toUpperCase() : 'SUPPORT') as any,
             },
         });
 
@@ -44,6 +77,12 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json(
                     { ok: false, error: "Database is unreachable (P1001). Check DATABASE_URL and DB server status." },
                     { status: 503 }
+                );
+            }
+            if (err?.code === 'P2003') {
+                return NextResponse.json(
+                    { ok: false, error: "Foreign key error. Ensure senderId and receiverId reference existing users." },
+                    { status: 400 }
                 );
             }
             return NextResponse.json({ ok: false, error: "Failed to send message" }, { status: 500 });

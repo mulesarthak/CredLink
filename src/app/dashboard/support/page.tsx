@@ -76,6 +76,22 @@ export default function SupportPage() {
 
   const handleFormSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
+    console.log("token", token);
+    const res = await fetch("/api/message/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        message: formData.message,
+        topic: formData.topic || "Other",
+        status: "PENDING",
+        read: false,
+        tag: "SUPPORT"
+      }),
+    });
     setIsSubmitting(true);
     setSubmitStatus("idle");
     try {

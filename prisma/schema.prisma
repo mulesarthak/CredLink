@@ -12,70 +12,50 @@ model ConnectionTest {
 }
 
 model User {
-  id               String    @id @default(uuid())
-  email            String    @unique
-  password         String
-  fullName         String
-  phone            String?
-  username         String    @unique
-  role             String?   @default("user")
-  
-  // Personal Information
-  firstName        String?
-  middleName       String?
-  lastName         String?
-  prefix           String?
-  suffix           String?
-  preferredName    String?
-  maidenName       String?
-  pronouns         String?
-  
-  // Professional Information
-  title            String?
-  company          String?
-  department       String?
-  affiliation      String?
-  headline         String?
-  accreditations   String?
-  
-  // Contact Information
-  emailLink        String?
-  phoneLink        String?
-  location         String?
-  linkedinUrl      String?
-  websiteUrl       String?
-  
-  // Card Customization
-  cardName         String?
-  cardType         String?   @default("Personal")
-  selectedDesign   String?   @default("Classic")
-  selectedColor    String?   @default("#145dfd")
-  selectedFont     String?   @default("Arial, sans-serif")
-  displayTypes     String?   @db.Text  // JSON array of display types: ["Classic", "Modern", "Sleek"]
-  
-  // Media
-  profileImage     String?   @db.Text
-  bannerImage      String?   @db.Text
-  
-  // Content
-  bio              String?   @db.Text
-  
-  // Metadata
-  status           String?   @default("active")
-  views            Int       @default(0)
-  connections      String?   @db.Text  // JSON array of connected user IDs: ["uuid1", "uuid2", ...]
-  
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  receivedMessages Message[]     @relation("ReceivedMessages")
-  sentMessages     Message[]     @relation("SentMessages")
-  cards            Card[]        @relation("UserCards")
-  sentConnections  Connections[] @relation("SentConnections")
-  receivedConnections Connections[] @relation("ReceivedConnections")
-  
+  id                                                        String                @id @default(uuid())
+  email                                                     String                @unique
+  password                                                  String
+  fullName                                                  String
+  phone                                                     String?
+  username                                                  String                @unique
+  firstName                                                 String?
+  middleName                                                String?
+  lastName                                                  String?
+  prefix                                                    String?
+  suffix                                                    String?
+  preferredName                                             String?
+  maidenName                                                String?
+  pronouns                                                  String?
+  title                                                     String?
+  company                                                   String?
+  department                                                String?
+  affiliation                                               String?
+  headline                                                  String?
+  accreditations                                            String?
+  emailLink                                                 String?
+  phoneLink                                                 String?
+  location                                                  String?
+  cardName                                                  String?
+  cardType                                                  String?               @default("Personal")
+  selectedDesign                                            String?               @default("Classic")
+  selectedColor                                             String?               @default("#145dfd")
+  selectedFont                                              String?               @default("Arial, sans-serif")
+  profileImage                                              String?               @db.Text
+  bannerImage                                               String?               @db.Text
+  bio                                                       String?               @db.Text
+  status                                                    String?               @default("draft")
+  views                                                     Int                   @default(0)
+  createdAt                                                 DateTime              @default(now())
+  updatedAt                                                 DateTime              @updatedAt
+  isActive                                                  Boolean               @default(true)
+  role                                                      String?               @default("user")
+  cards                                                     Card[]                @relation("UserCards")
+  connection_requests_connection_requests_receiverIdTousers connection_requests[] @relation("connection_requests_receiverIdTousers")
+  connection_requests_connection_requests_senderIdTousers   connection_requests[] @relation("connection_requests_senderIdTousers")
+  receivedMessages                                          Message[]             @relation("ReceivedMessages")
+  sentMessages                                              Message[]             @relation("SentMessages")
 
   @@index([username])
-  @@index([email])
   @@map("users")
 }
 
@@ -106,17 +86,16 @@ model AdminSession {
 }
 
 model Message {
-  id         String   @id @default(cuid())
-  text       String   @db.Text
+  id         String        @id @default(cuid())
+  text       String        @db.Text
   senderId   String
   receiverId String
-  // New fields for message state and categorization
   status     MessageStatus @default(PENDING)
   read       Boolean       @default(false)
   tag        MessageTag    @default(PRICING)
-  createdAt  DateTime @default(now())
-  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
-  sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  createdAt  DateTime      @default(now())
+  receiver   User          @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender     User          @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([senderId])
   @@index([receiverId])
@@ -125,63 +104,47 @@ model Message {
 }
 
 model Card {
-  id               String   @id @default(cuid()) @map("id")
-  userId           String   @map("user_id")
-  
-  // Personal Information
-  fullName         String   @db.VarChar(255)
-  firstName        String?
-  middleName       String?
-  lastName         String?
-  prefix           String?
-  suffix           String?
-  preferredName    String?
-  maidenName       String?
-  pronouns         String?
-  
-  // Professional Information
-  title            String?
-  company          String?
-  department       String?
-  affiliation      String?
-  headline         String?
-  accreditations   String?
-  
-  // Contact Information
-  email            String?  @db.VarChar(320)
-  phone            String?  @db.VarChar(50)
-  emailLink        String?
-  phoneLink        String?
-  location         String?
-  linkedinUrl      String?  @map("linkedin_url") @db.VarChar(2048)
-  websiteUrl       String?  @map("website_url") @db.VarChar(2048)
-  
-  // Card Customization
-  cardName         String?
-  cardType         String?  @default("Personal")
-  selectedDesign   String?  @default("Classic")
-  selectedColor    String?  @default("#145dfd")
-  selectedFont     String?  @default("Arial, sans-serif")
-  displayTypes     String?  @db.Text
-  
-  // Media
-  profileImage     String?  @db.Text
-  bannerImage      String?  @db.Text
-  coverImage       String?  @map("cover_image") @db.Text
-  
-  // Content
-  bio              String?  @db.Text
-  description      String?  @db.Text
-  
-  // Metadata
-  status           String?  @default("draft")
-  views            Int      @default(0)
-  
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
-  
-  user             User     @relation("UserCards", fields: [userId], references: [id], onDelete: Cascade)
-  
+  id             String   @id @default(cuid()) @map("id")
+  userId         String   @map("user_id")
+  title          String?  @db.VarChar(255)
+  email          String?  @db.VarChar(320)
+  phone          String?  @db.VarChar(50)
+  location       String?  @db.VarChar(255)
+  linkedinUrl    String?  @map("linkedin_url") @db.VarChar(2048)
+  websiteUrl     String?  @map("website_url") @db.VarChar(2048)
+  coverImage     String?  @map("cover_image") @db.VarChar(2048)
+  description    String?  @db.Text
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  fullName       String   @map("full_name") @db.VarChar(255)
+  profileImage   String?  @map("profile_image") @db.VarChar(2048)
+  accreditations String?  @db.Text
+  affiliation    String?  @db.VarChar(255)
+  bannerImage    String?  @map("banner_image") @db.VarChar(2048)
+  bio            String?  @db.Text
+  cardName       String?  @map("card_name") @db.VarChar(100)
+  cardType       String?  @default("Personal") @map("card_type") @db.VarChar(50)
+  company        String?  @db.VarChar(255)
+  department     String?  @db.VarChar(100)
+  displayTypes   String?  @map("display_types") @db.Text
+  emailLink      String?  @map("email_link") @db.VarChar(500)
+  firstName      String?  @map("first_name") @db.VarChar(100)
+  headline       String?  @db.VarChar(500)
+  lastName       String?  @map("last_name") @db.VarChar(100)
+  maidenName     String?  @map("maiden_name") @db.VarChar(100)
+  middleName     String?  @map("middle_name") @db.VarChar(100)
+  phoneLink      String?  @map("phone_link") @db.VarChar(500)
+  preferredName  String?  @map("preferred_name") @db.VarChar(100)
+  prefix         String?  @db.VarChar(20)
+  pronouns       String?  @db.VarChar(50)
+  selectedColor  String?  @default("#145dfd") @map("selected_color") @db.VarChar(20)
+  selectedDesign String?  @default("Classic") @map("selected_design") @db.VarChar(50)
+  selectedFont   String?  @default("Arial, sans-serif") @map("selected_font") @db.VarChar(100)
+  status         String?  @default("draft") @db.VarChar(20)
+  suffix         String?  @db.VarChar(20)
+  views          Int      @default(0)
+  user           User     @relation("UserCards", fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@index([createdAt])
   @@map("cards")
@@ -193,7 +156,7 @@ model Category {
   description String?  @db.Text
   icon        String   @default("Briefcase") @db.VarChar(50)
   color       String   @default("#3B82F6") @db.VarChar(7)
-  tags        Json     @default("[]")
+  tags        String   @db.LongText
   isActive    Boolean  @default(true)
   userCount   Int      @default(0)
   createdAt   DateTime @default(now())
@@ -204,13 +167,28 @@ model Category {
   @@map("categories")
 }
 
+model connection_requests {
+  id                                          String                     @id
+  status                                      connection_requests_status @default(PENDING)
+  createdAt                                   DateTime                   @default(now())
+  receiverId                                  String
+  senderId                                    String
+  updatedAt                                   DateTime
+  users_connection_requests_receiverIdTousers User                       @relation("connection_requests_receiverIdTousers", fields: [receiverId], references: [id], onDelete: Cascade)
+  users_connection_requests_senderIdTousers   User                       @relation("connection_requests_senderIdTousers", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+  @@index([receiverId])
+  @@index([senderId])
+  @@index([status])
+}
+
 enum AdminRole {
   SUPER_ADMIN
   ADMIN
   SUB_ADMIN
 }
 
-// Message related enums
 enum MessageStatus {
   NEW
   READ
@@ -227,25 +205,7 @@ enum MessageTag {
   FEEDBACK
 }
 
-model Connections {
-  id         String            @id @default(uuid())
-  senderId   String
-  receiverId String
-  status     ConnectionStatus  @default(PENDING)
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
-  
-  sender     User              @relation("SentConnections", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver   User              @relation("ReceivedConnections", fields: [receiverId], references: [id], onDelete: Cascade)
-
-  @@unique([senderId, receiverId])
-  @@index([senderId])
-  @@index([receiverId])
-  @@index([status])
-  @@map("connection_requests")
-}
-
-enum ConnectionStatus {
+enum connection_requests_status {
   PENDING
   ACCEPTED
   REJECTED
