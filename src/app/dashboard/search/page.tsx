@@ -273,7 +273,8 @@ export default function SearchPage() {
                     </div>
 
                     <button 
-                      onClick={() => handleConnect(p.id, p.name)} 
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); handleConnect(p.id, p.name); }} 
                       disabled={connectingUserId === p.id}
                       className={styles.connectBtn}
                     >
