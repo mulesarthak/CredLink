@@ -76,6 +76,36 @@ export default function SupportPage() {
 
   const handleFormSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
+    console.log("token", token);
+    // Ensure backend receives x-user-id header expected by the API
+    let userIdHeader: string | undefined = undefined;
+    try {
+      const meRes = await fetch('/api/auth/me', {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+      });
+      if (meRes.ok) {
+        const me = await meRes.json();
+        if (me?.user?.id) userIdHeader = me.user.id;
+      }
+    } catch {}
+    const res = await fetch("/api/message/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": token ? `Bearer ${token}` : '',
+        ...(userIdHeader ? { 'x-user-id': userIdHeader } : {}),
+      },
+      body: JSON.stringify({
+        message: formData.message,
+        topic: formData.topic || "Other",
+        status: "PENDING",
+        read: false,
+        tag: "SUPPORT"
+      }),
+    });
     setIsSubmitting(true);
     setSubmitStatus("idle");
     try {

@@ -26,7 +26,6 @@ export async function GET(
         email: true,
         fullName: true,
         phone: true,
-        status: true,
         createdAt: true,
         updatedAt: true
       }
@@ -110,7 +109,6 @@ export async function PATCH(
         email: updatedUser.email,
         fullName: updatedUser.fullName,
         phone: updatedUser.phone,
-        status: updatedUser.status
       }
     })
   } catch (error) {
