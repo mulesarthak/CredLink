@@ -18,13 +18,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'email, password, and fullName are required' }, { status: 400 })
     }
 
-    const existing = await prisma.user.findUnique({ 
-      where: { email },
-      select: { id: true, email: true }
-    })
-    if (existing) {
-      return NextResponse.json({ error: 'User already exists' }, { status: 409 })
-    }
+    // Normalize email to lowercase for consistency
+    const normalizedEmail = email.toLowerCase().trim()
 
     // Generate unique username from fullName
     const generateUsername = async (name: string): Promise<string> => {
@@ -59,12 +54,22 @@ export async function POST(req: NextRequest) {
       }
     };
 
+    const existing = await prisma.user.findUnique({ 
+      where: { email: normalizedEmail },
+      select: { id: true, email: true }
+    })
+    
+    // If user exists, reject signup
+    if (existing) {
+      return NextResponse.json({ error: 'User already exists' }, { status: 409 })
+    }
+
     const username = await generateUsername(fullName);
     const hashed = await bcrypt.hash(password, 10)
     
     const user = await prisma.user.create({
       data: {
-        email,
+        email: normalizedEmail,
         password: hashed,
         fullName,
         username,

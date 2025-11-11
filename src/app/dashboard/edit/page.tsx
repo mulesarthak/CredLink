@@ -1,5 +1,7 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 // ====================================================================
 // START: DigitalCardPreview Component (Modified to accept theme)
@@ -914,6 +916,10 @@ interface ExtraField {
 }
 
 const EditPage = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const cardId = searchParams.get('id');
+  
   const [activeTab, setActiveTab] = useState('Display');
   const [selectedColor, setSelectedColor] = useState('#145dfd');
   const [selectedColor1, setSelectedColor1] = useState('#145dfd');
@@ -1021,6 +1027,83 @@ const EditPage = () => {
       setHexValue2(selectedColor2);
     }
   }, [selectedColor2]);
+
+  // Fetch card data if editing existing card
+  useEffect(() => {
+    const fetchCardData = async () => {
+      if (!cardId) return;
+
+      try {
+        setIsLoading(true);
+        console.log('🔍 Fetching card for edit:', cardId);
+        
+        const response = await fetch(`/api/card/${cardId}`, {
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch card');
+        }
+
+        const data = await response.json();
+        
+        if (data.success && data.card) {
+          console.log('✅ Loaded card for editing:', data.card);
+          const card = data.card;
+          
+          // Populate all form fields with card data
+          setFirstName(card.fullName || card.firstName || '');
+          setMiddleName(card.middleName || '');
+          setLastName(card.lastName || '');
+          setPrefix(card.prefix || '');
+          setSuffix(card.suffix || '');
+          setPreferredName(card.preferredName || '');
+          setMaidenName(card.maidenName || '');
+          setPronouns(card.pronouns || '');
+          setEmail(card.email || '');
+          setPhone(card.phone || '');
+          setEmailLink(card.emailLink || '');
+          setPhoneLink(card.phoneLink || '');
+          setTitle(card.title || '');
+          setCompany(card.company || '');
+          setDepartment(card.department || '');
+          setAffiliation(card.affiliation || '');
+          setHeadline(card.headline || '');
+          setAccreditations(card.accreditations || '');
+          setCardLocation(card.location || '');
+          setAbout(card.bio || card.about || card.description || '');
+          setCardDescription(card.description || '');
+          setSkills(card.skills || '');
+          setPortfolio(card.portfolio || '');
+          setExperience(card.experience || '');
+          setServices(card.services || '');
+          setReviews(card.reviews || card.review || '');
+          setLinkedin(card.linkedinUrl || card.linkedin || '');
+          setWebsite(card.websiteUrl || card.website || '');
+          setProfileImage(card.profileImage || card.photo || null);
+          setBannerImage(card.coverImage || card.cover || card.bannerImage || null);
+          setSelectedDesign(card.selectedDesign || 'Classic');
+          setSelectedColor1(card.selectedColor || card.selectedColor1 || '#145dfd');
+          setSelectedColor2(card.selectedColor2 || '#145dfd');
+          setSelectedFont(card.selectedFont || 'Arial, sans-serif');
+          setCardName(card.cardName || '');
+          setCardType(card.cardType || 'Personal');
+          setExistingCardId(card.id);
+          
+          toast.success('Card loaded for editing');
+        } else {
+          toast.error('Card not found');
+        }
+      } catch (error: any) {
+        console.error('❌ Error loading card:', error);
+        toast.error(error.message || 'Failed to load card');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCardData();
+  }, [cardId]);
 
   const handleRChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const r = Number(e.target.value);
@@ -1217,7 +1300,7 @@ const EditPage = () => {
       if (cardName) formData.append('cardName', cardName);
       if (cardType) formData.append('cardType', cardType);
       if (selectedDesign) formData.append('selectedDesign', selectedDesign);
-      if (selectedColor) formData.append('selectedColor', selectedColor);
+      if (selectedColor1) formData.append('selectedColor', selectedColor1);
       if (selectedFont) formData.append('selectedFont', selectedFont);
       if (about) formData.append('bio', about);
       if (cardDescription) formData.append('description', cardDescription);
@@ -1233,22 +1316,37 @@ const EditPage = () => {
         formData.append('bannerImage', bannerImageFile);
       }
 
+      // Determine if we're updating or creating
+      const isUpdating = existingCardId || cardId;
+      const endpoint = isUpdating 
+        ? `/api/card/update/${existingCardId || cardId}` 
+        : '/api/card/create';
+      const method = isUpdating ? 'PATCH' : 'POST';
+
+      console.log(`${isUpdating ? '🔄 Updating' : '✨ Creating'} card...`);
+
       // Make API call
-      const response = await fetch('/api/card/create', {
-        method: 'POST',
+      const response = await fetch(endpoint, {
+        method: method,
         body: formData,
+        credentials: 'include',
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create card');
+        throw new Error(data.error || `Failed to ${isUpdating ? 'update' : 'create'} card`);
       }
 
       // Success!
       setExistingCardId(data.card.id);
       setIsPopupOpen(true);
-      setPopupMessage('Card created successfully! 🎉');
+      setPopupMessage(isUpdating ? 'Card updated successfully! 🎉' : 'Card created successfully! 🎉');
+      
+      // If we just created a card, update the URL to include the ID
+      if (!isUpdating && data.card.id) {
+        router.push(`/dashboard/edit?id=${data.card.id}`);
+      }
 
     } catch (error: any) {
       console.error('Error saving card:', error);
@@ -2604,4 +2702,23 @@ const EditPage = () => {
   );
 };
 
-export default EditPage;
+// Loading component for Suspense fallback
+const LoadingFallback = () => (
+  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p className="text-gray-600">Loading editor...</p>
+    </div>
+  </div>
+);
+
+// Wrapper component with Suspense boundary
+const EditPageWrapper = () => {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <EditPage />
+    </Suspense>
+  );
+};
+
+export default EditPageWrapper;

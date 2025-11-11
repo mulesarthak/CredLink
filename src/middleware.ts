@@ -38,7 +38,8 @@ export function middleware(request: NextRequest) {
     '/cards/:path*',
     '/dashboard/messages',
     '/api/message/receive',
-    '/api/message/send'
+    '/api/message/send',
+    '/onboarding'
   ]
   
   const isAuthPath = path.startsWith('/auth')

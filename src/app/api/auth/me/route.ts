@@ -24,9 +24,12 @@ export async function GET() {
       fullName: string
     }
 
-    // Get user from database
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+    // Get user from database (only if active)
+    const user = await prisma.user.findFirst({
+      where: { 
+        id: decoded.userId,
+        isActive: true
+      },
       select: {
         id: true,
         email: true,
@@ -67,12 +70,12 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'User not found' },
+        { error: 'User not found or account is deleted' },
         { status: 404 }
       )
     }
 
-    console.log('🔍 Auth API: Returning user data:', user);
+   // console.log('🔍 Auth API: Returning user data:', user);
     return NextResponse.json({ user })
   } catch (error) {
     console.error('Get current user error:', error)

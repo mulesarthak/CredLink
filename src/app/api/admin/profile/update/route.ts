@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers"
-import { verify } from "jsonwebtoken"
+import { verifyAdminToken } from "@/lib/jwt"
 
 export async function PUT(req: NextRequest) {
     try {
@@ -12,15 +12,11 @@ export async function PUT(req: NextRequest) {
               return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
             }
         
-            const decoded = verify(token, JWT_SECRET) as {
-              adminId: string
-              role: string
-              permissions: string[]
-            }
+            const decoded = verifyAdminToken(token)
         
-            // Check if admin has permission to view users
-            if (!decoded.adminId) {
-              return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+            // Check if admin token is valid and has adminId
+            if (!decoded || !decoded.adminId) {
+              return NextResponse.json({ error: 'Invalid token or insufficient permissions' }, { status: 403 })
             }
         
         const body = await req.json();

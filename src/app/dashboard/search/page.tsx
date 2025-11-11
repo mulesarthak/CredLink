@@ -23,6 +23,13 @@ type Profile = {
 
 export default function SearchPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  
+  // Dummy data for testing when API returns empty results
+  const dummyProfiles: Profile[] = [
+    { id: "1", username: "arnav_wasnik", name: "Arnav Wasnik", designation: "Frontend Developer", company: "BoostNow Solutions", city: "Nagpur", category: "Technology", verified: true, views: 245 },
+    { id: "2", username: "sarthak_patil", name: "Sarthak Patil", designation: "Backend Engineer", company: "CredLink", city: "Pune", category: "Engineering", verified: true, views: 189 },
+    { id: "3", username: "rohan_sharma", name: "Rohan Sharma", designation: "UI/UX Designer", company: "FigmaWorks", city: "Mumbai", category: "Design", verified: true, views: 312 }
+  ];
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
@@ -61,10 +68,17 @@ export default function SearchPage() {
           views: user.views || 0,
         }));
 
-        setProfiles(mappedProfiles);
+        // Use dummy data if API returns empty results
+        if (mappedProfiles.length === 0) {
+          setProfiles(dummyProfiles);
+        } else {
+          setProfiles(mappedProfiles);
+        }
       } catch (error) {
         console.error("Error fetching users:", error);
         toast.error("Failed to load users");
+        // Use dummy data on error as fallback
+        setProfiles(dummyProfiles);
       } finally {
         setLoading(false);
       }
@@ -106,8 +120,10 @@ export default function SearchPage() {
     return Array.from(set);
   }, [profiles]);
 
+  const hasQuery = query.trim().length > 0;
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+    if (!q) return [];
     return profiles.filter((p) => {
       const hay = `${p.name} ${p.designation ?? ""} ${p.company ?? ""} ${p.category ?? ""} ${p.city}`.toLowerCase();
 
@@ -228,14 +244,16 @@ export default function SearchPage() {
             </div>
           ) : (
             <>
-              <p className={styles.resultsCount}>
-                Showing <span>{filtered.length}</span> result{filtered.length !== 1 ? "s" : ""}
-              </p>
+              {hasQuery && (
+                <p className={styles.resultsCount}>
+                  Showing <span>{filtered.length}</span> result{filtered.length !== 1 ? "s" : ""}
+                </p>
+              )}
 
               <div className={styles.cardGrid}>
-            {filtered.map((p, idx) => (
+            {filtered.map((p, index) => (
               <article 
-                key={`${p.username}-${idx}`} 
+                key={`${p.username}-${index}`} 
                 className={styles.profileCard}
                 style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
@@ -255,7 +273,8 @@ export default function SearchPage() {
                     </div>
 
                     <button 
-                      onClick={() => handleConnect(p.id, p.name)} 
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); handleConnect(p.id, p.name); }} 
                       disabled={connectingUserId === p.id}
                       className={styles.connectBtn}
                     >
@@ -276,7 +295,7 @@ export default function SearchPage() {
             ))}
               </div>
 
-              {filtered.length === 0 && (
+              {hasQuery && filtered.length === 0 && (
                 <div className="text-center py-10 text-gray-500">No results found. Try changing filters.</div>
               )}
             </>

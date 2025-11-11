@@ -17,8 +17,15 @@ const handler = NextAuth({
           throw new Error("Email and password are required")
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
+        // Normalize email to lowercase for consistency
+        const normalizedEmail = credentials.email.toLowerCase().trim()
+
+        // Only allow active users to log in
+        const user = await prisma.user.findFirst({
+          where: { 
+            email: normalizedEmail,
+            isActive: true
+          }
         })
 
         if (!user) {

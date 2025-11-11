@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('user_token')?.value;
-
+    console.log("Received token:", token);
     if (!token) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
@@ -54,6 +54,9 @@ export async function POST(req: NextRequest) {
       description: formData.get('description') as string || undefined,
       status: formData.get('status') as string || 'draft',
     };
+
+    console.log('🎨 Card creation - selectedDesign received:', cardData.selectedDesign);
+    console.log('📦 Full cardData:', JSON.stringify(cardData, null, 2));
 
     // Handle profile image upload
     const profileImageFile = formData.get('profileImage') as File;

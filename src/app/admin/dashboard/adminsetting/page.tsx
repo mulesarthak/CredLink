@@ -139,10 +139,17 @@ const response = await fetch("/api/admin/profile/update", {
   const openModal = (user?: AppUser) => {
     if (user) {
       setEditingUser(user);
-      setForm(user);
+      setForm({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+        password: "", // Don't populate password for security
+        phoneNumber: "", // Default empty as it's not in AppUser interface
+      });
     } else {
       setEditingUser(null);
-      setForm({ name: "", email: "", role: "Admin", status: "active" });
+      setForm({ name: "", email: "", role: "Admin", status: "active", password: "", phoneNumber: "" });
     }
     setIsModalOpen(true);
   };
@@ -242,30 +249,33 @@ const response = await fetch("/api/admin/profile/update", {
 
             <form onSubmit={handlePasswordChange} className="mt-4 space-y-4">
               {(["currentPassword", "newPassword", "confirmPassword"] as const).map(
-                (field, idx) => (
-                  <div key={field} className="space-y-1.5">
-                    <label className={label}>
-                      {["Current Password", "New Password", "Confirm Password"][idx]}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={show[field] ? "text" : "password"}
-                        value={passwordData[field]}
-                        onChange={(e) =>
-                          setPasswordData((s) => ({ ...s, [field]: e.target.value }))
-                        }
-                        className={`${input} pr-10`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShow((s) => ({ ...s, [field]: !s[field] }))}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 hover:bg-slate-100"
-                      >
-                        {show[field] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
+                (field, idx) => {
+                  const showKey = field === "currentPassword" ? "current" : field === "newPassword" ? "new" : "confirm";
+                  return (
+                    <div key={field} className="space-y-1.5">
+                      <label className={label}>
+                        {["Current Password", "New Password", "Confirm Password"][idx]}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={show[showKey] ? "text" : "password"}
+                          value={passwordData[field]}
+                          onChange={(e) =>
+                            setPasswordData((s) => ({ ...s, [field]: e.target.value }))
+                          }
+                          className={`${input} pr-10`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShow((s) => ({ ...s, [showKey]: !s[showKey] }))}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 hover:bg-slate-100"
+                        >
+                          {show[showKey] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )
+                  );
+                }
               )}
 
               {/* small, right-aligned primary button */}

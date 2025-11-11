@@ -19,9 +19,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Normalize email to lowercase for consistency
+    const normalizedEmail = email.toLowerCase().trim()
+
     // Find user by email
-    const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() }
+    const user = await prisma.user.findFirst({
+      where: { 
+        email: normalizedEmail
+      }
     })
 
     if (!user) {
@@ -54,6 +59,13 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Login successful for user:', email)
 
+    // Check if user has any cards (first-time login check)
+    const cardCount = await prisma.card.count({
+      where: { userId: user.id }
+    })
+
+    const needsOnboarding = cardCount === 0
+
     // Create JWT token
     const token = sign(
       {
@@ -78,6 +90,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       token,
+      needsOnboarding,
       user: {
         id: user.id,
         email: user.email,

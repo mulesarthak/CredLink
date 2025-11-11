@@ -967,6 +967,10 @@ const EditPage = () => {
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
+  const [existingCardId, setExistingCardId] = useState<string | null>(null);
 
   const hexToRgb = (hex: string) => {
     // Ensure hex is valid
@@ -1160,6 +1164,95 @@ const EditPage = () => {
     ));
   };
   // --- END NEW HANDLER FUNCTIONS ---
+
+  // Save card function
+  const handleSaveCard = async () => {
+    try {
+      setIsSaving(true);
+
+      // Validate required fields
+      const fullName = `${prefix} ${firstName} ${middleName} ${lastName} ${suffix}`.trim();
+      const finalName = cardName || fullName;
+      
+      if (!finalName) {
+        setIsPopupOpen(true);
+        setPopupMessage('Please enter at least your first name or a card name.');
+        setIsSaving(false);
+        return;
+      }
+
+      // Create FormData
+      const formData = new FormData();
+      
+      // Add all the card fields
+      formData.append('fullName', finalName);
+      if (firstName) formData.append('firstName', firstName);
+      if (middleName) formData.append('middleName', middleName);
+      if (lastName) formData.append('lastName', lastName);
+      if (prefix) formData.append('prefix', prefix);
+      if (suffix) formData.append('suffix', suffix);
+      if (preferredName) formData.append('preferredName', preferredName);
+      if (maidenName) formData.append('maidenName', maidenName);
+      if (pronouns) formData.append('pronouns', pronouns);
+      if (title) formData.append('title', title);
+      if (company) formData.append('company', company);
+      if (department) formData.append('department', department);
+      if (affiliation) formData.append('affiliation', affiliation);
+      if (headline) formData.append('headline', headline);
+      if (accreditations) formData.append('accreditations', accreditations);
+      if (email) formData.append('email', email);
+      if (phone) formData.append('phone', phone);
+      if (emailLink) formData.append('emailLink', emailLink);
+      if (phoneLink) formData.append('phoneLink', phoneLink);
+      if (cardLocation) formData.append('location', cardLocation);
+      if (linkedin) formData.append('linkedinUrl', linkedin);
+      if (website) formData.append('websiteUrl', website);
+      if (cardName) formData.append('cardName', cardName);
+      if (cardType) formData.append('cardType', cardType);
+      if (selectedDesign) {
+        console.log('🎨 Sending selectedDesign:', selectedDesign);
+        formData.append('selectedDesign', selectedDesign);
+      }
+      if (selectedColor1) formData.append('selectedColor', selectedColor1);
+      if (selectedFont) formData.append('selectedFont', selectedFont);
+      if (about) formData.append('bio', about);
+      
+      formData.append('status', 'draft');
+
+      // Add image files if they exist
+      if (profileImageFile) {
+        formData.append('profileImage', profileImageFile);
+      }
+      
+      if (bannerImageFile) {
+        formData.append('bannerImage', bannerImageFile);
+      }
+
+      // Make API call
+      const response = await fetch('/api/card/create', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create card');
+      }
+
+      // Success!
+      setExistingCardId(data.card.id);
+      setIsPopupOpen(true);
+      setPopupMessage('Card created successfully! 🎉');
+
+    } catch (error: any) {
+      console.error('Error saving card:', error);
+      setIsPopupOpen(true);
+      setPopupMessage(error.message || 'Failed to save card. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Function to render the appropriate template based on selectedDesign
   const renderTemplatePreview = () => {
@@ -1402,6 +1495,7 @@ const EditPage = () => {
                     if (e.target.files && e.target.files[0]) {
                       const file = e.target.files[0];
                       setBannerImage(URL.createObjectURL(file));
+                      setBannerImageFile(file);
                     }
                   }}
                 />
@@ -1450,6 +1544,7 @@ const EditPage = () => {
                     if (e.target.files && e.target.files[0]) {
                       const file = e.target.files[0];
                       setProfileImage(URL.createObjectURL(file));
+                      setProfileImageFile(file);
                     }
                   }}
                 />
@@ -2402,25 +2497,27 @@ const EditPage = () => {
             }}>
               Cancel
             </button>
-            <button style={{
-              backgroundColor: selectedColor1,
+            <button 
+              onClick={handleSaveCard}
+              disabled={isSaving}
+              style={{
+              backgroundColor: isSaving ? '#999' : selectedColor1,
               border: 'none',
               borderRadius: '8px',
               padding: '10px 20px',
               fontSize: 'clamp(13px, 3.5vw, 16px)',
               fontWeight: 'bold',
               color: 'white',
-              cursor: 'pointer',
+              cursor: isSaving ? 'not-allowed' : 'pointer',
               outline: 'none',
               flex: '1',
               minWidth: '100px'
             }}>
-              Save
+              {isSaving ? 'Saving...' : 'Save'}
             </button>
           </div>
         </div>
-}
-      </div>
+}</div>
 
       {/* --- NEWLY ADDED: "Add Field" Modal --- */}
       {isModalOpen && (

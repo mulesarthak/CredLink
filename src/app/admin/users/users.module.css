@@ -450,3 +450,24 @@
   border-color: #6366f1;
   box-shadow: 0 0 0 1px #6366f1;
 }
+
+/* Error Message */
+.errorMessage {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  border: 1px solid #fecaca;
+}
+
+/* Disabled Button */
+.saveBtn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.saveBtn:disabled:hover {
+  background: #9ca3af;
+}

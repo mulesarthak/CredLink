@@ -21,46 +21,40 @@ import styles from "./analytics.module.css";
 
 export default function AnalyticsPage() {
   // Function to calculate new users based on period
-  const getNewUsersByPeriod = (period: string) => {
-    switch (period) {
-      case "thisWeek": return 23;
-      case "thisMonth": return 89;
-      case "lastMonth": return 76;
-      case "last3Months": return 234;
-      case "thisYear": return 567;
-      default: return 89;
+  const getNewUsersByPeriod = async (period: string) => {
+    try {
+      const url = new URL('/api/admin/analytics', window.location.origin);
+      url.searchParams.append('period', period);
+      
+      const res = await fetch(url.toString());
+      const data = await res.json();
+      return data.stats.newUsers;
+    } catch (error) {
+      console.error('Error fetching user count:', error);
+      return 0;
     }
   };
 
   const getPeriodLabel = (period: string) => {
     switch (period) {
       case "thisWeek": return "New Users (This Week)";
-      case "thisMonth": return "New Users (This Month)";
       case "lastMonth": return "New Users (Last Month)";
       case "last3Months": return "New Users (Last 3 Months)";
       case "thisYear": return "New Users (This Year)";
-      default: return "New Users (This Month)";
+      default: return "New Users (This Week)";
     }
   };
 
   // Demo data for overview metrics
   const [overview, setOverview] = useState<any>({
-    totalUsers: 1247,
+    totalUsers: 0,
     totalConnections: 3892,
     activeCities: 15,
-    newUsersForPeriod: 89 // Default value
+    newUsersForPeriod: 0
   });
 
-  // Demo data for category distribution pie chart
-  const [categoryData, setCategoryData] = useState<any[]>([
-    { category: "Doctor", count: 312 },
-    { category: "Designer", count: 245 },
-    { category: "Developer", count: 198 },
-    { category: "Artist", count: 156 },
-    { category: "Consultant", count: 134 },
-    { category: "Teacher", count: 98 },
-    { category: "Engineer", count: 104 }
-  ]);
+  // Real data for category distribution pie chart
+  const [categoryData, setCategoryData] = useState<any[]>([]);
 
   const [engagementData, setEngagementData] = useState<any[]>([]);
 
@@ -333,20 +327,94 @@ export default function AnalyticsPage() {
     category: "all",
     fromDate: "",
     toDate: "",
-    usersPeriod: "thisMonth", // New filter for users metric
+    usersPeriod: "thisWeek", // New filter for users metric
   });
   const [loading, setLoading] = useState(false);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
-  // Update overview data when filters change
+  // Update overview data when filters change (for non-realtime periods)
   useEffect(() => {
-    console.log("Filters updated:", filters);
-    // Update overview data based on new filters
-    setOverview((prev: any) => ({
-      ...prev,
-      newUsersForPeriod: getNewUsersByPeriod(filters.usersPeriod)
-    }));
-  }, [filters.usersPeriod]); // Only listen to usersPeriod changes
+    const updatePeriodCount = async () => {
+      if (filters.usersPeriod !== 'thisMonth') {
+        const count = await getNewUsersByPeriod(filters.usersPeriod);
+        setOverview((prev: { totalUsers: number; totalConnections: number; activeCities: number; newUsersForPeriod: number }) => ({
+          ...prev,
+          newUsersForPeriod: count
+        }));
+      }
+    };
+    updatePeriodCount();
+  }, [filters.usersPeriod]);
+
+  useEffect(() => {
+    let isMounted = true;
+    let es: EventSource | null = null;
+    let intervalId: any;
+
+    const applyStats = (stats: any) => {
+      if (!isMounted) return;
+      setOverview((prev: { totalUsers: number; totalConnections: number; activeCities: number; newUsersForPeriod: number }) => ({
+        ...prev,
+        totalUsers: stats?.totalUsers ?? prev.totalUsers,
+        activeCities: stats?.activeCities ?? prev.activeCities,
+        newUsersForPeriod: stats?.newUsers ?? prev.newUsersForPeriod
+      }));
+    };
+
+    const usePolling = () => {
+      const fetchData = async () => {
+        try {
+          const res = await fetch('/api/admin/analytics', { cache: 'no-store' });
+          if (!res.ok) return;
+          const data = await res.json();
+          applyStats(data?.stats);
+          setCategoryData(
+            data.engagementData
+              .filter((item: any) => item.name !== 'Users')
+              .map((item: any) => ({ category: item.name, count: item.value }))
+          );
+          setEngagementData(data.trafficData);
+          setActivityData(data.activitySummaryDaily || []); // Update activityData from backend-provided activitySummaryDaily
+        } catch (_) {}
+      };
+      fetchData();
+      intervalId = setInterval(fetchData, 10000);
+    };
+
+    const useSSE = () => {
+      es = new EventSource('/api/admin/analytics?stream=1');
+      es.onmessage = (evt) => {
+        try {
+          const payload = JSON.parse(evt.data);
+          applyStats(payload?.stats);
+          setCategoryData(
+            payload.engagementData
+              .filter((item: any) => item.name !== 'Users')
+              .map((item: any) => ({ category: item.name, count: item.value }))
+          );
+          setEngagementData(payload.trafficData);
+          setActivityData(payload.activitySummaryDaily || []); // Update activityData from backend-provided activitySummaryDaily
+        } catch (_) {}
+      };
+      es.onerror = () => {
+        es?.close();
+        es = null;
+        usePolling();
+      };
+    };
+
+    if (typeof window !== 'undefined' && 'EventSource' in window) {
+      useSSE();
+    } else {
+      usePolling();
+    }
+
+    return () => {
+      isMounted = false;
+      if (es) es.close();
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [filters.usersPeriod]);
 
   const toggleRowExpansion = (rowIndex: number) => {
     const newExpandedRows = new Set(expandedRows);
@@ -419,7 +487,6 @@ export default function AnalyticsPage() {
           className={styles.periodFilter}
         >
           <option value="thisWeek">This Week</option>
-          <option value="thisMonth">This Month</option>
           <option value="lastMonth">Last Month</option>
           <option value="last3Months">Last 3 Months</option>
           <option value="thisYear">This Year</option>
@@ -448,7 +515,7 @@ export default function AnalyticsPage() {
           <h3>{getPeriodLabel(filters.usersPeriod)}</h3>
           <p className={styles.metric}>{overview?.newUsersForPeriod || 0}</p>
           <div className="text-xs text-gray-500 mt-1">
-            Filter: {filters.usersPeriod ? filters.usersPeriod.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) : 'This Month'}
+            Filter: {filters.usersPeriod ? filters.usersPeriod.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) : 'This Week'}
           </div>
         </div>
       </div>
@@ -488,7 +555,16 @@ export default function AnalyticsPage() {
 
       {/* ===== ACTIVITY TABLE ===== */}
       <div className={styles.insightSection}>
-        <h2>Activity Summary </h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2>Activity Summary</h2>
+          <button 
+            onClick={exportCSV}
+            className={styles.primaryActionBtn}
+          >
+            <Download size={18} />
+            Export CSV
+          </button>
+        </div>
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b text-gray-600">
@@ -500,42 +576,30 @@ export default function AnalyticsPage() {
             </tr>
           </thead>
           <tbody>
-            {activityData.map((row, i) => {
-              const isExpanded = expandedRows.has(i);
-              const usersToShow = isExpanded ? row.usersJoined : row.usersJoined.slice(0, 2);
-              const hasMoreUsers = row.usersJoined.length > 2;
-              
+            {activityData.map((row: any, i: number) => {
+              const users = row.usersJoined || [];
+              const firstTwo = users.slice(0, 2);
+              const remaining = Math.max(users.length - 2, 0);
               return (
-                <tr key={i} className="border-b hover:bg-gray-50">
+                <tr key={`${row.date}-${i}`} className="border-b hover:bg-gray-50">
                   <td className="py-2 font-medium">{row.date}</td>
                   <td className="text-blue-600 font-semibold">{row.newUsers}</td>
                   <td className="py-2 max-w-md">
                     <div className="flex flex-wrap gap-1">
-                      {usersToShow.map((user: any, idx: number) => (
-                        <div 
-                          key={idx} 
-                          className="inline-block bg-blue-50 border border-blue-200 text-blue-800 text-xs px-2 py-1 rounded-lg"
-                        >
-                          <div className="font-medium">{typeof user === 'string' ? user : user.name}</div>
-                          {typeof user === 'object' && (
-                            <div className="text-xs text-blue-600 mt-1">
-                              <span className="bg-green-100 text-green-700 px-1 rounded">{user.city}</span>
-                              {' • '}
-                              <span className="bg-purple-100 text-purple-700 px-1 rounded">{user.category}</span>
-                            </div>
-                          )}
+                      {firstTwo.map((user: any, idx: number) => (
+                        <div key={idx} className="inline-block bg-blue-50 border border-blue-200 text-blue-800 text-xs px-2 py-1 rounded-lg">
+                          <div className="font-medium">{user.name}</div>
+                          <div className="text-xs text-blue-600 mt-1">
+                            <span className="bg-green-100 text-green-700 px-1 rounded">{user.city}</span>
+                            {' '}
+                            <span className="bg-purple-100 text-purple-700 px-1 rounded">{user.category}</span>
+                          </div>
                         </div>
                       ))}
-                      {hasMoreUsers && (
-                        <button
-                          onClick={() => toggleRowExpansion(i)}
-                          className="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full hover:bg-orange-200 cursor-pointer transition-colors"
-                        >
-                          {isExpanded 
-                            ? `Show Less` 
-                            : `+${row.usersJoined.length - 2} Others`
-                          }
-                        </button>
+                      {remaining > 0 && (
+                        <span className="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">
+                          +{remaining} Others
+                        </span>
                       )}
                     </div>
                   </td>
