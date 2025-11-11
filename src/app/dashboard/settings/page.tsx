@@ -578,6 +578,35 @@ export default function AccountSettingsPage(): React.JSX.Element {
     }
   };
 
+  const handleSaveChanges = async () => {
+    try {
+      const res = await fetch('/api/profile/update', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: name,
+          email,
+          phone: phoneNumber,
+          profileImage: accountPhoto,
+          password: password !== '**********' ? password : undefined
+        })
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Failed to save changes');
+      }
+
+      // Refresh auth state to get updated user data
+      await checkAuth();
+      
+      alert('Changes saved successfully');
+    } catch (err) {
+      console.error('Save failed:', err);
+      alert(err instanceof Error ? err.message : 'Failed to save changes');
+    }
+  };
+
   /* ---------- small helpers for style merging ---------- */
   const merge = (...objs: Array<React.CSSProperties | false | null | undefined>) =>
     Object.assign({}, ...objs.filter(Boolean));
@@ -621,7 +650,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
             }}
             onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            onClick={() => alert('All changes saved')}
+            onClick={handleSaveChanges}
           >
             Save Changes
           </button>
@@ -747,10 +776,19 @@ export default function AccountSettingsPage(): React.JSX.Element {
               fontSize: 14
             }, isMobile ? S.formLabelMobile : undefined)}>Email</label>
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
-              <div style={S.inputStatic}>{email || "your@email.com"}</div>
-              <button className="change-email" style={S.smallBtn} onClick={() => setShowEmailModal(true)}>
-                Change Email
-              </button>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onFocus={() => setFocusedInput("email")}
+                onBlur={() => setFocusedInput(null)}
+                style={merge(
+                  S.input,
+                  S.inputMobile,
+                  focusedInput === "email" ? S.inputFocus : undefined
+                )}
+                type="email"
+                aria-label="Email"
+              />
             </div>
           </div>
 
@@ -767,6 +805,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
+                placeholder="Enter new password"
                 onFocus={() => setFocusedInput("password")}
                 onBlur={() => setFocusedInput(null)}
                 style={merge(
@@ -776,9 +815,6 @@ export default function AccountSettingsPage(): React.JSX.Element {
                 )}
                 aria-label="Password"
               />
-              <button className="reset-password" style={S.smallBtn} onClick={() => alert("Trigger reset password flow (mock)")}>
-                Reset Password
-              </button>
             </div>
           </div>
 
