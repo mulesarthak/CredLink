@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { verify } from 'jsonwebtoken'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
-
-const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key'
+import { verifyUserToken } from '@/lib/jwt'
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,10 +16,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const decoded = verify(token, JWT_SECRET) as {
+    const decoded = verifyUserToken(token) as {
       userId: string
       email: string
       fullName: string
+    }
+
+    if (!decoded) {
+      return NextResponse.json(
+        { error: 'Invalid or expired token' },
+        { status: 401 }
+      )
     }
 
     const body = await request.json()

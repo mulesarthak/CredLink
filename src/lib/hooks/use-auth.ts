@@ -116,7 +116,7 @@ export const useAuth = create<AuthState>((set) => ({
   checkAuth: async () => {
     set({ isLoading: true })
     try {
-      const response = await fetch('/api/auth/me', {
+      const response = await fetch('/api/user/me', {
         credentials: 'include' // Ensure cookies are sent
       })
       
@@ -126,7 +126,7 @@ export const useAuth = create<AuthState>((set) => ({
           data = await response.json()
         } catch {
           const text = await response.text()
-          console.error('Unexpected non-JSON from /api/auth/me:', text)
+          console.error('Unexpected non-JSON from /api/user/me:', text)
           set({
             user: null,
             isAuthenticated: false,

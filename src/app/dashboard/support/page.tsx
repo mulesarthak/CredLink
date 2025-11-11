@@ -81,7 +81,7 @@ export default function SupportPage() {
     // Ensure backend receives x-user-id header expected by the API
     let userIdHeader: string | undefined = undefined;
     try {
-      const meRes = await fetch('/api/auth/me', {
+      const meRes = await fetch('/api/user/me', {
         headers: {
           'Authorization': token ? `Bearer ${token}` : '',
         },
