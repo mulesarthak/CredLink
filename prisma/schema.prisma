@@ -17,6 +17,7 @@ model User {
   password         String
   fullName         String
   phone            String?
+  phoneVerified    Boolean?  @default(false)
   username         String    @unique
   firstName        String?
   middleName       String?
@@ -35,6 +36,7 @@ model User {
   emailLink        String?
   phoneLink        String?
   location         String?
+  role            String?
   cardName         String?
   cardType         String?   @default("Personal")
   selectedDesign   String?   @default("Classic")
