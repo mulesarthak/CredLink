@@ -20,6 +20,7 @@ model User {
   phoneVerified    Boolean?  @default(false)
   username         String    @unique
   role             String?   @default("user")
+  isActive         Boolean   @default(true)
 
   // Personal Info
   firstName        String?
