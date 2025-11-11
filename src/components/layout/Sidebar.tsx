@@ -13,7 +13,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import "./sidebar.css"; // 👈 linked CSS file
+import "./sidebar.css"; // 
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "react-hot-toast";
@@ -24,6 +24,7 @@ const Sidebar = () => {
   const { logout } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -35,6 +36,31 @@ const Sidebar = () => {
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
+
+  // Fetch unread messages count for badge
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        if (!token) return;
+        const res = await fetch('/api/message/receive', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const unread = (data.messages || []).filter((m: any) => m && (m.read === false || m.read === undefined)).length;
+        setUnreadCount(unread);
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    fetchUnread();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -113,6 +139,9 @@ const Sidebar = () => {
               >
                 <span className="navIcon">{item.icon}</span>
                 <span>{item.name}</span>
+                {item.name === "Messages" && unreadCount > 0 && pathname !== "/dashboard/messages" && (
+                  <span className="navBadge">{unreadCount}</span>
+                )}
               </Link>
             );
           })}

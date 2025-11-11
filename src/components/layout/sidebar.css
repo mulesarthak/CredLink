@@ -89,6 +89,7 @@
   font-weight: 500;
   margin-bottom: 0.6rem;
   transition: all 0.3s ease;
+  position: relative; /* for badge positioning */
 }
 
 .navItem:hover {
@@ -113,6 +114,27 @@
   color: #1e40af !important;
   box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
   border: 1px solid rgba(37, 99, 235, 0.15);
+}
+
+/* ----------- NAV BADGE (UNREAD COUNT) ----------- */
+.navBadge {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: #ef4444; /* red-500 */
+  color: #ffffff;
+  border-radius: 9999px;
+  font-size: 11px;
+  line-height: 18px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff22; /* subtle ring on gradient */
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.15);
 }
 
 /* ----------- FOOTER LINKS ----------- */
