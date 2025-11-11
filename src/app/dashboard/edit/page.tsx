@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 
@@ -2702,4 +2702,23 @@ const EditPage = () => {
   );
 };
 
-export default EditPage;
+// Loading component for Suspense fallback
+const LoadingFallback = () => (
+  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p className="text-gray-600">Loading editor...</p>
+    </div>
+  </div>
+);
+
+// Wrapper component with Suspense boundary
+const EditPageWrapper = () => {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <EditPage />
+    </Suspense>
+  );
+};
+
+export default EditPageWrapper;

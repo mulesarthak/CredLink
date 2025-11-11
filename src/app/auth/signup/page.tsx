@@ -68,12 +68,38 @@ export default function SignupPage() {
     
     setLoading(true)
     
-    // Simulate signup process
-    setTimeout(() => {
+    try {
       console.log('Signup attempt:', { fullName, email, phone, password })
-      alert('Signup functionality will be implemented with backend integration')
+      
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName,
+          email,
+          phone,
+          password
+        })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        // Success - redirect to login or dashboard
+        alert(`Account created successfully! ${data.reactivated ? 'Account reactivated.' : ''}`)
+        router.push('/auth/login')
+      } else {
+        // Error from API
+        setError(data.error || 'Failed to create account')
+      }
+    } catch (error) {
+      console.error('Signup error:', error)
+      setError('Network error. Please try again.')
+    } finally {
       setLoading(false)
-    }, 1000)
+    }
   }
 
 

@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if request already exists
-    const existingRequest = await prisma.connections.findFirst({
+    const existingRequest = await prisma.connection.findFirst({
       where: {
         OR: [
           { senderId, receiverId },
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     if (existingRequest) {
       // If rejected, allow resending
       if (existingRequest.status === "REJECTED") {
-        const updated = await prisma.connections.update({
+        const updated = await prisma.connection.update({
           where: { id: existingRequest.id },
           data: {
             status: "PENDING",
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create new connection request
-    const connectionRequest = await prisma.connections.create({
+    const connectionRequest = await prisma.connection.create({
       data: {
         senderId,
         receiverId,
@@ -103,7 +103,7 @@ export async function GET(req: NextRequest) {
 
     if (type === "received") {
       // Pending requests received by this user
-      requests = await prisma.connections.findMany({
+      requests = await prisma.connection.findMany({
         where: {
           receiverId: userId,
           status: "PENDING",
@@ -125,7 +125,7 @@ export async function GET(req: NextRequest) {
       });
     } else if (type === "sent") {
       // Pending requests sent by this user
-      requests = await prisma.connections.findMany({
+      requests = await prisma.connection.findMany({
         where: {
           senderId: userId,
           status: "PENDING",
@@ -147,7 +147,7 @@ export async function GET(req: NextRequest) {
       });
     } else if (type === "accepted") {
       // Accepted connections (friends)
-      requests = await prisma.connections.findMany({
+      requests = await prisma.connection.findMany({
         where: {
           OR: [
             { senderId: userId, status: "ACCEPTED" },

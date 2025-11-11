@@ -17,7 +17,6 @@ model User {
   password         String
   fullName         String
   phone            String?
-  phoneVerified    Boolean?  @default(false)
   username         String    @unique
   role             String?   @default("user")
   isActive         Boolean   @default(true)
