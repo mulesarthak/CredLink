@@ -467,7 +467,7 @@ const OnboardingPage: React.FC = () => {
         {isLargeScreen && (
           <div style={leftPanelStyle}>
             <img
-              src="/assests/Welcome0.png"
+              src="/assets/Welcome0.png"
               alt="Collection of Digital Cards"
               style={fullImageStyle}
             />
