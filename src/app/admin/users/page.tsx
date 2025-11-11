@@ -42,6 +42,8 @@ export default function UsersPage() {
   });
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [passwords, setPasswords] = useState({ password: "", confirm: "" });
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const dummyUsers: User[] = [
     {
@@ -159,6 +161,7 @@ export default function UsersPage() {
     });
     setShowPasswordFields(false);
     setPasswords({ password: "", confirm: "" });
+    setErrorMessage("");
   };
   
   const handleDelete = (id: string) => setDeletingUser(id);
@@ -178,18 +181,26 @@ export default function UsersPage() {
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingUser) return;
+    
+    setErrorMessage("");
+    
     if (showPasswordFields) {
       if (!passwords.password || !passwords.confirm) {
-        alert("Please enter and confirm the new password.");
+        setErrorMessage("Please enter and confirm the new password.");
         return;
       }
       if (passwords.password !== passwords.confirm) {
-        alert("Passwords do not match.");
+        setErrorMessage("Passwords do not match.");
+        return;
+      }
+      if (passwords.password.length < 6) {
+        setErrorMessage("Password must be at least 6 characters long.");
         return;
       }
     }
 
     try {
+      setUpdateLoading(true);
       const payload: any = {
         fullName: editForm.fullName,
         phone: editForm.phone,
@@ -203,18 +214,26 @@ export default function UsersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      if (!res.ok) {
-        throw new Error("Failed to update");
-      }
+      
       const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update user");
+      }
+      
       setUsers(users.map(user => 
         user.id === editingUser.id 
           ? { ...user, ...data.user }
           : user
       ));
       setEditingUser(null);
-    } catch (error) {
+      setShowPasswordFields(false);
+      setPasswords({ password: "", confirm: "" });
+    } catch (error: any) {
       console.error("Update failed:", error);
+      setErrorMessage(error.message || "Failed to update user. Please try again.");
+    } finally {
+      setUpdateLoading(false);
     }
   };
 
@@ -377,6 +396,11 @@ export default function UsersPage() {
         <div className={styles.modalBackdrop}>
           <div className={styles.modal}>
             <h2>Edit User</h2>
+            {errorMessage && (
+              <div className={styles.errorMessage}>
+                {errorMessage}
+              </div>
+            )}
             <form onSubmit={handleEditSubmit} className={styles.editForm}>
               <div className={styles.formRow}>
                 <div className={styles.formGroup}>
@@ -472,8 +496,8 @@ export default function UsersPage() {
                 >
                   Cancel
                 </button>
-                <button type="submit" className={styles.saveBtn}>
-                  Save Changes
+                <button type="submit" className={styles.saveBtn} disabled={updateLoading}>
+                  {updateLoading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
