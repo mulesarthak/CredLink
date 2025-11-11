@@ -45,13 +45,21 @@ function VerifyOtpContent() {
 
     setLoading(true)
     try {
-      const verificationId = typeof window !== 'undefined' ? sessionStorage.getItem('verificationId') : null
-      if (!verificationId) {
-        setError("Verification session expired. Please resend the code.")
-        return
+      // Verify OTP with API
+      const verifyResponse = await fetch('/api/auth/otp/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phone, otp })
+      })
+      
+      const verifyData = await verifyResponse.json()
+      
+      if (!verifyResponse.ok || !verifyData.success) {
+        throw new Error('OTP verification failed')
       }
-      const cred = PhoneAuthProvider.credential(verificationId, otp)
-      await signInWithCredential(auth, cred)
+
       toast.success("Phone verified successfully!")
       router.push("/auth/login")
     } catch {
@@ -59,7 +67,6 @@ function VerifyOtpContent() {
     } finally {
       setLoading(false)
     }
-
   }
 
   const handleResend = async () => {

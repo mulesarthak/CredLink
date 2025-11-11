@@ -8,9 +8,9 @@ export async function POST(request: NextRequest) {
     const { email, password, fullName, phone } = body
         console.log(email,password,fullName,phone);
     // Validate required fields
-    if (!email || !password || !fullName) {
+    if (!email || !password || !fullName || !phone) {
       return NextResponse.json(
-        { error: 'Email, password, and full name are required' },
+        { error: 'Email, password, full name and phone number are required' },
         { status: 400 }
       )
     }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         data: {
           password: hashedPassword,
           fullName,
-          phone: phone || null,
+          phone,
           username,
           status: 'active' // Reactivate the account
         },
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         email: normalizedEmail,
         password: hashedPassword,
         fullName,
-        phone: phone || null,
+        phone,
         username,
       },
       select: {
@@ -108,9 +108,22 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    // Send OTP to phone
+    const otpResponse = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/otp/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ phone })
+    })
+
+    if (!otpResponse.ok) {
+      console.error('Failed to send OTP:', await otpResponse.text())
+    }
+
     return NextResponse.json(
       { 
-        message: 'User created successfully',
+        message: 'User created successfully. OTP sent to phone.',
         user 
       },
       { status: 201 }
