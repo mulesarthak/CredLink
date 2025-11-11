@@ -24,7 +24,7 @@ const handler = NextAuth({
         const user = await prisma.user.findFirst({
           where: { 
             email: normalizedEmail,
-            isActive: true
+            status: 'active'
           }
         })
 

@@ -28,7 +28,7 @@ export async function GET() {
     const user = await prisma.user.findFirst({
       where: { 
         id: decoded.userId,
-        isActive: true
+        status: 'active'
       },
       select: {
         id: true,

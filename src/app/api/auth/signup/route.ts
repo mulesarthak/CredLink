@@ -21,11 +21,11 @@ export async function POST(request: NextRequest) {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email: normalizedEmail },
-      select: { id: true, email: true, isActive: true }
+      select: { id: true, email: true, status: true }
     })
 
     // If user exists and is active, reject signup
-    if (existingUser && existingUser.isActive) {
+    if (existingUser && existingUser.status === 'active') {
       return NextResponse.json(
         { error: 'User with this email already exists' },
         { status: 409 }
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
     
     // If user exists but is inactive, reactivate the account
-    if (existingUser && !existingUser.isActive) {
+    if (existingUser && existingUser.status !== 'active') {
       const hashedPassword = await bcrypt.hash(password, 10)
       
       // Generate username from normalized email
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
           fullName,
           phone: phone || null,
           username,
-          isActive: true // Reactivate the account
+          status: 'active' // Reactivate the account
         },
         select: {
           id: true,

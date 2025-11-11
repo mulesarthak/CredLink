@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         id: true,
         email: true,
         password: true,
-        isActive: true
+        status: true
       }
     })
 
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!user.isActive) {
+    if (user.status !== 'active') {
       return NextResponse.json(
         { error: 'Account is already deleted' },
         { status: 400 }
@@ -69,11 +69,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Soft delete: Set isActive to false instead of deleting
+    // Soft delete: Set status to inactive instead of deleting
     await prisma.user.update({
       where: { id: decoded.userId },
       data: {
-        isActive: false
+        status: 'inactive'
       }
     })
 
