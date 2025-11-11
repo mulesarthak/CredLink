@@ -80,7 +80,15 @@ export default function SignupPage() {
     try {
       const input = rawPhone ?? watch('phone')
       const normalized = (input || '').replace(/\D/g, '')
-      const phoneNumber = input?.startsWith('+') ? input : (normalized.length === 10 ? `+91${normalized}` : `+${normalized}`)
+      
+      // Validate phone number length
+      if (normalized.length !== 10) {
+        toast.error('Please enter a valid 10-digit phone number')
+        return
+      }
+      
+      // Format as E.164 for India (+91)
+      const phoneNumber = `+91${normalized}`
       const verifier = setupRecaptcha()
       const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, verifier)
       if (typeof window !== 'undefined') {
@@ -88,10 +96,21 @@ export default function SignupPage() {
         sessionStorage.setItem('otpPhone', phoneNumber)
       }
       toast.success('OTP sent!')
-      router.push(`/auth/verify-otp?phone=${encodeURIComponent(input || '')}`)
+      router.push(`/auth/verify-otp?phone=${encodeURIComponent(normalized)}`)
     } catch (error: any) {
-      console.error(error)
-      toast.error(error?.message || 'Failed to send OTP')
+      console.error('Firebase OTP error:', error)
+      // Provide more helpful error messages
+      if (error?.code === 'auth/invalid-app-credential' || error?.code === 'auth/app-not-authorized') {
+        toast.error('Phone authentication is not configured. Please sign up with email instead.')
+        throw new Error('Phone authentication is not available. Please use email signup.')
+      } else if (error?.code === 'auth/too-many-requests') {
+        toast.error('Too many requests. Please try again later.')
+      } else if (error?.code === 'auth/invalid-phone-number') {
+        toast.error('Invalid phone number format. Please check and try again.')
+      } else {
+        toast.error(error?.message || 'Failed to send OTP. Please try email signup instead.')
+      }
+      throw error
     }
   }
 
@@ -106,17 +125,38 @@ export default function SignupPage() {
   }
 
   const onSubmit = async (data: SignupForm) => {
-    if (data.phone) {
+    // Validate that at least email or phone is provided
+    if (!data.email && !data.phone) {
+      setError('Please provide either an email or phone number')
+      toast.error('Please provide either an email or phone number')
+      return
+    }
+
+    // If email is provided, always use email signup (phone is optional additional info)
+    // Only use phone authentication if phone is provided AND email is not provided
+    if (data.phone && !data.email) {
       try {
         setLoading(true)
         await sendOtp(data.phone)
+      } catch (error: any) {
+        // If Firebase is not configured, show helpful error
+        if (error?.code === 'auth/invalid-app-credential' || error?.code === 'auth/app-not-authorized') {
+          toast.error('Phone authentication is not configured. Please sign up with email instead.')
+          setError('Phone authentication is not available. Please use email signup.')
+        }
       } finally {
         setLoading(false)
       }
       return
     }
     
-    // For email signup, continue as before
+    // For email signup (email is required, phone is optional)
+    if (!data.email) {
+      setError('Email is required for signup')
+      toast.error('Email is required for signup')
+      return
+    }
+
     try {
       const loadingToast = toast.loading('Creating your account...')
       
@@ -128,7 +168,7 @@ export default function SignupPage() {
           email: data.email,
           password: data.password,
           fullName: data.fullName,
-          phone: data.phone
+          phone: data.phone || null
         }),
       })
 
@@ -214,19 +254,17 @@ export default function SignupPage() {
             </div>
 
             <div className="auth-input-group">
-              <label htmlFor="identifier" className="label">
-                 Phone Number
+              <label htmlFor="phone" className="label">
+                 Phone Number <span className="text-gray-400 text-sm">(Optional)</span>
               </label>
               <input
-                id="identifier"
-                type="number"
+                id="phone"
+                type="tel"
                 {...register('phone')}
-                //onChange={handleIdentifierChange}
                 className="auth-input"
-                placeholder="Enter phone number"
-                maxLength={50}
-                //autoComplete="email tel"
-                required
+                placeholder="Enter 10-digit phone number (optional)"
+                maxLength={10}
+                pattern="[0-9]{10}"
               />
               {identifierType && (
                 <p className="text-xs text-gray-500 mt-1">
@@ -238,18 +276,17 @@ export default function SignupPage() {
             </div>
 
             <div className="auth-input-group">
-              <label htmlFor="identifier" className="label">
-                Email 
+              <label htmlFor="email" className="label">
+                Email <span className="text-gray-400 text-sm">(Required)</span>
               </label>
               <input
-                id="identifier"
+                id="email"
                 type="email"
                 {...register('email')}
-                //onChange={handleIdentifierChange}
                 className="auth-input"
                 placeholder="Enter email"
                 maxLength={50}
-                autoComplete="email tel"
+                autoComplete="email"
                 required
               />
               {identifierType && (
