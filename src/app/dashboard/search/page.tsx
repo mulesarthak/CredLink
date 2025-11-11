@@ -120,8 +120,10 @@ export default function SearchPage() {
     return Array.from(set);
   }, [profiles]);
 
+  const hasQuery = query.trim().length > 0;
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+    if (!q) return [];
     return profiles.filter((p) => {
       const hay = `${p.name} ${p.designation ?? ""} ${p.company ?? ""} ${p.category ?? ""} ${p.city}`.toLowerCase();
 
@@ -242,9 +244,11 @@ export default function SearchPage() {
             </div>
           ) : (
             <>
-              <p className={styles.resultsCount}>
-                Showing <span>{filtered.length}</span> result{filtered.length !== 1 ? "s" : ""}
-              </p>
+              {hasQuery && (
+                <p className={styles.resultsCount}>
+                  Showing <span>{filtered.length}</span> result{filtered.length !== 1 ? "s" : ""}
+                </p>
+              )}
 
               <div className={styles.cardGrid}>
             {filtered.map((p, index) => (
@@ -290,7 +294,7 @@ export default function SearchPage() {
             ))}
               </div>
 
-              {filtered.length === 0 && (
+              {hasQuery && filtered.length === 0 && (
                 <div className="text-center py-10 text-gray-500">No results found. Try changing filters.</div>
               )}
             </>
