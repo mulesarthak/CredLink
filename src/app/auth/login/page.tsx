@@ -3,42 +3,19 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useAuth } from "@/lib/hooks/use-auth"
-import { toast } from "react-hot-toast"
+import "../../globals.css"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login } = useAuth()
-  const [identifier, setIdentifier] = useState('')
-  const [identifierType, setIdentifierType] = useState<'email' | 'phone' | null>(null)
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const detectInputType = (value: string) => {
-    // Email regex pattern
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    // Phone regex pattern (matches 10 digits, optionally starting with +)
-    const phonePattern = /^\+?\d{10,12}$/
-
-    if (emailPattern.test(value)) {
-      return 'email'
-    } else if (phonePattern.test(value.replace(/\D/g, ''))) {
-      return 'phone'
-    }
-    return null
-  }
-
-  const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.trim()
-    setIdentifier(value)
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value)
     setError('')
-
-    // Auto-detect input type as user types
-    const type = detectInputType(value)
-    setIdentifierType(type)
   }
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,51 +25,19 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!identifier || !password) {
-      setError('Please enter your email/phone and password')
+    if (!email || !password) {
+      setError('Please enter your email and password')
       return
     }
     setLoading(true)
     setError('')
-    try {
-      console.log('identifier', identifier)
-      console.log('password', password)
-      // Send login payload to backend JSON API (email + password)
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: identifier,
-          password,
-        }),
-      })
-
-      
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        setError(data?.error || 'Login failed. Please try again.')
-        return
-      }
-      const data = await res.json().catch(() => ({}))
-      if (data?.token) {
-        localStorage.setItem('token', data.token)
-      }
-      // On success, go to dashboard
-      window.location.href = '/dashboard'
-    } catch {
-      setError('Login failed. Please try again.')
-    } finally {
+    
+    // Simulate login process
+    setTimeout(() => {
+      console.log('Login attempt:', { email, password })
+      alert('Login functionality will be implemented with backend integration')
       setLoading(false)
-    }
-  }
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/logout', { method: 'POST' })
-      toast.success('Logged out successfully')
-      router.push('/')
-    } catch {
-      toast.error('Failed to log out')
-    }
+    }, 1000)
   }
 
   return (
@@ -112,22 +57,22 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
-        <form onSubmit={handleLogin} className="auth-form space-y-6" suppressHydrationWarning>
+        <form onSubmit={handleLogin} className="auth-form space-y-6">
           <div className="auth-input-group">
-            <label htmlFor="identifier" className="label">
-              Email or Phone Number
+            <label htmlFor="email" className="label">
+              Email Address
             </label>
             <div className="mt-1">
               <input
-                id="identifier"
-                name="identifier"
-                type="text"
-                autoComplete="email tel"
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
                 required
-                value={identifier}
-                onChange={handleIdentifierChange}
+                value={email}
+                onChange={handleEmailChange}
                 className="auth-input"
-                placeholder="Enter email or phone number"
+                placeholder="Enter your email address"
               />
             </div>
           </div>
@@ -135,11 +80,11 @@ export default function LoginPage() {
             <label htmlFor="password" className="label">
               Password
             </label>
-            <div className="mt-1">
+            <div className="mt-1 relative">
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 required
                 value={password}
@@ -147,17 +92,35 @@ export default function LoginPage() {
                 className="auth-input"
                 placeholder="Enter your password"
               />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                style={{ paddingRight: '10px' }}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
           {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-          <Button
+          <button
             type="submit"
             disabled={loading}
-            className="w-full"
-            suppressHydrationWarning
+            className="auth-submit-button w-full"
           >
             {loading ? 'Signing in...' : 'Sign in'}
-          </Button>
+          </button>
         </form>
 
         {/* Google Sign-in can be added later when OAuth is configured */}

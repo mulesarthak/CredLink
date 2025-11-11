@@ -96,9 +96,10 @@ export function middleware(request: NextRequest) {
     if (!isAuthenticated && !isCombinedPublicPath) {
       return NextResponse.redirect(new URL('/auth/login', request.url))
     }
-    if (isAuthenticated && path.startsWith('/auth')) {
-      return NextResponse.redirect(new URL('/', request.url))
-    }
+    // Temporarily disable auth page redirect to debug navigation issue
+    // if (isAuthenticated && path.startsWith('/auth')) {
+    //   return NextResponse.redirect(new URL('/', request.url))
+    // }
   }
 
   // Add user/admin IDs to headers
