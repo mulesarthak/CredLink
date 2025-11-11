@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   MessageSquare,
@@ -15,9 +15,13 @@ import {
 } from "lucide-react";
 import "./sidebar.css"; // 👈 linked CSS file
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/lib/hooks/use-auth";
+import { toast } from "react-hot-toast";
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -31,6 +35,16 @@ const Sidebar = () => {
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+      router.push("/auth/login");
+    } catch (e) {
+      toast.error("Logout failed");
+    }
+  };
 
   const menuItems = [
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard /> },
@@ -119,7 +133,7 @@ const Sidebar = () => {
               </Link>
             );
           })}
-          <button className="footerLogout">
+          <button className="footerLogout" onClick={handleLogout}>
             <X />
             Logout
           </button>

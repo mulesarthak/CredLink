@@ -19,6 +19,9 @@ model User {
   phone            String?
   phoneVerified    Boolean?  @default(false)
   username         String    @unique
+  role             String?   @default("user")
+
+  // Personal Info
   firstName        String?
   middleName       String?
   lastName         String?
@@ -132,7 +135,7 @@ model Card {
   location         String?  @db.VarChar(255)
   linkedinUrl      String?  @map("linkedin_url") @db.VarChar(2048)
   websiteUrl       String?  @map("website_url") @db.VarChar(2048)
-  
+
   // Card Customization
   cardName         String?  @map("card_name") @db.VarChar(100)
   cardType         String?  @map("card_type") @default("Personal") @db.VarChar(50)
@@ -149,16 +152,16 @@ model Card {
   // Content
   bio              String?  @db.Text
   description      String?  @db.Text
-  
+
   // Metadata
   status           String?  @default("draft") @db.VarChar(20)
   views            Int      @default(0)
-  
+
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
-  
+
   user             User     @relation("UserCards", fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
   @@index([createdAt])
   @@map("cards")
@@ -179,6 +182,30 @@ model Category {
   @@index([name])
   @@index([isActive])
   @@map("categories")
+}
+
+model Connection {
+  id         String            @id @default(uuid())
+  senderId   String
+  receiverId String
+  status     ConnectionStatus  @default(PENDING)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  sender     User              @relation("SentConnections", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User              @relation("ReceivedConnections", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([status])
+  @@map("connection_requests") // matches their naming convention
+}
+
+enum ConnectionStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
 
 enum AdminRole {
