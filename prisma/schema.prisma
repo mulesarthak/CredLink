@@ -17,6 +17,7 @@ model User {
   password         String
   fullName         String
   phone            String?
+  phoneVerified    Boolean?  @default(false)
   username         String    @unique
   role             String?   @default("user")
 
@@ -29,55 +30,33 @@ model User {
   preferredName    String?
   maidenName       String?
   pronouns         String?
-
-  // Professional Info
   title            String?
   company          String?
   department       String?
   affiliation      String?
   headline         String?
   accreditations   String?
-
-  // Contact & Social Info
   emailLink        String?
   phoneLink        String?
   location         String?
-  linkedinUrl      String?
-  websiteUrl       String?
-
-  // Card Customization
+  role            String?
   cardName         String?
   cardType         String?   @default("Personal")
   selectedDesign   String?   @default("Classic")
   selectedColor    String?   @default("#145dfd")
   selectedFont     String?   @default("Arial, sans-serif")
-  displayTypes     String?   @db.Text // from their version, stores multiple card styles
-
-  // Media
   profileImage     String?   @db.Text
   bannerImage      String?   @db.Text
-
-  // Content
   bio              String?   @db.Text
-
-  // Metadata
-  status           String?   @default("active")
+  status           String?   @default("draft")
   views            Int       @default(0)
-  connections      String?   @db.Text // for legacy tracking (keep this)
-  phoneVerified    Boolean?  @default(false)
-
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
-
-  // Relations
-  receivedMessages Message[]     @relation("ReceivedMessages")
-  sentMessages     Message[]     @relation("SentMessages")
-  cards            Card[]        @relation("UserCards")
-  sentConnections  Connection[]  @relation("SentConnections")
-  receivedConnections Connection[] @relation("ReceivedConnections")
+  cards            Card[]    @relation("UserCards")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  sentMessages     Message[] @relation("SentMessages")
 
   @@index([username])
-  @@index([email])
   @@map("users")
 }
 
@@ -128,54 +107,54 @@ model Message {
 model Card {
   id               String   @id @default(cuid()) @map("id")
   userId           String   @map("user_id")
-
-  // Personal Info
-  fullName         String   @db.VarChar(255)
-  firstName        String?
-  middleName       String?
-  lastName         String?
-  prefix           String?
-  suffix           String?
-  preferredName    String?
-  maidenName       String?
-  pronouns         String?
-
-  // Professional Info
-  title            String?
-  company          String?
-  department       String?
-  affiliation      String?
-  headline         String?
-  accreditations   String?
-
-  // Contact Info
+  
+  // Personal Information
+  fullName         String   @map("full_name") @db.VarChar(255)
+  firstName        String?  @map("first_name") @db.VarChar(100)
+  middleName       String?  @map("middle_name") @db.VarChar(100)
+  lastName         String?  @map("last_name") @db.VarChar(100)
+  prefix           String?  @db.VarChar(20)
+  suffix           String?  @db.VarChar(20)
+  preferredName    String?  @map("preferred_name") @db.VarChar(100)
+  maidenName       String?  @map("maiden_name") @db.VarChar(100)
+  pronouns         String?  @db.VarChar(50)
+  
+  // Professional Information
+  title            String?  @db.VarChar(255)
+  company          String?  @db.VarChar(255)
+  department       String?  @db.VarChar(100)
+  affiliation      String?  @db.VarChar(255)
+  headline         String?  @db.VarChar(500)
+  accreditations   String?  @db.Text
+  
+  // Contact Information
   email            String?  @db.VarChar(320)
   phone            String?  @db.VarChar(50)
-  emailLink        String?
-  phoneLink        String?
-  location         String?
+  emailLink        String?  @map("email_link") @db.VarChar(500)
+  phoneLink        String?  @map("phone_link") @db.VarChar(500)
+  location         String?  @db.VarChar(255)
   linkedinUrl      String?  @map("linkedin_url") @db.VarChar(2048)
   websiteUrl       String?  @map("website_url") @db.VarChar(2048)
 
   // Card Customization
-  cardName         String?
-  cardType         String?  @default("Personal")
-  selectedDesign   String?  @default("Classic")
-  selectedColor    String?  @default("#145dfd")
-  selectedFont     String?  @default("Arial, sans-serif")
-  displayTypes     String?  @db.Text
-
+  cardName         String?  @map("card_name") @db.VarChar(100)
+  cardType         String?  @map("card_type") @default("Personal") @db.VarChar(50)
+  selectedDesign   String?  @map("selected_design") @default("Classic") @db.VarChar(50)
+  selectedColor    String?  @map("selected_color") @default("#145dfd") @db.VarChar(20)
+  selectedFont     String?  @map("selected_font") @default("Arial, sans-serif") @db.VarChar(100)
+  displayTypes     String?  @map("display_types") @db.Text
+  
   // Media
-  profileImage     String?  @db.Text
-  bannerImage      String?  @db.Text
-  coverImage       String?  @map("cover_image") @db.Text
-
+  profileImage     String?  @map("profile_image") @db.VarChar(2048)
+  bannerImage      String?  @map("banner_image") @db.VarChar(2048)
+  coverImage       String?  @map("cover_image") @db.VarChar(2048)
+  
   // Content
   bio              String?  @db.Text
   description      String?  @db.Text
 
   // Metadata
-  status           String?  @default("draft")
+  status           String?  @default("draft") @db.VarChar(20)
   views            Int      @default(0)
 
   createdAt        DateTime @default(now()) @map("created_at")

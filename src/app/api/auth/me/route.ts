@@ -72,7 +72,7 @@ export async function GET() {
       )
     }
 
-    console.log('🔍 Auth API: Returning user data:', user);
+   // console.log('🔍 Auth API: Returning user data:', user);
     return NextResponse.json({ user })
   } catch (error) {
     console.error('Get current user error:', error)
