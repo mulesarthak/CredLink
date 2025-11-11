@@ -77,8 +77,12 @@ export default function LoginPage() {
       if (data?.token) {
         localStorage.setItem('token', data.token)
       }
-      // On success, go to dashboard
-      window.location.href = '/dashboard'
+      // On success, redirect to onboarding if first-time login, otherwise dashboard
+      if (data?.needsOnboarding) {
+        window.location.href = '/onboarding'
+      } else {
+        window.location.href = '/dashboard'
+      }
     } catch {
       setError('Login failed. Please try again.')
     } finally {

@@ -25,8 +25,11 @@ const Sidebar = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    // Set mounted flag to ensure client-side only updates
+    setIsMounted(true);
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
@@ -87,11 +90,12 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile Menu Button */}
-      {isMobile && (
+      {isMounted && isMobile && (
         <motion.button
           onClick={() => setIsOpen(!isOpen)}
           className="mobileToggle"
           whileTap={{ scale: 0.9 }}
+          suppressHydrationWarning
         >
           {isOpen ? <X size={22} /> : <Menu size={22} />}
         </motion.button>
@@ -162,7 +166,11 @@ const Sidebar = () => {
               </Link>
             );
           })}
-          <button className="footerLogout" onClick={handleLogout}>
+          <button 
+            className="footerLogout" 
+            onClick={handleLogout}
+            suppressHydrationWarning
+          >
             <X />
             Logout
           </button>

@@ -134,8 +134,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
-    await prisma.user.delete({
-      where: { id }
+    // Soft delete: Set isActive to false instead of deleting
+    await prisma.user.update({
+      where: { id },
+      data: { isActive: false }
     })
 
     return NextResponse.json({ success: true, message: 'User deleted successfully' })
