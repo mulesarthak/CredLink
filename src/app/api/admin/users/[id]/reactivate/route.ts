@@ -33,14 +33,14 @@ export async function POST(
     // Check if user exists
     const user = await prisma.user.findUnique({
       where: { id },
-      select: { id: true, email: true, fullName: true, isActive: true }
+      select: { id: true, email: true, fullName: true, status: true }
     })
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    if (user.isActive) {
+    if (user.status === 'active') {
       return NextResponse.json({ 
         error: 'User account is already active' 
       }, { status: 400 })
@@ -49,7 +49,7 @@ export async function POST(
     // Reactivate the account
     const reactivatedUser = await prisma.user.update({
       where: { id },
-      data: { isActive: true }
+      data: { status: 'active' }
     })
 
     return NextResponse.json({ 
@@ -59,7 +59,7 @@ export async function POST(
         id: reactivatedUser.id,
         email: reactivatedUser.email,
         fullName: reactivatedUser.fullName,
-        isActive: reactivatedUser.isActive
+        status: reactivatedUser.status
       }
     })
   } catch (error) {
