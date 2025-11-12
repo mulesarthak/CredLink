@@ -18,7 +18,7 @@ async function createAdmin() {
       console.log('\n🚀 Creating default admin user...')
       
       const defaultEmail = 'admin@credlink.com'
-      const defaultPassword = 'admin123'
+      const defaultPassword = 'Test@1234'
       const hashedPassword = await bcrypt.hash(defaultPassword, 10)
       
       const defaultPermissions = JSON.stringify({

@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { toast } from "react-hot-toast";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 /**
  * Single-file inline-styled Account Settings page
@@ -299,6 +301,37 @@ const S: Record<string, React.CSSProperties> = {
     cursor: "pointer",
   },
 
+  // password input container
+  passwordInputContainer: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    maxWidth: 520,
+  },
+  passwordInputContainerMobile: {
+    width: "100%",
+    maxWidth: "100%",
+  },
+  passwordInput: {
+    width: "100%",
+    padding: "10px 40px 10px 12px", // Extra padding on right for eye icon
+    borderRadius: 8,
+    border: "1px solid #CBD5E1",
+    background: "#fff",
+    outline: "none",
+    fontSize: 14,
+    boxSizing: "border-box",
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 12,
+    cursor: "pointer",
+    color: "#64748b",
+    fontSize: 16,
+    zIndex: 1,
+  },
+
   // toggle (visual only)
   toggle: { position: "relative", width: 52, height: 28, display: "inline-block" },
   toggleSlider: {
@@ -421,6 +454,12 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [name, setName] = useState<string>("Yaasnick");
   const [email, setEmail] = useState<string>("yaasnick01@gmail.com");
   const [password, setPassword] = useState<string>("**********");
+  const [currentPassword, setCurrentPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState<boolean>(false);
+  const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
   const [phoneNumber, setPhoneNumber] = useState<string>("+1234567890");
 
@@ -428,14 +467,9 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
-  const [showEmailModal, setShowEmailModal] = useState<boolean>(false);
 
   const [deleteReasons, setDeleteReasons] = useState<string[]>([]);
   const [deletePassword, setDeletePassword] = useState<string>("");
-
-  const [newEmail, setNewEmail] = useState('');
-  const [emailCode, setEmailCode] = useState('');
-  const [emailStep, setEmailStep] = useState(1); // 1 = enter email, 2 = verify code
 
   // responsive
   const { width, isMobile } = useWindowWidth(760);
@@ -484,6 +518,9 @@ export default function AccountSettingsPage(): React.JSX.Element {
     try {
       const fd = new FormData();
       fd.append("image", file);
+      fd.append("userId", "currentUserId"); // Add user ID for database update
+      fd.append("fullName", name); // Include current name for database sync
+      
       const res = await fetch("/api/profile/upload-image", {
         method: "POST",
         credentials: "include",
@@ -567,56 +604,64 @@ export default function AccountSettingsPage(): React.JSX.Element {
     }
   };
 
-  const handleEmailChange = async () => {
-    if (emailStep === 1) {
-      // Send verification code (mock API call)
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('/api/verify-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ newEmail })
-        });
-        
-        if (response.ok) {
-          setEmailStep(2);
-        } else {
-          const error = await response.json();
-          alert(error.message || 'Failed to send verification code');
-        }
-      } catch (err) {
-        console.error('Email verification error:', err);
-        alert('Failed to send verification code');
+  const updateNameInDatabase = async (newName: string) => {
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ fullName: newName }),
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        console.error('Name update failed:', error);
+        return false;
       }
-    } else {
-      // Verify code and update email (mock API call)
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('/api/change-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ newEmail, code: emailCode })
-        });
-        
-        if (response.ok) {
-          setEmail(newEmail);
-          setShowEmailModal(false);
-          setEmailStep(1);
-          alert('Email updated successfully');
-        } else {
-          const error = await response.json();
-          alert(error.message || 'Failed to update email');
-        }
-      } catch (err) {
-        console.error('Email change error:', err);
-        alert('Failed to update email');
+      setTimeout(() => { checkAuth(); }, 200);
+      return true;
+    } catch (err) {
+      console.error('Name update error:', err);
+      return false;
+    }
+  };
+
+  const changePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error('Please fill all password fields');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('New password and confirm password do not match');
+      return;
+    }
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
+      });
+      const data = await res.json().catch(() => ({}));
+      
+      if (res.status === 200) {
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        toast.success('Password updated successfully!');
+      } else if (res.status === 400) {
+        toast.error('Invalid input or password mismatch');
+      } else if (res.status === 401) {
+        toast.error('Unauthorized request');
+      } else if (res.status === 500) {
+        toast.error('Something went wrong, please try again later');
+      } else {
+        toast.error(data.error || 'Failed to change password');
       }
+    } catch (e) {
+      console.error('Change password error:', e);
+      toast.error('Something went wrong, please try again later');
     }
   };
 
@@ -711,9 +756,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
             <div style={S.profileInfo}>
               <h2 style={S.name}>{name}</h2>
               <div style={S.email}>{email}</div>
-              <div style={S.small}>
-                Member since: <strong>2024</strong>
-              </div>
+              
             </div>
           </div>
         </section>
@@ -740,9 +783,11 @@ export default function AccountSettingsPage(): React.JSX.Element {
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
               <input
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
                 onFocus={() => setFocusedInput("name")}
-                onBlur={() => setFocusedInput(null)}
+                onBlur={() => { setFocusedInput(null); updateNameInDatabase(name); }}
                 style={merge(
                   S.input,
                   S.inputMobile,
@@ -792,14 +837,6 @@ export default function AccountSettingsPage(): React.JSX.Element {
             }, isMobile ? S.formLabelMobile : undefined)}>Email</label>
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
               <div style={S.inputStatic}>{email || "your@email.com"}</div>
-              <button 
-                className="change-email" 
-                style={S.smallBtn} 
-                onClick={() => setShowEmailModal(true)}
-                suppressHydrationWarning
-              >
-                Change Email
-              </button>
             </div>
           </div>
 
@@ -812,27 +849,86 @@ export default function AccountSettingsPage(): React.JSX.Element {
               fontSize: 14
             }, isMobile ? S.formLabelMobile : undefined)}>Password</label>
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
-              <input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type="password"
-                onFocus={() => setFocusedInput("password")}
-                onBlur={() => setFocusedInput(null)}
-                style={merge(
-                  S.input,
-                  S.inputMobile,
-                  focusedInput === "password" ? S.inputFocus : undefined
-                )}
-                aria-label="Password"
-              />
-              <button 
-                className="reset-password" 
-                style={S.smallBtn} 
-                onClick={() => alert("Trigger reset password flow (mock)")}
-                suppressHydrationWarning
-              >
-                Reset Password
-              </button>
+              {/* Current Password */}
+              <div style={merge(S.passwordInputContainer, isMobile ? S.passwordInputContainerMobile : undefined)}>
+                <input
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  type={showCurrentPassword ? "text" : "password"}
+                  placeholder="Current password"
+                  onFocus={() => setFocusedInput("currentPassword")}
+                  onBlur={() => setFocusedInput(null)}
+                  style={merge(
+                    S.passwordInput,
+                    focusedInput === "currentPassword" ? S.inputFocus : undefined
+                  )}
+                  aria-label="Current password"
+                />
+                <div
+                  style={S.eyeIcon}
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                >
+                  {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
+                </div>
+              </div>
+
+              {/* New Password */}
+              <div style={merge(S.passwordInputContainer, isMobile ? S.passwordInputContainerMobile : undefined)}>
+                <input
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  type={showNewPassword ? "text" : "password"}
+                  placeholder="New password"
+                  onFocus={() => setFocusedInput("newPassword")}
+                  onBlur={() => setFocusedInput(null)}
+                  style={merge(
+                    S.passwordInput,
+                    focusedInput === "newPassword" ? S.inputFocus : undefined
+                  )}
+                  aria-label="New password"
+                />
+                <div
+                  style={S.eyeIcon}
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                >
+                  {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div style={merge(S.passwordInputContainer, isMobile ? S.passwordInputContainerMobile : undefined)}>
+                <input
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm new password"
+                  onFocus={() => setFocusedInput("confirmPassword")}
+                  onBlur={() => setFocusedInput(null)}
+                  style={merge(
+                    S.passwordInput,
+                    focusedInput === "confirmPassword" ? S.inputFocus : undefined
+                  )}
+                  aria-label="Confirm new password"
+                />
+                <div
+                  style={S.eyeIcon}
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                </div>
+              </div>
+
+              {/* Change Password Button */}
+              <div style={{ display: "flex", justifyContent: "center", paddingRight: "1rem", marginTop: "8px" }}>
+                <button 
+                  className="change-password" 
+                  style={S.smallBtn} 
+                  onClick={changePassword}
+                  suppressHydrationWarning
+                >
+                  Change Password
+                </button>
+              </div>
             </div>
           </div>
 
@@ -843,7 +939,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
               color: "#4B5563",
               fontWeight: 600,
               fontSize: 14
-            }, isMobile ? S.formLabelMobile : undefined)}>Delete</label>
+            }, isMobile ? S.formLabelMobile : undefined)}>Deactivate</label>
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
               <button
                 style={merge(S.delete, deleteHover.hovered ? S.deleteHover : undefined)}
@@ -852,7 +948,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
                 onClick={() => setShowDeleteModal(true)}
                 suppressHydrationWarning
               >
-                Delete Account
+                Deactivate Account
               </button>
             </div>
           </div>
@@ -949,62 +1045,6 @@ export default function AccountSettingsPage(): React.JSX.Element {
               </button>
               <button style={S.delete} onClick={finalizeDelete} disabled={!deletePassword}>
                 Delete Account
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Email Change Modal */}
-      {showEmailModal && (
-        <div style={S.modalBackdrop}>
-          <div style={S.modal}>
-            <h4>{emailStep === 1 ? 'Change Email Address' : 'Verify Email'}</h4>
-            
-            {emailStep === 1 ? (
-              <>
-                <p>Enter your new email address below:</p>
-                <input
-                  type="email"
-                  value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
-                  placeholder="New email address"
-                  style={merge(S.input, focusedInput === 'newEmail' ? S.inputFocus : undefined)}
-                  onFocus={() => setFocusedInput('newEmail')}
-                  onBlur={() => setFocusedInput(null)}
-                />
-              </>
-            ) : (
-              <>
-                <p>We've sent a verification code to {newEmail}</p>
-                <input
-                  type="text"
-                  value={emailCode}
-                  onChange={(e) => setEmailCode(e.target.value)}
-                  placeholder="Verification code"
-                  style={merge(S.input, focusedInput === 'emailCode' ? S.inputFocus : undefined)}
-                  onFocus={() => setFocusedInput('emailCode')}
-                  onBlur={() => setFocusedInput(null)}
-                />
-              </>
-            )}
-            
-            <div style={S.modalActions}>
-              <button 
-                style={S.ghost} 
-                onClick={() => {
-                  setShowEmailModal(false);
-                  setEmailStep(1);
-                }}
-              >
-                Cancel
-              </button>
-              <button 
-                style={S.primaryBase} 
-                onClick={handleEmailChange}
-                disabled={emailStep === 1 ? !newEmail : !emailCode}
-              >
-                {emailStep === 1 ? 'Send Code' : 'Verify & Update'}
               </button>
             </div>
           </div>

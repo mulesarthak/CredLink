@@ -35,7 +35,7 @@ export function middleware(request: NextRequest) {
     '/terms',
     '/privacy',
     '/create-card',
-    '/cards/:path*',
+    '/cards/*',
     '/dashboard/messages',
     '/api/message/receive',
     '/api/message/send',

@@ -123,6 +123,9 @@ export async function PATCH(
     const selectedColor = formData.get('selectedColor') as string;
     if (selectedColor !== null) updateData.selectedColor = selectedColor || undefined;
     
+    const selectedColor2 = formData.get('selectedColor2') as string;
+    if (selectedColor2 !== null) updateData.selectedColor2 = selectedColor2 || undefined;
+    
     const selectedFont = formData.get('selectedFont') as string;
     if (selectedFont !== null) updateData.selectedFont = selectedFont || undefined;
 

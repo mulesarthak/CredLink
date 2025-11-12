@@ -8,9 +8,9 @@ export async function POST(request: NextRequest) {
     const { email, password, fullName, phone } = body
         console.log(email,password,fullName,phone);
     // Validate required fields
-    if (!email || !password || !fullName) {
+    if (!email || !password || !fullName || !phone) {
       return NextResponse.json(
-        { error: 'Email, password, and full name are required' },
+        { error: 'Email, password, full name and phone number are required' },
         { status: 400 }
       )
     }
@@ -21,11 +21,11 @@ export async function POST(request: NextRequest) {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email: normalizedEmail },
-      select: { id: true, email: true, isActive: true }
+      select: { id: true, email: true, status: true }
     })
 
     // If user exists and is active, reject signup
-    if (existingUser && existingUser.isActive) {
+    if (existingUser && existingUser.status === 'active') {
       return NextResponse.json(
         { error: 'User with this email already exists' },
         { status: 409 }
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
     
     // If user exists but is inactive, reactivate the account
-    if (existingUser && !existingUser.isActive) {
+    if (existingUser && existingUser.status !== 'active') {
       const hashedPassword = await bcrypt.hash(password, 10)
       
       // Generate username from normalized email
@@ -53,9 +53,9 @@ export async function POST(request: NextRequest) {
         data: {
           password: hashedPassword,
           fullName,
-          phone: phone || null,
+          phone,
           username,
-          isActive: true // Reactivate the account
+          status: 'active' // Reactivate the account
         },
         select: {
           id: true,
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         email: normalizedEmail,
         password: hashedPassword,
         fullName,
-        phone: phone || null,
+        phone,
         username,
       },
       select: {
@@ -108,9 +108,22 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    // Send OTP to phone
+    const otpResponse = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/otp/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ phone })
+    })
+
+    if (!otpResponse.ok) {
+      console.error('Failed to send OTP:', await otpResponse.text())
+    }
+
     return NextResponse.json(
       { 
-        message: 'User created successfully',
+        message: 'User created successfully. OTP sent to phone.',
         user 
       },
       { status: 201 }

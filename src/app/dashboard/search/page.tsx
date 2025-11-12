@@ -38,6 +38,7 @@ export default function SearchPage() {
   const [connectionName, setConnectionName] = useState("");
   const [connectingUserId, setConnectingUserId] = useState<string | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
 
   // Fetch users from backend
   useEffect(() => {
@@ -105,6 +106,7 @@ export default function SearchPage() {
 
       setConnectionName(name);
       setShowModal(true);
+      setSentRequests(prev => new Set([...prev, userId]));
       toast.success(`Connection request sent to ${name}!`);
     } catch (error: any) {
       console.error("Connection error:", error);
@@ -273,11 +275,17 @@ export default function SearchPage() {
                     </div>
 
                     <button 
-                      onClick={() => handleConnect(p.id, p.name)} 
-                      disabled={connectingUserId === p.id}
-                      className={styles.connectBtn}
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); handleConnect(p.id, p.name); }} 
+                      disabled={connectingUserId === p.id || sentRequests.has(p.id)}
+                      className={`${styles.connectBtn} ${sentRequests.has(p.id) ? styles.connectBtnSent : ''}`}
+                      style={sentRequests.has(p.id) ? { 
+                        backgroundColor: '#9CA3AF', 
+                        color: '#ffffff',
+                        cursor: 'not-allowed'
+                      } : {}}
                     >
-                      {connectingUserId === p.id ? "Connecting..." : "Connect"}
+                      {connectingUserId === p.id ? "Connecting..." : sentRequests.has(p.id) ? "Sent" : "Connect"}
                     </button>
                   </div>
 

@@ -40,7 +40,14 @@ export const useAuth = create<AuthState>((set) => ({
       })
       
       console.log('📡 useAuth: Response status:', response.status)
-      const data = await response.json()
+      let data: any = null
+      try {
+        data = await response.json()
+      } catch {
+        const text = await response.text()
+        data = { error: text }
+      }
+      
       console.log('📦 useAuth: Response data:', data)
       
       if (!response.ok) {
@@ -109,12 +116,24 @@ export const useAuth = create<AuthState>((set) => ({
   checkAuth: async () => {
     set({ isLoading: true })
     try {
-      const response = await fetch('/api/auth/me', {
+      const response = await fetch('/api/user/me', {
         credentials: 'include' // Ensure cookies are sent
       })
       
       if (response.ok) {
-        const data = await response.json()
+        let data: any = null
+        try {
+          data = await response.json()
+        } catch {
+          const text = await response.text()
+          console.error('Unexpected non-JSON from /api/user/me:', text)
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+          })
+          return
+        }
         set({
           user: data.user,
           isAuthenticated: true,

@@ -8,6 +8,9 @@ import { FiPlus } from "react-icons/fi";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "react-hot-toast";
 import DigitalCardPreview, { DigitalCardProps } from "@/components/cards/DigitalCardPreview";
+import FlatCardPreview from '@/components/cards/FlatCardPreview';
+import ModernCardPreview from "@/components/cards/ModernCardPreview";
+import SleekCardPreview from "@/components/cards/SleekCardPreview";
 
 // ----------------- Card Type Definition -----------------
 interface Card {
@@ -27,6 +30,7 @@ interface Card {
   profileImage?: string;
   cover?: string;
   coverImage?: string;
+  bannerImage?: string;
   email?: string;
   phone?: string;
   linkedin?: string;
@@ -35,8 +39,50 @@ interface Card {
   websiteUrl?: string;
   selectedDesign?: string;
   selectedColor?: string;
+  selectedColor2?: string;
   selectedFont?: string;
 }
+
+// ----------------- Card Preview Renderer (Exact Copy from Edit Page) -----------------
+const renderCardPreview = (card: Card) => {
+  // Use EXACT same prop mapping as edit page
+  const commonProps = {
+    name: card.fullName || card.name || '',
+    title: card.title || '',
+    company: card.company || '',
+    location: card.location || '',
+    about: card.bio || card.about || card.description || '',
+    skills: card.skills || 'SEO, Content Creation, Analytics, Social Media',
+    portfolio: card.portfolio || '[Link] Latest Campaigns',
+    experience: card.experience || `${card.title || 'Lead SEO Specialist'} @ ${card.company || 'TechCorp'} (2021-Present)`,
+    services: 'SEO Audits, Content Campaigns',
+    review: 'John transformed our online presence!',
+    photo: card.profileImage || card.photo || '',
+    cover: card.coverImage || card.bannerImage || card.cover || '',
+    email: card.email || '',
+    phone: card.phone || '',
+    linkedin: card.linkedinUrl || card.linkedin || '',
+    website: card.websiteUrl || card.website || '',
+    themeColor1: card.selectedColor || '#3b82f6',
+    themeColor2: card.selectedColor2 || '#2563eb',
+    fontFamily: card.selectedFont || 'system-ui, sans-serif',
+  };
+
+  const selectedDesign = card.selectedDesign || 'Classic';
+  
+  // Use EXACT same switch logic as edit page
+  switch (selectedDesign) {
+    case 'Flat':
+      return <FlatCardPreview {...commonProps} />;
+    case 'Modern':
+      return <ModernCardPreview {...commonProps} />;
+    case 'Sleek':
+      return <SleekCardPreview {...commonProps} />;
+    case 'Classic':
+    default:
+      return <DigitalCardPreview {...commonProps} />;
+  }
+};
 
 // ----------------- Main Dashboard -----------------
 const Dashboard = () => {
@@ -145,7 +191,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] px-8 sm:px-14 py-8 lg:ml-64 transition-all duration-300">
+    <div className="min-h-screen bg-background px-8 sm:px-14 py-8 lg:ml-64 transition-all duration-300">
       {/* Create New Card Button */}
       <div className="flex justify-center my-6">
         <motion.button
@@ -185,9 +231,6 @@ const Dashboard = () => {
           </div>
         ) : cardsData.length > 0 ? (
           cardsData.map((card, index) => {
-            const actualDesign = card.selectedDesign || 'Classic';
-            console.log(`🎨 Card ${card.id}: Design = "${actualDesign}" | From DB: "${card.selectedDesign}"`);
-            
             return (
               <motion.div
                 key={card.id}
@@ -201,23 +244,7 @@ const Dashboard = () => {
                 className="transition-all duration-300 cursor-pointer"
                 onClick={() => router.push(`/cards/${card.id}`)}
               >
-                <DigitalCardPreview
-                  name={card.fullName || card.name || ''}
-                  title={card.title || ''}
-                  company={card.company || ''}
-                  location={card.location || ''}
-                  about={card.bio || card.about || card.description || ''}
-                  skills={card.skills || ''}
-                  portfolio={card.portfolio || ''}
-                  experience={card.experience || ''}
-                  photo={card.profileImage || card.photo || ''}
-                  cover={card.coverImage || card.cover || ''}
-                  email={card.email || ''}
-                  phone={card.phone || ''}
-                  linkedin={card.linkedinUrl || card.linkedin || ''}
-                  website={card.websiteUrl || card.website || ''}
-                  design={actualDesign}
-                />
+{renderCardPreview(card)}
               </motion.div>
             );
           })
@@ -258,6 +285,8 @@ const Dashboard = () => {
                   linkedin={card.linkedin || ''}
                   website={card.website || ''}
                   design="Classic"
+                  themeColor1="#3b82f6"
+                  themeColor2="#2563eb"
                 />
               </motion.div>
             ))}

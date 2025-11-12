@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
                 NOT: {
                     id: userId
                 },
-                isActive: true
+                status: 'active'
             },
             select: {
                 id: true,

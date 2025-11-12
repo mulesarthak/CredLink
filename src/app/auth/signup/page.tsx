@@ -40,7 +40,7 @@ export default function SignupPage() {
     e.preventDefault()
     setError('')
     
-    if (!fullName || !email || !password || !confirmPassword) {
+    if (!fullName || !email || !phone || !password || !confirmPassword) {
       setError('Please fill in all required fields')
       return
     }
@@ -87,9 +87,8 @@ export default function SignupPage() {
       const data = await response.json()
 
       if (response.ok) {
-        // Success - redirect to login or dashboard
-        alert(`Account created successfully! ${data.reactivated ? 'Account reactivated.' : ''}`)
-        router.push('/auth/login')
+        // Success - redirect to OTP verification
+        router.push(`/auth/verify-otp?phone=${encodeURIComponent(phone)}`)
       } else {
         // Error from API
         setError(data.error || 'Failed to create account')
@@ -144,7 +143,7 @@ export default function SignupPage() {
 
             <div className="auth-input-group">
               <label htmlFor="phone" className="label">
-                Phone Number (Optional)
+                Phone Number
               </label>
               <input
                 id="phone"
@@ -153,6 +152,7 @@ export default function SignupPage() {
                 onChange={(e) => setPhone(e.target.value)}
                 className="auth-input"
                 placeholder="Enter phone number"
+                required
               />
             </div>
 
