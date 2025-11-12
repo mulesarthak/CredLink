@@ -311,9 +311,27 @@ export default function MessagesPage() {
         {/* Header */}
         {isMobile ? (
           <div style={{ marginBottom: 24 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>Messages</h1>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, position: "relative" }}>
+            <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>Messages</h1>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div className="relative" style={{ flex: 1 }}>
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#94A3B8" }} />
+                <input
+                  type="text"
+                  placeholder="Search messages..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="w-full"
+                  style={{
+                    padding: "10px 14px 10px 40px",
+                    fontSize: 14,
+                    border: "1px solid #CBD5E1",
+                    borderRadius: 8,
+                    outline: "none",
+                    backgroundColor: "#FFFFFF",
+                  }}
+                />
+              </div>
+              <div style={{ position: "relative" }}>
                 <button
                   aria-label="Filters"
                   onClick={() => setMobileFilterOpen(v => !v)}
@@ -324,15 +342,15 @@ export default function MessagesPage() {
                 {mobileFilterOpen && (
                   <div
                     style={{
-                      position: "absolute",
-                      right: 0,
-                      top: 34,
+                      position: "fixed",
+                      right: 16,
+                      top: 120,
                       backgroundColor: "#FFFFFF",
                       border: "1px solid #E5E7EB",
                       borderRadius: 8,
                       boxShadow: "0 8px 24px rgba(16,24,40,0.12)",
-                      zIndex: 30,
-                      width: 180,
+                      zIndex: 1000,
+                      width: 200,
                       overflow: "hidden",
                     }}
                   >
@@ -365,24 +383,6 @@ export default function MessagesPage() {
                   </div>
                 )}
               </div>
-            </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#94A3B8" }} />
-              <input
-                type="text"
-                placeholder="Search messages..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="w-full"
-                style={{
-                  padding: "10px 14px 10px 40px",
-                  fontSize: 14,
-                  border: "1px solid #CBD5E1",
-                  borderRadius: 8,
-                  outline: "none",
-                  backgroundColor: "#FFFFFF",
-                }}
-              />
             </div>
           </div>
         ) : (
@@ -457,7 +457,16 @@ export default function MessagesPage() {
             className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
             style={{ padding: 16, borderBottom: "1px solid #E5E7EB" }}
           >
-            <div className="flex items-center gap-2 flex-wrap">
+            <div
+              className="flex items-center gap-2"
+              style={{
+                flexWrap: isMobile ? "nowrap" : "wrap",
+                overflowX: isMobile ? "auto" : "visible",
+                WebkitOverflowScrolling: "touch",
+                msOverflowStyle: isMobile ? "none" : undefined,
+                scrollbarWidth: isMobile ? "none" : undefined,
+              }}
+            >
               {(["All", "Unread", "Replied", "Pending", "Archived", "Deleted"] as const).map(f => (
                 <button
                   key={f}
@@ -470,6 +479,8 @@ export default function MessagesPage() {
                     transition: "background-color .2s ease",
                     backgroundColor: activeFilter === f ? "#2563EB" : "#F1F5F9",
                     color: activeFilter === f ? "#FFFFFF" : "#334155",
+                    whiteSpace: "nowrap",
+                    flex: "0 0 auto",
                   }}
                 >
                   {f}
