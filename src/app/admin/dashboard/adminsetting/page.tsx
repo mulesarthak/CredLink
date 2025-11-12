@@ -62,7 +62,7 @@ export default function AdminSettingsPage() {
     confirmPassword: "",
   });
   const [saving, setSaving] = useState(false);
-  const [show, setShow] = useState({ current: false, new: false, confirm: false });
+  const [show, setShow] = useState({ currentPassword: false, newPassword: false, confirmPassword: false });
 
   const [users, setUsers] = useState<AppUser[]>([
     {

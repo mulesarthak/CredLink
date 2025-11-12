@@ -233,8 +233,7 @@ export default function AdminDashboardPage() {
               <p className={styles.actionDesc}>View platform statistics</p>
             </div>
 
-            {(admin.role === "SUPER_ADMIN" ||
-              admin.permissions.includes("MANAGE_SETTINGS")) && (
+            {admin.role === "SUPER_ADMIN" && (
               <div
                 onClick={() => router.push("/admin/dashboard/adminsetting")}
                 className={styles.actionCard}
