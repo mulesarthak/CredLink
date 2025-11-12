@@ -368,11 +368,14 @@ export default function AnalyticsPage() {
           if (!res.ok) return;
           const data = await res.json();
           applyStats(data?.stats);
-          setCategoryData(
-            data.engagementData
+          {
+            const mapped = data.engagementData
               .filter((item: any) => item.name !== 'Users')
-              .map((item: any) => ({ category: item.name, count: item.value }))
-          );
+              .map((item: any) => ({ category: item.name, count: Number(item.value) || 0 }));
+            const sum = mapped.reduce((s: number, d: any) => s + d.count, 0);
+            console.debug('[Analytics] categoryData (poll)', mapped);
+            setCategoryData(sum > 0 ? mapped : mapped.map((d: any) => ({ ...d, count: 1 })));
+          }
           setEngagementData(data.trafficData);
           setActivityData(data.activitySummaryDaily || []); // Update activityData from backend-provided activitySummaryDaily
         } catch (_) {}
@@ -387,11 +390,14 @@ export default function AnalyticsPage() {
         try {
           const payload = JSON.parse(evt.data);
           applyStats(payload?.stats);
-          setCategoryData(
-            payload.engagementData
+          {
+            const mapped = payload.engagementData
               .filter((item: any) => item.name !== 'Users')
-              .map((item: any) => ({ category: item.name, count: item.value }))
-          );
+              .map((item: any) => ({ category: item.name, count: Number(item.value) || 0 }));
+            const sum = mapped.reduce((s: number, d: any) => s + d.count, 0);
+            console.debug('[Analytics] categoryData (sse)', mapped);
+            setCategoryData(sum > 0 ? mapped : mapped.map((d: any) => ({ ...d, count: 1 })));
+          }
           setEngagementData(payload.trafficData);
           setActivityData(payload.activitySummaryDaily || []); // Update activityData from backend-provided activitySummaryDaily
         } catch (_) {}
@@ -524,9 +530,22 @@ export default function AnalyticsPage() {
       <div className={styles.chartsContainer}>
         <div className={styles.chartBox}>
           <h2>Profile Distribution by Category</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={categoryData} dataKey="count" nameKey="category" outerRadius={100} label>
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <PieChart width={420} height={300}>
+              <Pie
+                data={categoryData}
+                dataKey="count"
+                nameKey="category"
+                cx="50%"
+                cy="50%"
+                innerRadius={50}
+                outerRadius={100}
+                startAngle={90}
+                endAngle={-270}
+                minAngle={1}
+                paddingAngle={2}
+                isAnimationActive={false}
+              >
                 {categoryData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
@@ -534,7 +553,7 @@ export default function AnalyticsPage() {
               <Tooltip />
               <Legend />
             </PieChart>
-          </ResponsiveContainer>
+          </div>
         </div>
 
         {/* <div className={styles.chartBox}>

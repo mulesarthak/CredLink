@@ -145,6 +145,9 @@ export default function DashboardContactPage() {
         }));
         
         setContactsList(mappedConnections);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('connections-updated'));
+        }
       } catch (error) {
         console.error('Error fetching connections:', error);
         toast.error('Failed to load connections');
@@ -187,6 +190,9 @@ export default function DashboardContactPage() {
         }));
         
         setConnectionRequests(mappedRequests);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('connections-updated'));
+        }
       } catch (error) {
         console.error('Error fetching connection requests:', error);
         toast.error('Failed to load connection requests');
@@ -305,6 +311,9 @@ export default function DashboardContactPage() {
         setContactsList(prev => [...prev, {...request, connectionStatus: 'connected'}]);
         setConnectionRequests(prev => prev.filter(c => c.id !== contactId));
         toast.success(`Connection with ${request.name} approved!`);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('connections-updated'));
+        }
       }
     } catch (error: any) {
       console.error('Error approving connection request:', error);
@@ -333,6 +342,9 @@ export default function DashboardContactPage() {
       
       if (request) {
         toast.success(`Connection request from ${request.name} rejected`);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('connections-updated'));
+        }
       }
     } catch (error: any) {
       console.error('Error rejecting connection request:', error);
