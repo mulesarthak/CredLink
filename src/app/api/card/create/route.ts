@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
       cardType: formData.get('cardType') as string || undefined,
       selectedDesign: formData.get('selectedDesign') as string || undefined,
       selectedColor: formData.get('selectedColor') as string || undefined,
+      selectedColor2: formData.get('selectedColor2') as string || undefined,
       selectedFont: formData.get('selectedFont') as string || undefined,
       bio: formData.get('bio') as string || undefined,
       description: formData.get('description') as string || undefined,

@@ -118,22 +118,45 @@ export default function AdminSettingsPage() {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       return toast.error("Passwords do not match");
     }
+    if (passwordData.newPassword.length < 6) {
+      return toast.error("New password must be at least 6 characters long");
+    }
    
-const response = await fetch("/api/admin/profile/update", {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      id: admin?.id,
-      password: passwordData.currentPassword,
-      newPassword: passwordData.newPassword,
-    }),
-  });
     setSaving(true);
-    await new Promise((res) => setTimeout(res, 900));
-    toast.success("Password updated successfully");
-    setSaving(false);
+    try {
+      const response = await fetch("/api/admin/profile/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          password: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || "Failed to update password");
+        return;
+      }
+
+      // Clear form on success
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      
+      toast.success("Password updated successfully");
+    } catch (error) {
+      console.error("Password change error:", error);
+      toast.error("Failed to update password. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const openModal = (user?: AppUser) => {

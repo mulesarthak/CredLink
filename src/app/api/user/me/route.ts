@@ -1,6 +1,20 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
+// Simple JWT decode function (without verification for now)
+function decodeJWT(token: string) {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+    
+    const payload = parts[1]
+    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString())
+    return decoded
+  } catch (error) {
+    return null
+  }
+}
+
 export async function GET() {
   try {
     const cookieStore = await cookies()
@@ -13,15 +27,25 @@ export async function GET() {
       )
     }
 
-    // For now, return mock user data to test the flow
-    // TODO: Add JWT verification and database lookup
+    // Decode JWT token to get user info
+    const decoded = decodeJWT(token)
+    
+    if (!decoded || !decoded.userId) {
+      return NextResponse.json(
+        { error: 'Invalid token' },
+        { status: 401 }
+      )
+    }
+
+    // Return actual user data from the token
     return NextResponse.json({ 
       user: {
-        id: 'mock-id',
-        email: 'jaydhurve09@gmail.com',
-        fullName: 'Jay D',
-        phone: null,
-        username: 'jayd'
+        id: decoded.userId,
+        email: decoded.email,
+        fullName: decoded.fullName,
+        phone: decoded.phone || null,
+        username: decoded.username || null,
+        profileImage: decoded.profileImage || null
       }
     })
   } catch (error) {

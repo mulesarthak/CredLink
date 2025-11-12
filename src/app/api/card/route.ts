@@ -18,7 +18,6 @@ export async function GET(req: NextRequest) {
     const decoded = verify(token, JWT_SECRET) as { userId: string };
 
     // Fetch all cards for the user
-    // Explicitly select columns to avoid schema mismatch issues
     const cards = await prisma.card.findMany({
       where: { userId: decoded.userId },
       orderBy: { createdAt: 'desc' },
@@ -72,17 +71,32 @@ export async function GET(req: NextRequest) {
       }
     });
 
+    // Add selectedColor2 using a separate query for now
+    const cardsWithColor2 = await Promise.all(
+      cards.map(async (card) => {
+        const color2Result = await prisma.$queryRaw`
+          SELECT selected_color2 as selectedColor2 FROM cards WHERE id = ${card.id}
+        ` as any[];
+        
+        return {
+          ...card,
+          selectedColor2: color2Result[0]?.selectedColor2 || null
+        };
+      })
+    );
+
     console.log('📊 Fetched cards for user:', decoded.userId);
-    console.log('📋 Number of cards:', cards.length);
-    if (cards.length > 0) {
-      console.log('🎨 First card design:', cards[0].selectedDesign);
-      console.log('🔍 First card data:', JSON.stringify(cards[0], null, 2));
+    console.log('📋 Number of cards:', cardsWithColor2.length);
+    if (cardsWithColor2.length > 0) {
+      console.log('🎨 First card design:', cardsWithColor2[0].selectedDesign);
+      console.log('🎨 First card selectedColor2:', cardsWithColor2[0].selectedColor2);
+      console.log('🔍 First card data:', JSON.stringify(cardsWithColor2[0], null, 2));
     }
 
     return NextResponse.json({ 
       success: true,
-      cards,
-      count: cards.length
+      cards: cardsWithColor2,
+      count: cardsWithColor2.length
     });
 
   } catch (error: any) {
