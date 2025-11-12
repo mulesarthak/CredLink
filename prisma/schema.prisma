@@ -143,6 +143,7 @@ model Card {
   cardType         String?  @map("card_type") @default("Personal") @db.VarChar(50)
   selectedDesign   String?  @map("selected_design") @default("Classic") @db.VarChar(50)
   selectedColor    String?  @map("selected_color") @default("#145dfd") @db.VarChar(20)
+  selectedColor2   String?  @map("selected_color2") @default("#00c0fd") @db.VarChar(20)
   selectedFont     String?  @map("selected_font") @default("Arial, sans-serif") @db.VarChar(100)
   displayTypes     String?  @map("display_types") @db.Text
   

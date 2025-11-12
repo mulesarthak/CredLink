@@ -465,13 +465,28 @@ export default function AccountSettingsPage(): React.JSX.Element {
       }
     };
     fetchUserProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // photo change: preview + upload
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Validate file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      alert("File size too large. Maximum size is 5MB. Please choose a smaller image.");
+      e.target.value = ''; // Clear the input
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Invalid file type. Only JPEG, PNG, and WebP images are allowed.");
+      e.target.value = ''; // Clear the input
+      return;
+    }
 
     // immediate preview
     const reader = new FileReader();
@@ -493,24 +508,32 @@ export default function AccountSettingsPage(): React.JSX.Element {
       const data = await res.json();
       if (res.ok && data.imageUrl) {
         setAccountPhoto(data.imageUrl);
+        alert("Profile image updated successfully!");
         // refresh auth state so header/avatar update if needed
         setTimeout(async () => {
           await checkAuth();
         }, 300);
       } else {
         console.error("Upload failed:", data?.error);
-        alert("Failed to upload image: " + (data?.error ?? "Unknown error"));
+        // Revert preview on error
+        setAccountPhoto(null);
+        
+        // Show specific error messages
+        if (data?.error?.includes('size')) {
+          alert("File size too large. Maximum size is 5MB.");
+        } else if (data?.error?.includes('type')) {
+          alert("Invalid file type. Only JPEG, PNG, and WebP images are allowed.");
+        } else {
+          alert("Failed to upload image: " + (data?.error ?? "Unknown error"));
+        }
       }
     } catch (err) {
       console.error("Upload error:", err);
-      alert("Failed to upload image. Try again.");
+      // Revert preview on error
+      setAccountPhoto(null);
+      alert("Failed to upload image. Please check your internet connection and try again.");
     }
   };
-
-  /**
-   * SIMPLIFIED: Instantly removes the photo from the UI by setting state to null, 
-   * no backend call or await needed.
-   */
   const handleRemovePhoto = () => {
     setAccountPhoto(null);
     alert('Profile photo removed from UI.');
