@@ -136,6 +136,22 @@ export async function PATCH(
     const description = formData.get('description') as string;
     if (description !== null) updateData.description = description || undefined;
 
+    // Card Sections
+    const skills = formData.get('skills') as string;
+    if (skills !== null) updateData.skills = skills || undefined;
+    
+    const portfolio = formData.get('portfolio') as string;
+    if (portfolio !== null) updateData.portfolio = portfolio || undefined;
+    
+    const experience = formData.get('experience') as string;
+    if (experience !== null) updateData.experience = experience || undefined;
+    
+    const services = formData.get('services') as string;
+    if (services !== null) updateData.services = services || undefined;
+    
+    const review = formData.get('review') as string;
+    if (review !== null) updateData.review = review || undefined;
+
     // Status
     const status = formData.get('status') as string;
     if (status !== null) updateData.status = status;

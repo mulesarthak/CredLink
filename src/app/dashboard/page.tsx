@@ -26,6 +26,8 @@ interface Card {
   skills?: string;
   portfolio?: string;
   experience?: string;
+  services?: string;
+  review?: string;
   photo?: string;
   profileImage?: string;
   cover?: string;
@@ -55,8 +57,8 @@ const renderCardPreview = (card: Card) => {
     skills: card.skills || 'SEO, Content Creation, Analytics, Social Media',
     portfolio: card.portfolio || '[Link] Latest Campaigns',
     experience: card.experience || `${card.title || 'Lead SEO Specialist'} @ ${card.company || 'TechCorp'} (2021-Present)`,
-    services: 'SEO Audits, Content Campaigns',
-    review: 'John transformed our online presence!',
+    services: card.services || '',
+    review: card.review || '',
     photo: card.profileImage || card.photo || '',
     cover: card.coverImage || card.bannerImage || card.cover || '',
     email: card.email || '',
@@ -222,8 +224,8 @@ const Dashboard = () => {
       {/* Invisible container for vertical spacing */}
       <div className="h-10"></div>
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-14 justify-items-center mt-4">
+      {/* Cards Bento Layout */}
+      <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6 mt-4">
         {isLoadingCards ? (
           <div className="col-span-full text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-green mx-auto mb-4"></div>
@@ -241,7 +243,7 @@ const Dashboard = () => {
                   scale: 1.02,
                   y: -4,
                 }}
-                className="transition-all duration-300 cursor-pointer"
+                className="transition-all duration-300 cursor-pointer break-inside-avoid mb-6 inline-block w-full"
                 onClick={() => router.push(`/cards/${card.id}`)}
               >
 {renderCardPreview(card)}
@@ -266,7 +268,7 @@ const Dashboard = () => {
                   scale: 1.02,
                   y: -4,
                 }}
-                className="transition-all duration-300 cursor-pointer"
+                className="transition-all duration-300 cursor-pointer break-inside-avoid mb-6 inline-block w-full"
                 onClick={() => router.push(`/cards/${card.id}`)}
               >
                 <DigitalCardPreview

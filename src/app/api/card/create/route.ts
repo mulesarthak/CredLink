@@ -53,6 +53,11 @@ export async function POST(req: NextRequest) {
       selectedFont: formData.get('selectedFont') as string || undefined,
       bio: formData.get('bio') as string || undefined,
       description: formData.get('description') as string || undefined,
+      skills: formData.get('skills') as string || undefined,
+      portfolio: formData.get('portfolio') as string || undefined,
+      experience: formData.get('experience') as string || undefined,
+      services: formData.get('services') as string || undefined,
+      review: formData.get('review') as string || undefined,
       status: formData.get('status') as string || 'draft',
     };
 
