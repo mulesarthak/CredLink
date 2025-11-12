@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Linkedin, Twitter, Instagram, Mail, MapPin, Phone, Sparkles } from "lucide-react";
 import '../app/globals.css';
 import { useState, useEffect } from 'react';
@@ -220,20 +221,20 @@ export default function Footer() {
             </div>
           </div>
           {/* Social & Newsletter Column */}
-          <div>
-            <div style={{
+          {/* <div> */}
+            {/* <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.5rem',
               marginBottom: '1.5rem'
-            }}>
-              <div style={{
+            }}> */}
+              {/* <div style={{
                 width: '32px',
                 height: '2px',
                 background: 'linear-gradient(90deg, #0066FF 0%, transparent 100%)'
-              }} />
-              <h4 style={{
+              }} /> */}
+              {/* <h4 style={{
                 fontSize: '0.875rem',
                 fontWeight: '700',
                 color: '#2C3E50',
@@ -242,11 +243,11 @@ export default function Footer() {
                 margin: 0
               }}>
                 Connect
-              </h4>
-            </div>
+              </h4> */}
+            {/* </div> */}
             
             {/* Social Icons */}
-            <div style={{
+            {/* <div style={{
               display: 'flex',
               justifyContent: 'center',
               gap: '0.75rem',
@@ -293,10 +294,10 @@ export default function Footer() {
                     <Icon size={20} />
                   </a>
                 ))}
-            </div>
+            </div> */}
             {/* Newsletter */}
            
-            <div style={{
+            {/* <div style={{
               display: 'flex',
               justifyContent: 'center',
               gap: '0.5rem',
@@ -305,7 +306,7 @@ export default function Footer() {
               
               
             </div>
-          </div>
+          </div> */}
         </div>
         {/* Bottom Bar */}
         <div style={{
@@ -323,23 +324,26 @@ export default function Footer() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '0.5rem'
+            gap: '0'
           }}>
             <p style={{
               fontSize: '1rem',
               color: '#6B7280',
               margin: 0,
-              fontWeight: '400'
+              fontWeight: '400',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
             }}>
-              <span style={{
-                fontWeight: '700',
-                background: 'linear-gradient(to right, #2563eb, #1d4ed8)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}>
-                MyKard
-              </span>{" "}
+              <Image
+                src="/assets/headerlogo.png"
+                alt="Logo"
+                width={112}
+                height={112}
+                className="w-28 h-16 object-contain"
+                priority
+                unoptimized
+              />
               powered by BoostNow
             </p>
             <p style={{

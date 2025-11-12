@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -123,11 +124,16 @@ const Sidebar = () => {
       >
         {/* Header */}
         <div className="sidebarHeader">
-          <Link href="/" className="logoArea">
-            <div className="logoIcon">
-              <LayoutDashboard />
-            </div>
-            <span className="logoText">MyKard</span>
+          <Link href="/" className="logoArea" style={{ paddingLeft: '2rem' }}>
+            <Image
+              src="/assets/mykard.png"
+              alt="Logo"
+              width={40}
+              height={40}
+              className="w-36 h-36 object-contain"
+              priority
+              unoptimized
+            />
           </Link>
         </div>
 
