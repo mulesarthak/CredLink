@@ -17,14 +17,11 @@ model User {
   password         String
   fullName         String
   phone            String?
-  phoneVerified    Boolean?  @default(false)
   username         String    @unique
-<<<<<<< HEAD
-=======
   role             String?   @default("user")
+  isActive         Boolean   @default(true)
 
   // Personal Info
->>>>>>> f6c1cd60d2bebf2bd591f7294ecbd908c8d27124
   firstName        String?
   middleName       String?
   lastName         String?
@@ -33,39 +30,20 @@ model User {
   preferredName    String?
   maidenName       String?
   pronouns         String?
-<<<<<<< HEAD
-=======
-
-  // Professional Info
->>>>>>> f6c1cd60d2bebf2bd591f7294ecbd908c8d27124
   title            String?
   company          String?
   department       String?
   affiliation      String?
   headline         String?
   accreditations   String?
-<<<<<<< HEAD
   emailLink        String?
   phoneLink        String?
   location         String?
-  role            String?
-=======
-
-  // Contact & Social Info
-  emailLink        String?
-  phoneLink        String?
-  location         String?
-  linkedinUrl      String?
-  websiteUrl       String?
-
-  // Card Customization
->>>>>>> f6c1cd60d2bebf2bd591f7294ecbd908c8d27124
   cardName         String?
   cardType         String?   @default("Personal")
   selectedDesign   String?   @default("Classic")
   selectedColor    String?   @default("#145dfd")
   selectedFont     String?   @default("Arial, sans-serif")
-<<<<<<< HEAD
   profileImage     String?   @db.Text
   bannerImage      String?   @db.Text
   bio              String?   @db.Text
@@ -76,32 +54,8 @@ model User {
   cards            Card[]    @relation("UserCards")
   receivedMessages Message[] @relation("ReceivedMessages")
   sentMessages     Message[] @relation("SentMessages")
-=======
-  displayTypes     String?   @db.Text // from their version, stores multiple card styles
-
-  // Media
-  profileImage     String?   @db.Text
-  bannerImage      String?   @db.Text
-
-  // Content
-  bio              String?   @db.Text
-
-  // Metadata
-  status           String?   @default("active")
-  views            Int       @default(0)
-  connections      String?   @db.Text // for legacy tracking (keep this)
-  phoneVerified    Boolean?  @default(false)
-
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
-  // Relations
-  receivedMessages Message[]     @relation("ReceivedMessages")
-  sentMessages     Message[]     @relation("SentMessages")
-  cards            Card[]        @relation("UserCards")
-  sentConnections  Connection[]  @relation("SentConnections")
+  sentConnections  Connection[] @relation("SentConnections")
   receivedConnections Connection[] @relation("ReceivedConnections")
->>>>>>> f6c1cd60d2bebf2bd591f7294ecbd908c8d27124
 
   @@index([username])
   @@map("users")
@@ -136,6 +90,7 @@ model AdminSession {
 model Message {
   id         String        @id @default(cuid())
   text       String        @db.Text
+  topic      String        @default("Other")
   senderId   String
   receiverId String
   status     MessageStatus @default(PENDING)
@@ -154,7 +109,6 @@ model Message {
 model Card {
   id               String   @id @default(cuid()) @map("id")
   userId           String   @map("user_id")
-<<<<<<< HEAD
   
   // Personal Information
   fullName         String   @map("full_name") @db.VarChar(255)
@@ -176,29 +130,6 @@ model Card {
   accreditations   String?  @db.Text
   
   // Contact Information
-=======
-
-  // Personal Info
-  fullName         String   @db.VarChar(255)
-  firstName        String?
-  middleName       String?
-  lastName         String?
-  prefix           String?
-  suffix           String?
-  preferredName    String?
-  maidenName       String?
-  pronouns         String?
-
-  // Professional Info
-  title            String?
-  company          String?
-  department       String?
-  affiliation      String?
-  headline         String?
-  accreditations   String?
-
-  // Contact Info
->>>>>>> f6c1cd60d2bebf2bd591f7294ecbd908c8d27124
   email            String?  @db.VarChar(320)
   phone            String?  @db.VarChar(50)
   emailLink        String?  @map("email_link") @db.VarChar(500)
@@ -208,7 +139,6 @@ model Card {
   websiteUrl       String?  @map("website_url") @db.VarChar(2048)
 
   // Card Customization
-<<<<<<< HEAD
   cardName         String?  @map("card_name") @db.VarChar(100)
   cardType         String?  @map("card_type") @default("Personal") @db.VarChar(50)
   selectedDesign   String?  @map("selected_design") @default("Classic") @db.VarChar(50)
@@ -221,20 +151,6 @@ model Card {
   bannerImage      String?  @map("banner_image") @db.VarChar(2048)
   coverImage       String?  @map("cover_image") @db.VarChar(2048)
   
-=======
-  cardName         String?
-  cardType         String?  @default("Personal")
-  selectedDesign   String?  @default("Classic")
-  selectedColor    String?  @default("#145dfd")
-  selectedFont     String?  @default("Arial, sans-serif")
-  displayTypes     String?  @db.Text
-
-  // Media
-  profileImage     String?  @db.Text
-  bannerImage      String?  @db.Text
-  coverImage       String?  @map("cover_image") @db.Text
-
->>>>>>> f6c1cd60d2bebf2bd591f7294ecbd908c8d27124
   // Content
   bio              String?  @db.Text
   description      String?  @db.Text

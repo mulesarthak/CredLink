@@ -37,20 +37,7 @@ interface Contact {
   isIncomingRequest?: boolean;
 }
 
-// Enhanced sample contact data (Keeping this data structure for existing connections)
-const contactsData: Contact[] = [
-  { id: "1", name: "Leo Garcia", title: "Full Stack Developer", company: "MyKard", tags: ["Personal"], associatedCard: "Personal", dateAdded: "2024-10-30", email: "leo@mykard.com", phone: "+1 (555) 123-4567", location: "Mumbai, India", lastInteraction: "2024-10-29", activityStatus: "active" },
-  { id: "2", name: "John Smith", title: "Software Engineer", company: "Tech Corp", tags: ["Tech"], associatedCard: "Work", dateAdded: "2024-10-25", email: "john@techcorp.com", phone: "+1 (555) 234-5678", location: "San Francisco, CA", lastInteraction: "2024-10-28", activityStatus: "active" },
-  { id: "3", name: "Sarah Johnson", title: "Marketing Manager", company: "Creative Agency", tags: ["Marketing"], associatedCard: "Business", dateAdded: "2024-10-20", email: "sarah@creative.com", phone: "+1 (555) 345-6789", location: "New York, NY", lastInteraction: "2024-10-15", activityStatus: "inactive" },
-  { id: "4", name: "Mike Davis", title: "Product Designer", company: "Design Studio", tags: ["Design"], associatedCard: "Creative", dateAdded: "2024-10-15", email: "mike@designstudio.com", phone: "+1 (555) 456-7890", location: "Austin, TX", lastInteraction: "2024-10-30", activityStatus: "active" },
-  { id: "5", name: "Emily Chen", title: "Data Scientist", company: "Analytics Inc", tags: ["Professional"], associatedCard: "Professional", dateAdded: "2024-10-10", email: "emily@analytics.com", phone: "+1 (555) 567-8901", location: "Seattle, WA", lastInteraction: "2024-10-25", activityStatus: "active" },
-  { id: "6", name: "Alex Rodriguez", title: "Sales Director", company: "Sales Solutions", tags: ["Business"], associatedCard: "Business", dateAdded: "2024-10-05", email: "alex@sales.com", phone: "+1 (555) 678-9012", location: "Miami, FL", lastInteraction: "2024-09-20", activityStatus: "inactive" },
-  { id: "7", name: "Lisa Wang", title: "UX Researcher", company: "User Labs", tags: ["Creative"], associatedCard: "Creative", dateAdded: "2024-09-30", email: "lisa@userlabs.com", phone: "+1 (555) 789-0123", location: "Portland, OR", lastInteraction: "2024-10-28", activityStatus: "active" },
-  { id: "8", name: "David Brown", title: "DevOps Engineer", company: "Cloud Systems", tags: ["Technical"], associatedCard: "Technical", dateAdded: "2024-10-12", email: "david@cloudsys.com", phone: "+1 (555) 890-1234", location: "Denver, CO", lastInteraction: "2024-10-26", activityStatus: "new" }
-];
-
-// Mock data removed - now fetched from backend
-// const connectionRequestsData: Contact[] = [];
+// Removed dummy data - now fetched from backend
 
 export default function DashboardContactPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -61,7 +48,7 @@ export default function DashboardContactPage() {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [showContactInfo, setShowContactInfo] = useState<{[key: string]: {type: 'phone' | 'email' | null}}>({});
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [contactsList, setContactsList] = useState<Contact[]>(contactsData);
+  const [contactsList, setContactsList] = useState<Contact[]>([]);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [messageModal, setMessageModal] = useState<{isOpen: boolean, contact: Contact | null}>({isOpen: false, contact: null});
@@ -125,6 +112,49 @@ export default function DashboardContactPage() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isFilterOpen]);
+
+  // Fetch accepted connections from backend
+  useEffect(() => {
+    const fetchAcceptedConnections = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/users/connections?type=accepted', {
+          credentials: 'include',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch connections');
+        }
+        
+        const data = await response.json();
+        
+        // Map backend data to frontend Contact structure
+        const mappedConnections: Contact[] = (data.requests || []).map((connection: any) => ({
+          id: connection.id,
+          name: connection.user?.fullName || 'Unknown User',
+          title: connection.user?.title || 'No Title',
+          company: connection.user?.company || 'No Company',
+          tags: ['Professional'],
+          associatedCard: 'Professional',
+          dateAdded: new Date(connection.updatedAt).toISOString().split('T')[0],
+          email: connection.user?.email,
+          phone: connection.user?.phone,
+          location: connection.user?.location,
+          connectionStatus: 'connected',
+          activityStatus: 'active' as const
+        }));
+        
+        setContactsList(mappedConnections);
+      } catch (error) {
+        console.error('Error fetching connections:', error);
+        toast.error('Failed to load connections');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAcceptedConnections();
+  }, []);
 
   // Fetch connection requests from backend
   useEffect(() => {

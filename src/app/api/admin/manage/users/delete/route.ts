@@ -36,14 +36,16 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    // Delete user
-    const deletedUser = await prisma.user.delete({
-      where: { id: userId }
+    // Soft delete: Set status to inactive instead of deleting
+    const deactivatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { status: 'inactive' }
     })
 
     return NextResponse.json({
       success: true,
-      user: deletedUser
+      message: 'User deleted successfully',
+      user: deactivatedUser
     })
   } catch (error) {
     console.error("Delete user error:", error)

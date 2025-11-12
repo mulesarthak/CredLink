@@ -22,9 +22,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Normalize email to lowercase for consistency
+    const normalizedEmail = email.toLowerCase().trim()
+
     // Find admin by email
     const admin = await prisma.admin.findUnique({
-      where: { email: email.toLowerCase() }
+      where: { email: normalizedEmail }
     })
 
     if (!admin) {

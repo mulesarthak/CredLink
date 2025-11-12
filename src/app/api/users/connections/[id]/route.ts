@@ -33,7 +33,7 @@ export async function PATCH(
     }
 
     // Find the connection request
-    const connectionRequest = await prisma.connections.findUnique({
+    const connectionRequest = await prisma.connection.findUnique({
       where: { id: requestId },
     });
 
@@ -53,42 +53,15 @@ export async function PATCH(
     }
 
     // Update the request status
-    const updatedRequest = await prisma.connections.update({
+    const updatedRequest = await prisma.connection.update({
       where: { id: requestId },
       data: {
         status: action === "accept" ? "ACCEPTED" : "REJECTED",
       },
     });
 
-    // If accepted, add to both users' connections arrays
-    if (action === "accept") {
-      const senderId = connectionRequest.senderId;
-      const receiverId = connectionRequest.receiverId;
-
-      // Update sender's connections
-      await prisma.$executeRaw`
-        UPDATE users 
-        SET connections = JSON_ARRAY_APPEND(
-          COALESCE(connections, '[]'), 
-          '$', 
-          ${receiverId}
-        )
-        WHERE id = ${senderId}
-        AND NOT JSON_CONTAINS(COALESCE(connections, '[]'), JSON_QUOTE(${receiverId}))
-      `;
-
-      // Update receiver's connections
-      await prisma.$executeRaw`
-        UPDATE users 
-        SET connections = JSON_ARRAY_APPEND(
-          COALESCE(connections, '[]'), 
-          '$', 
-          ${senderId}
-        )
-        WHERE id = ${receiverId}
-        AND NOT JSON_CONTAINS(COALESCE(connections, '[]'), JSON_QUOTE(${senderId}))
-      `;
-    }
+    // Connection status is already updated above - no need for additional user table updates
+    // The Connection model handles the relationship through proper foreign keys
 
     return NextResponse.json({
       message: `Connection request ${action}ed`,
@@ -124,7 +97,7 @@ export async function DELETE(
     const requestId = params.id;
 
     // Find the connection request
-    const connectionRequest = await prisma.connections.findUnique({
+    const connectionRequest = await prisma.connection.findUnique({
       where: { id: requestId },
     });
 
@@ -146,36 +119,10 @@ export async function DELETE(
       );
     }
 
-    const senderId = connectionRequest.senderId;
-    const receiverId = connectionRequest.receiverId;
-
-    // Remove from both users' connections arrays if accepted
-    if (connectionRequest.status === "ACCEPTED") {
-      // Remove receiver from sender's connections
-      await prisma.$executeRaw`
-        UPDATE users 
-        SET connections = JSON_REMOVE(
-          connections,
-          JSON_UNQUOTE(JSON_SEARCH(connections, 'one', ${receiverId}))
-        )
-        WHERE id = ${senderId}
-        AND JSON_CONTAINS(connections, JSON_QUOTE(${receiverId}))
-      `;
-
-      // Remove sender from receiver's connections
-      await prisma.$executeRaw`
-        UPDATE users 
-        SET connections = JSON_REMOVE(
-          connections,
-          JSON_UNQUOTE(JSON_SEARCH(connections, 'one', ${senderId}))
-        )
-        WHERE id = ${receiverId}
-        AND JSON_CONTAINS(connections, JSON_QUOTE(${senderId}))
-      `;
-    }
+    // No need to update user tables - the Connection model deletion below handles the relationship
 
     // Delete the connection request
-    await prisma.connections.delete({
+    await prisma.connection.delete({
       where: { id: requestId },
     });
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { ChevronDown, User, LogOut, Menu } from "lucide-react"; // ✅ Added Menu icon for hamburger
+import { ChevronDown, User, LogOut, Menu, Bell } from "lucide-react"; // ✅ Added Menu icon for hamburger
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
@@ -184,7 +184,35 @@ export function Header() {
                       }}
                     >
                       <Link
-                        href="/profile"
+                        href="/dashboard/notifications"
+                        onClick={() => setIsDropdownOpen(false)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          padding: "12px 16px",
+                          margin: "6px 0",
+                          fontSize: "14px",
+                          color: "#374151",
+                          textDecoration: "none",
+                          transition: "all 0.2s ease",
+                          borderRadius: "8px",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#eff6ff";
+                          e.currentTarget.style.color = "#1d4ed8";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                          e.currentTarget.style.color = "#374151";
+                        }}
+                      >
+                        <Bell style={{ width: "16px", height: "16px" }} />
+                        <span>Notifications</span>
+                      </Link>
+
+                      <Link
+                        href="/dashboard/settings"
                         onClick={() => setIsDropdownOpen(false)}
                         style={{
                           display: "flex",

@@ -1,7 +1,7 @@
 "use client";
 
 import "./support.css";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Search,
   MessageSquare,
@@ -23,45 +23,37 @@ interface SupportTicket {
   status: "Pending" | "Resolved";
 }
 
-const dummyTickets: SupportTicket[] = [
-  {
-    id: "1",
-    userName: "John Smith",
-    userEmail: "john.smith@email.com",
-    subject: "Unable to update profile information",
-    message:
-      "I'm having trouble updating my profile details. Every time I try to save changes, I get an error message saying 'Failed to update profile'. Could you please help me resolve this issue?",
-    date: "2024-11-02",
-    status: "Pending",
-  },
-  {
-    id: "2",
-    userName: "Sarah Johnson",
-    userEmail: "sarah.j@email.com",
-    subject: "Payment processing issue",
-    message:
-      "My payment was charged but the transaction shows as failed in my account. The amount was deducted from my bank account but I don't see the credit in my balance.",
-    date: "2024-11-01",
-    status: "Resolved",
-  },
-  {
-    id: "3",
-    userName: "Mike Chen",
-    userEmail: "mike.chen@email.com",
-    subject: "Account verification problems",
-    message:
-      "I've uploaded my documents for verification multiple times but my account status still shows as unverified.",
-    date: "2024-10-31",
-    status: "Pending",
-  },
-];
-
 export default function SupportPage() {
-  const [tickets, setTickets] = useState<SupportTicket[]>(dummyTickets);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "resolved">("all");
   const [openReplyId, setOpenReplyId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
+
+  useEffect(() => {
+    const fetchSupport = async () => {
+      try {
+        const res = await fetch('/api/admin/messages/support');
+        if (!res.ok) return;
+        const data = await res.json();
+        const sendersMap: Record<string, { id: string; fullName?: string; email?: string }> = {};
+        (data.senders || []).forEach((s: any) => { sendersMap[s.id] = s; });
+        const mapped: SupportTicket[] = (data.messages || []).map((m: any) => ({
+          id: m.id,
+          userName: sendersMap[m.senderId]?.fullName || 'Unknown',
+          userEmail: sendersMap[m.senderId]?.email || '',
+          subject: m.topic || 'Support',
+          message: m.text || '',
+          date: m.createdAt || new Date().toISOString(),
+          status: String(m.status) === 'REPLIED' || String(m.status) === 'READ' ? 'Resolved' : 'Pending',
+        }));
+        setTickets(mapped);
+      } catch (e) {
+        console.error('Failed to load support messages', e);
+      }
+    };
+    fetchSupport();
+  }, []);
 
   const filteredTickets = tickets.filter((ticket) => {
     const matchSearch =
@@ -87,11 +79,22 @@ export default function SupportPage() {
     setReplyText("");
   };
 
-  const sendReply = (id: string) => {
-    if (replyText.trim()) {
-      alert(`Reply sent to ${id}: ${replyText}`);
+  const sendReply = async (id: string) => {
+    if (!replyText.trim()) return;
+    try {
+      const res = await fetch('/api/admin/messages/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messageId: id, replyText }),
+      });
+      if (!res.ok) throw new Error('Failed to send reply');
+      // Mark ticket resolved locally
+      updateTicketStatus(id, 'Resolved');
       setOpenReplyId(null);
-      setReplyText("");
+      setReplyText('');
+    } catch (e) {
+      console.error('Reply failed', e);
+      alert('Failed to send reply.');
     }
   };
 

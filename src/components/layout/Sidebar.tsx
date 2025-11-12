@@ -13,7 +13,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import "./sidebar.css"; // 👈 linked CSS file
+import "./sidebar.css"; // 
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "react-hot-toast";
@@ -24,8 +24,12 @@ const Sidebar = () => {
   const { logout } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    // Set mounted flag to ensure client-side only updates
+    setIsMounted(true);
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
@@ -35,6 +39,31 @@ const Sidebar = () => {
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
+
+  // Fetch unread messages count for badge
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        if (!token) return;
+        const res = await fetch('/api/message/receive', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const unread = (data.messages || []).filter((m: any) => m && (m.read === false || m.read === undefined)).length;
+        setUnreadCount(unread);
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    fetchUnread();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -61,11 +90,12 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile Menu Button */}
-      {isMobile && (
+      {isMounted && isMobile && (
         <motion.button
           onClick={() => setIsOpen(!isOpen)}
           className="mobileToggle"
           whileTap={{ scale: 0.9 }}
+          suppressHydrationWarning
         >
           {isOpen ? <X size={22} /> : <Menu size={22} />}
         </motion.button>
@@ -113,6 +143,9 @@ const Sidebar = () => {
               >
                 <span className="navIcon">{item.icon}</span>
                 <span>{item.name}</span>
+                {item.name === "Messages" && unreadCount > 0 && pathname !== "/dashboard/messages" && (
+                  <span className="navBadge">{unreadCount}</span>
+                )}
               </Link>
             );
           })}
@@ -133,7 +166,11 @@ const Sidebar = () => {
               </Link>
             );
           })}
-          <button className="footerLogout" onClick={handleLogout}>
+          <button 
+            className="footerLogout" 
+            onClick={handleLogout}
+            suppressHydrationWarning
+          >
             <X />
             Logout
           </button>

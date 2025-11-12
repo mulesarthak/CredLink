@@ -18,10 +18,50 @@ export async function GET(req: NextRequest) {
     const decoded = verify(token, JWT_SECRET) as { userId: string };
 
     // Fetch all cards for the user
+    // Explicitly select columns to avoid schema mismatch issues
     const cards = await prisma.card.findMany({
       where: { userId: decoded.userId },
       orderBy: { createdAt: 'desc' },
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        fullName: true,
+        firstName: true,
+        middleName: true,
+        lastName: true,
+        prefix: true,
+        suffix: true,
+        preferredName: true,
+        maidenName: true,
+        pronouns: true,
+        title: true,
+        company: true,
+        department: true,
+        affiliation: true,
+        headline: true,
+        accreditations: true,
+        email: true,
+        phone: true,
+        emailLink: true,
+        phoneLink: true,
+        location: true,
+        linkedinUrl: true,
+        websiteUrl: true,
+        cardName: true,
+        cardType: true,
+        selectedDesign: true,
+        selectedColor: true,
+        selectedFont: true,
+        displayTypes: true,
+        profileImage: true,
+        bannerImage: true,
+        coverImage: true,
+        bio: true,
+        description: true,
+        status: true,
+        views: true,
+        createdAt: true,
+        updatedAt: true,
         user: {
           select: {
             id: true,

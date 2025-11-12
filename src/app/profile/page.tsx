@@ -49,7 +49,7 @@ export default function ProfilePage() {
   const fetchUserProfile = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/auth/me', {
+      const response = await fetch('/api/user/me', {
         method: 'GET',
         credentials: 'include', // Include cookies
       });
