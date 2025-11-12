@@ -169,7 +169,14 @@ export default function UsersPage() {
   const confirmDelete = async () => {
     if (!deletingUser) return;
     try {
-      // TODO: Call DELETE /api/users/${deletingUser}
+      const res = await fetch(`/api/admin/manage/users/delete`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: deletingUser }),
+      });
+      const data = await res.json();
+      console.log(data);
+      if (!res.ok) throw new Error(data.error || "Failed to delete user");
       setUsers(users.filter(user => user.id !== deletingUser));
     } catch (error) {
       console.error("Delete failed:", error);
@@ -202,17 +209,21 @@ export default function UsersPage() {
     try {
       setUpdateLoading(true);
       const payload: any = {
+        id: editingUser.id,
         fullName: editForm.fullName,
         phone: editForm.phone,
-        status: editForm.status
+        city: editForm.city,
+        category: editForm.category,
+        status: editForm.status,
       };
-      if (showPasswordFields && passwords.password) {
-        payload.password = passwords.password;
-      }
-      const res = await fetch(`/api/users/${editingUser.id}`, {
-        method: "PATCH",
+      
+      const res = await fetch(`/api/admin/manage/users/update`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ 
+          payload, 
+          passwords: showPasswordFields ? passwords.password : null 
+        })
       });
       
       const data = await res.json();
@@ -308,8 +319,8 @@ export default function UsersPage() {
                     <td>{user.fullName}</td>
                     <td>{user.email}</td>
                     <td>{user.phone || "N/A"}</td>
-                    <td>{user.city}</td>
-                    <td>{user.category}</td>
+                    <td>{user.city || "N/A"}</td>
+                    <td>{user.category || "N/A"}</td>
                     <td>
                       <span
                         className={`${styles.statusBadge} ${
