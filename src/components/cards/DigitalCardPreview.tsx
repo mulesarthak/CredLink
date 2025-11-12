@@ -18,6 +18,8 @@ export interface DigitalCardProps {
   linkedin?: string;
   website?: string;
   design?: string; // Classic, Flat, Modern, Sleek
+  themeColor1?: string;
+  themeColor2?: string;
 }
 
 const DigitalCardPreview: React.FC<DigitalCardProps> = ({
@@ -36,6 +38,8 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   linkedin = "",
   website = "",
   design = "Classic",
+  themeColor1 = "#3b82f6",
+  themeColor2 = "#2563eb",
 }) => {
   const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
   const parsedCompany = (() => {
@@ -104,17 +108,17 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       case 'Classic':
       default:
         return {
-          header: "linear-gradient(180deg, #3b82f6 0%, #2563eb 45%, #1d4ed8 100%)",
+          header: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
           headerText: "#ffffff",
-          border: "none",
-          shadow: "0 25px 50px rgba(0, 0, 0, 0.15)",
-          borderRadius: "28px",
-          profileBorder: "5px solid #ffffff",
-          coverBorder: "2px solid rgba(255,255,255,0.7)",
-          coverBg: "rgba(255,255,255,0.15)",
-          profileBg: "#60A5FA",
-          buttonBg: "rgba(255,255,255,0.2)",
-          buttonBorder: "1px solid rgba(255,255,255,0.5)",
+          border: "3px solid #ffffff",
+          shadow: "0 25px 50px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255,255,255,0.1)",
+          borderRadius: "24px",
+          profileBorder: "6px solid #ffffff",
+          coverBorder: "3px solid rgba(255,255,255,0.9)",
+          coverBg: "rgba(255,255,255,0.25)",
+          profileBg: themeColor1,
+          buttonBg: "rgba(255,255,255,0.3)",
+          buttonBorder: "2px solid rgba(255,255,255,0.7)",
           buttonText: "#ffffff",
         };
     }
@@ -175,23 +179,6 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
 
   return (
     <div style={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
-      {/* Design Type Indicator - for debugging */}
-      <div style={{
-        position: 'absolute',
-        top: '-25px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        background: '#1e293b',
-        color: '#fff',
-        padding: '4px 12px',
-        borderRadius: '12px',
-        fontSize: '11px',
-        fontWeight: 'bold',
-        zIndex: 10,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-      }}>
-        Design: {design}
-      </div>
       
       <div style={{
         width: "360px",

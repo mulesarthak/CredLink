@@ -20,6 +20,9 @@ import {
   
 } from "react-icons/fi";
 import DigitalCardPreview, { DigitalCardProps } from "@/components/cards/DigitalCardPreview";
+import FlatCardPreview from "@/components/cards/FlatCardPreview";
+import ModernCardPreview from "@/components/cards/ModernCardPreview";
+import SleekCardPreview from "@/components/cards/SleekCardPreview";
 import {
   QrCode,
   Download,
@@ -53,6 +56,7 @@ interface Card {
   profileImage?: string;
   cover?: string;
   coverImage?: string;
+  bannerImage?: string;
   email?: string;
   phone?: string;
   linkedin?: string;
@@ -61,6 +65,7 @@ interface Card {
   websiteUrl?: string;
   selectedDesign?: string;
   selectedColor?: string;
+  selectedColor2?: string;
   selectedFont?: string;
   views?: number;
   boost?: "Active" | "Inactive";
@@ -74,6 +79,41 @@ interface Card {
 
 // ----------------- Card Preview -----------------
 const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
+  const renderCardPreview = () => {
+    const commonProps = {
+      name: card.fullName || card.name || '',
+      title: card.title || '',
+      company: card.company || '',
+      location: card.location || '',
+      about: card.bio || card.about || card.description || '',
+      skills: card.skills || '',
+      portfolio: card.portfolio || '',
+      experience: card.experience || '',
+      photo: card.profileImage || card.photo || '',
+      cover: card.coverImage || card.bannerImage || card.cover || '',
+      email: card.email || '',
+      phone: card.phone || '',
+      linkedin: card.linkedinUrl || card.linkedin || '',
+      website: card.websiteUrl || card.website || '',
+      themeColor1: card.selectedColor || '#3b82f6',
+      themeColor2: card.selectedColor2 || '#2563eb',
+    };
+
+    const design = card.selectedDesign || 'Classic';
+    
+    switch (design) {
+      case 'Flat':
+        return <FlatCardPreview {...commonProps} />;
+      case 'Modern':
+        return <ModernCardPreview {...commonProps} />;
+      case 'Sleek':
+        return <SleekCardPreview {...commonProps} />;
+      case 'Classic':
+      default:
+        return <DigitalCardPreview {...commonProps} design={design} />;
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -82,23 +122,7 @@ const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
       className="flex items-center justify-center"
       style={{ maxWidth: '360px' }}
     >
-      <DigitalCardPreview
-        name={card.fullName || card.name || ''}
-        title={card.title || ''}
-        company={card.company || ''}
-        location={card.location || ''}
-        about={card.bio || card.about || card.description || ''}
-        skills={card.skills || ''}
-        portfolio={card.portfolio || ''}
-        experience={card.experience || ''}
-        photo={card.profileImage || card.photo || ''}
-        cover={card.coverImage || card.cover || ''}
-        email={card.email || ''}
-        phone={card.phone || ''}
-        linkedin={card.linkedinUrl || card.linkedin || ''}
-        website={card.websiteUrl || card.website || ''}
-        design={card.selectedDesign || 'Classic'}
-      />
+      {renderCardPreview()}
     </motion.div>
   );
 };

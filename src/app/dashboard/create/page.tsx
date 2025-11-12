@@ -1214,6 +1214,7 @@ const EditPage = () => {
         formData.append('selectedDesign', selectedDesign);
       }
       if (selectedColor1) formData.append('selectedColor', selectedColor1);
+      if (selectedColor2) formData.append('selectedColor2', selectedColor2);
       if (selectedFont) formData.append('selectedFont', selectedFont);
       if (about) formData.append('bio', about);
       
