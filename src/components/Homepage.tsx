@@ -80,15 +80,18 @@ export default function Homepage() {
         }}></div>
 
         <div className="container mx-auto w-full" style={{ position: 'relative', zIndex: 10 }}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center hero-grid-mobile">
             {/* Left Side - Content */}
-            <div style={{ 
+            <div className="hero-content" style={{ 
               animation: 'fadeInUp 1s ease-out',
               position: 'relative'
             }}>
               <h1 className="heading-1" style={{ 
                 color: 'var(--foreground)',
-                fontWeight: '600'
+                fontWeight: '600',
+                lineHeight: '1.3',
+                paddingBottom: '1rem',
+                overflow: 'visible'
               }}>
                 More Than a Card — <span className="gradient-text">It's How Connections Begin.</span>
               </h1>
@@ -108,7 +111,7 @@ export default function Homepage() {
                 Join thousands of professionals who've revolutionized their networking approach. No more lost cards, outdated information, or missed opportunities – just seamless, modern connections that drive real business results.
               </p> */}
               
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-4 hero-button-container">
                 <Link href="/auth/signup" className="text-white rounded-full transition-all" style={{ 
                   paddingLeft: '2.5rem',
                   paddingRight: '2.5rem',
@@ -116,8 +119,8 @@ export default function Homepage() {
                   paddingBottom: '1rem',
                   fontSize: '16px',
                   fontWeight: '600',
-                  background: 'var(--gradient-primary)',
-                  boxShadow: 'var(--shadow-colored)',
+                  background: 'linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%)',
+                  boxShadow: '0 10px 30px rgba(59, 130, 246, 0.4)',
                   cursor: 'pointer',
                   display: 'inline-block',
                   textDecoration: 'none'
@@ -242,7 +245,7 @@ export default function Homepage() {
                   }}
                 />
                 <button 
-                  className="absolute text-white rounded-full transition-all"
+                  className="absolute text-white rounded-full transition-all search-button-mobile"
                   style={{ 
                     right: '0.4rem',
                     paddingLeft: '2rem',
@@ -260,37 +263,7 @@ export default function Homepage() {
                   Search
                 </button>
               </div>
-              <div className="flex flex-wrap gap-2 justify-center" style={{ marginTop: '1.75rem', alignItems: 'center' }}>
-                <span style={{ 
-                  fontSize: '0.9rem', 
-                  color: 'var(--text-secondary)',
-                  fontWeight: '500',
-                  marginRight: '0.25rem'
-                }}>
-                  Popular:
-                </span>
-                {['Marketing', 'Technology', 'Finance', 'Healthcare'].map((tag) => (
-                  <button
-                    key={tag}
-                    className="rounded-full transition-all"
-                    style={{ 
-                      paddingLeft: '1.25rem',
-                      paddingRight: '1.25rem',
-                      paddingTop: '0.5rem',
-                      paddingBottom: '0.5rem',
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
-                      color: 'var(--primary-blue)',
-                      background: 'var(--background-white)',
-                      boxShadow: 'var(--shadow-sm)',
-                      border: '1px solid var(--background-light-blue)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
+              
             </div>
           </div>
         </div>
@@ -327,13 +300,13 @@ export default function Homepage() {
         <div className="container mx-auto" style={{ position: 'relative', zIndex: 10 }}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left Side - Content */}
-            <div>
+            <div style={{ textAlign: 'center' }}>
               <h2 className="heading-2" style={{ 
                 color: '#110032ff',
                 marginBottom: '1.5rem',
                 fontWeight: '500'
               }}>
-               MyKard isn’t just a<span style={{
+               MyKard isn't just a<span style={{
                   background: 'var(--gradient-primary)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
@@ -345,7 +318,7 @@ export default function Homepage() {
                 marginBottom: '1.5rem'
               }}>
                MyKard is your all-in-one digital identity and networking card — a smart, shareable profile that brings together everything about you in one link.
-Whether you’re a student, freelancer, professional, or business owner, MyKard helps you connect, get discovered, and grow your network effortlessly.
+Whether you're a student, freelancer, professional, or business owner, MyKard helps you connect, get discovered, and grow your network effortlessly.
 
 No more lost visiting cards or scattered links — just one personal link or QR that lets anyone know who you are, what you do, and how to reach you.
 
@@ -363,34 +336,36 @@ No more lost visiting cards or scattered links — just one personal link or QR 
               }}>
                 Perfect for professionals, entrepreneurs, and businesses looking to make lasting impressions while staying ahead in the digital age.
               </p> */}
-              <Link href="/auth/signup" className="text-white rounded-full transition-all" style={{ 
-                paddingLeft: '2.5rem',
-                paddingRight: '2.5rem',
-                paddingTop: '1rem',
-                paddingBottom: '1rem',
-                fontWeight: '600',
-                background: 'var(--gradient-primary)',
-                boxShadow: '0 10px 30px rgba(102, 126, 234, 0.4)',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                textDecoration: 'none',
-                border: 'none'
-              }}>
-                <span>Get Started Free</span>
-                
-              </Link>
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <Link href="/auth/signup" className="text-white rounded-full transition-all" style={{ 
+                  paddingLeft: '2.5rem',
+                  paddingRight: '2.5rem',
+                  paddingTop: '1rem',
+                  paddingBottom: '1rem',
+                  fontWeight: '600',
+                  background: 'linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%)',
+                  boxShadow: '0 10px 30px rgba(59, 130, 246, 0.4)',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  textDecoration: 'none',
+                  border: 'none'
+                }}>
+                  <span>Get Started Free</span>
+                  
+                </Link>
+              </div>
             </div>
 
             {/* Right Side - Stats Cards */}
-            <div className="grid grid-cols-1 gap-5">
+            <div className="grid grid-cols-1 gap-5 stats-grid">
               {[
                 { stat: '100%', label: 'Growth Oriented', color: '#667eea' },
-                { stat: '42%', label: 'Increase in Professional Connections', color: '#764ba2' },
-                { stat: '70%', label: 'Better Follow-ups', color: '#5e35b1' }
+                { stat: '42%', label: 'Increase in Professional Connections', color: '#667eea' },
+                { stat: '70%', label: 'Better Follow-ups', color: '#667eea' }
               ].map((item, idx) => (
-                <div key={idx} style={{
+                <div key={idx} className="stats-card" style={{
                   background: 'linear-gradient(135deg, #ffffffff 0%, #ffffffff 100%)',
                   borderRadius: '1.5rem',
                   padding: '2rem 2.5rem',
@@ -511,7 +486,7 @@ No more lost visiting cards or scattered links — just one personal link or QR 
             maxWidth: '48rem',
             margin: '0 auto 1.5rem auto'
           }}>
-            Make every introduction memorable. With MyKard, you’re not just sharing contact info — you’re showcasing your identity, credibility, and personal brand.
+            Make every introduction memorable with MyKard, you’re not just sharing contact info — you’re showcasing your identity, credibility, and personal brand.
           </p>
           {/* <p className="body-text" style={{ 
             color: '#64748B',
@@ -521,7 +496,7 @@ No more lost visiting cards or scattered links — just one personal link or QR 
             From verified professional badges and client testimonials to portfolio showcases and achievement highlights, our platform provides everything you need to demonstrate your expertise and build lasting trust with prospects and clients.
           </p> */}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 credibility-grid">
             {[
               { 
                 icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />,
@@ -544,7 +519,7 @@ No more lost visiting cards or scattered links — just one personal link or QR 
                 color: '#a78bfa'
               }
             ].map((feature, idx) => (
-              <div key={idx} style={{
+              <div key={idx} className="credibility-card" style={{
                 background: 'white',
                 borderRadius: '1.5rem',
                 padding: '2rem 1.5rem',
@@ -668,8 +643,8 @@ No more lost visiting cards or scattered links — just one personal link or QR 
         }}></div>
 
         <div className="container mx-auto" style={{ position: 'relative', zIndex: 2 }}>
-          <h2 className="heading-2 text-center mb-16" style={{ color: '#000000', textShadow: '0 0 15px rgba(0, 0, 0, 0.1)', fontWeight: '500' }}>Why Every Professional Needs a <span className="gradient-text">MyKard</span></h2>
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <h2 className="heading-2 text-center mb-16" style={{ color: '#000000', textShadow: '0 0 15px rgba(0, 0, 0, 0.1)', fontWeight: '500' }}>Why Every Professional Needs <span className="gradient-text">MyKard</span></h2>
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 professional-cards-grid">
             {[
               {
                 title: 'Smart Digital Card',
@@ -702,7 +677,7 @@ No more lost visiting cards or scattered links — just one personal link or QR 
             ].map((feature, idx) => (
               <div 
                 key={idx} 
-                className="card p-6 flex flex-col items-center text-center transition-all duration-300 ease-in-out"
+                className="card p-6 flex flex-col items-center text-center transition-all duration-300 ease-in-out professional-card"
                 style={{
                   background: 'white', // Darker card background
                   borderRadius: '1.5rem',
@@ -735,7 +710,7 @@ No more lost visiting cards or scattered links — just one personal link or QR 
       <section id="how-it-works" className="section py-12 lg:py-20 px-4 sm:px-6 lg:px-12" style={{ background: 'var(--background-purple-light)' }}>
         <div className="container mx-auto max-w-4xl">
           <h2 className="heading-2 text-center mb-16" style={{ color: '#1A1A2E', fontWeight: '500' }}>How It <span className="gradient-text">Works</span></h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 how-it-works-grid">
             {[
               {
                 icon: <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.0 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 13a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
@@ -758,7 +733,7 @@ No more lost visiting cards or scattered links — just one personal link or QR 
                 description: 'Monitor who views your card and generates leads.'
               }
             ].map((card, idx) => (
-              <div key={idx} className="card p-6 text-center flex flex-col items-center" style={{ boxShadow: '0 10px 20px rgba(0,0,0,0.05)' }}>
+              <div key={idx} className="card p-6 text-center flex flex-col items-center how-it-works-card" style={{ boxShadow: '0 10px 20px rgba(0,0,0,0.05)' }}>
                 <div className="mb-4 w-20 h-20 flex items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)', color: '#fff' }}>
                   {card.icon}
                 </div>
@@ -775,9 +750,9 @@ No more lost visiting cards or scattered links — just one personal link or QR 
         <div className="container mx-auto text-center flex flex-col items-center">
           <h2 className="heading-2 mb-6" style={{ color: 'var(--foreground)', fontWeight: '500' }}>Ready to Go Digital?</h2>
           <p className="body-large mb-8 max-w-2xl mx-auto" style={{ color: 'var(--text-primary)' }}>
-            Join millions of professionals who have already made the switch to digital business cards.
+            Join millions of professionals who have already made the switch to MyKard.
           </p>
-          <Link href="/auth/signup" className="btn btn-large px-12 py-4 text-lg font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all" style={{ background: 'var(--gradient-primary)', color: 'white' }}>
+          <Link href="/auth/signup" className="btn btn-large px-12 py-4 text-lg font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all" style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%)', color: 'white', boxShadow: '0 15px 35px rgba(59, 130, 246, 0.4)' }}>
             Create Your Free Card Now
           </Link>
         </div>
