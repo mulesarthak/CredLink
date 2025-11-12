@@ -8,7 +8,7 @@ import { FiPlus } from "react-icons/fi";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "react-hot-toast";
 import DigitalCardPreview, { DigitalCardProps } from "@/components/cards/DigitalCardPreview";
-import FlatCardPreview from "@/components/cards/FlatCardPreview";
+import FlatCardPreview from '@/components/cards/FlatCardPreview';
 import ModernCardPreview from "@/components/cards/ModernCardPreview";
 import SleekCardPreview from "@/components/cards/SleekCardPreview";
 
