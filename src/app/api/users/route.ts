@@ -48,7 +48,7 @@ export async function GET() {
         phone: true,
         status: true,
         location: true,
-        company: true,
+        title: true,
         createdAt: true,
         updatedAt: true
       },
@@ -64,7 +64,7 @@ export async function GET() {
       fullName: user.fullName,
       phone: user.phone,
       city: user.location || '',
-      category: user.company || '',
+      category: user.title || '',
       status: user.status || 'active', // Default to active if status is null
       createdAt: user.createdAt,
       updatedAt: user.updatedAt
