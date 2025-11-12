@@ -38,7 +38,8 @@ export function middleware(request: NextRequest) {
     '/cards/:path*',
     '/dashboard/messages',
     '/api/message/receive',
-    '/api/message/send'
+    '/api/message/send',
+    '/onboarding'
   ]
   
   const isAuthPath = path.startsWith('/auth')
@@ -53,7 +54,7 @@ export function middleware(request: NextRequest) {
       return path.startsWith(publicPath.slice(0, -1))
     }
     return publicPath === path
-  }) || isAuthPath || isAdminPath || isDashboardPath || isPricingPath || isContactPath || isDashboardContactPath
+  }) || isAdminPath || isDashboardPath || isPricingPath || isContactPath || isDashboardContactPath
 
   const userToken = request.cookies.get('user_token')?.value
   const adminToken = request.cookies.get('admin_token')?.value
@@ -91,16 +92,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Redirect logic
-  if (!isApiRequest) {
-    if (!isAuthenticated && !isCombinedPublicPath) {
-      return NextResponse.redirect(new URL('/auth/login', request.url))
-    }
-    if (isAuthenticated && path.startsWith('/auth')) {
-      return NextResponse.redirect(new URL('/', request.url))
-    }
-  }
-
   // Add user/admin IDs to headers
   const requestHeaders = new Headers(request.headers)
   if (userId !== null) {
@@ -108,6 +99,23 @@ export function middleware(request: NextRequest) {
   }
   if (adminId !== null) {
     requestHeaders.set('x-admin-id', adminId)
+  }
+
+  // Redirect logic
+  if (!isApiRequest) {
+    // Allow access to auth pages (no redirect even if authenticated)
+    if (isAuthPath) {
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      })
+    }
+    
+    // Protect other pages - redirect to login if not authenticated
+    if (!isAuthenticated && !isCombinedPublicPath) {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
+    }
   }
 
   return NextResponse.next({

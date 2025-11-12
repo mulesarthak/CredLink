@@ -9,6 +9,7 @@ type ModalProps = {
   primaryText?: string
   onPrimary?: () => void
   children?: React.ReactNode
+  showActions?: boolean
 }
 
 export function Modal({
@@ -19,6 +20,7 @@ export function Modal({
   primaryText,
   onPrimary,
   children,
+  showActions = true,
 }: ModalProps) {
   if (!isOpen) return null
 
@@ -41,11 +43,13 @@ export function Modal({
 
         {children}
 
-        <div className={styles.actions}>
-          <button onClick={handlePrimary} className={styles.primaryBtn}>
-            {primaryText ?? "Close"}
-          </button>
-        </div>
+        {showActions && (
+          <div className={styles.actions}>
+            <button onClick={handlePrimary} className={styles.primaryBtn}>
+              {primaryText ?? "Close"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

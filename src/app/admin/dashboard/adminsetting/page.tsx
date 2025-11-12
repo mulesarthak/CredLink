@@ -94,6 +94,8 @@ export default function AdminSettingsPage() {
   const [editingUser, setEditingUser] = useState<AppUser | null>(null);
   const [form, setForm] = useState({
     name: "",
+    password: "",
+    phoneNumber: "",
     email: "",
     role: "Admin" as AppUser["role"],
     status: "active" as AppUser["status"],
@@ -119,20 +121,61 @@ export default function AdminSettingsPage() {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       return toast.error("Passwords do not match");
     }
-
+    if (passwordData.newPassword.length < 6) {
+      return toast.error("New password must be at least 6 characters long");
+    }
+   
     setSaving(true);
-    await new Promise((res) => setTimeout(res, 900));
-    toast.success("Password updated successfully");
-    setSaving(false);
+    try {
+      const response = await fetch("/api/admin/profile/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          password: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || "Failed to update password");
+        return;
+      }
+
+      // Clear form on success
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      
+      toast.success("Password updated successfully");
+    } catch (error) {
+      console.error("Password change error:", error);
+      toast.error("Failed to update password. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const openModal = (user?: AppUser) => {
     if (user) {
       setEditingUser(user);
-      setForm(user);
+      setForm({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+        password: "", // Don't populate password for security
+        phoneNumber: "", // Default empty as it's not in AppUser interface
+      });
     } else {
       setEditingUser(null);
-      setForm({ name: "", email: "", role: "Admin", status: "active" });
+      setForm({ name: "", email: "", role: "Admin", status: "active", password: "", phoneNumber: "" });
     }
     setIsModalOpen(true);
   };
@@ -249,30 +292,33 @@ export default function AdminSettingsPage() {
 
             <form onSubmit={handlePasswordChange} className="mt-4 space-y-4">
               {(["currentPassword", "newPassword", "confirmPassword"] as const).map(
-                (field, idx) => (
-                  <div key={field} className="space-y-1.5">
-                    <label className={label}>
-                      {["Current Password", "New Password", "Confirm Password"][idx]}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={show[field] ? "text" : "password"}
-                        value={passwordData[field]}
-                        onChange={(e) =>
-                          setPasswordData((s) => ({ ...s, [field]: e.target.value }))
-                        }
-                        className={`${input} pr-10`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShow((s) => ({ ...s, [field]: !s[field] }))}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 hover:bg-slate-100"
-                      >
-                        {show[field] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
+                (field, idx) => {
+                  const showKey = field === "currentPassword" ? "current" : field === "newPassword" ? "new" : "confirm";
+                  return (
+                    <div key={field} className="space-y-1.5">
+                      <label className={label}>
+                        {["Current Password", "New Password", "Confirm Password"][idx]}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={show[showKey] ? "text" : "password"}
+                          value={passwordData[field]}
+                          onChange={(e) =>
+                            setPasswordData((s) => ({ ...s, [field]: e.target.value }))
+                          }
+                          className={`${input} pr-10`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShow((s) => ({ ...s, [showKey]: !s[showKey] }))}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 hover:bg-slate-100"
+                        >
+                          {show[showKey] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )
+                  );
+                }
               )}
 
               {/* small, right-aligned primary button */}
@@ -432,6 +478,24 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className={input}
                   placeholder="john@example.com"
+                />
+              </div>
+              <div>
+                <label className={label}>Phone Number</label>
+                <input
+                  value={form.phoneNumber}
+                  onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+                  className={input}
+                  placeholder="+91 1234567890"
+                />
+              </div>
+              <div>
+                <label className={label}>Password</label>
+                <input
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  className={input}
+                  placeholder="password"
                 />
               </div>
               <div>

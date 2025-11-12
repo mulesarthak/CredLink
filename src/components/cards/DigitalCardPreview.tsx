@@ -17,6 +17,9 @@ export interface DigitalCardProps {
   phone?: string;
   linkedin?: string;
   website?: string;
+  design?: string; // Classic, Flat, Modern, Sleek
+  themeColor1?: string;
+  themeColor2?: string;
 }
 
 const DigitalCardPreview: React.FC<DigitalCardProps> = ({
@@ -34,6 +37,8 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   phone = "",
   linkedin = "",
   website = "",
+  themeColor1 = "#3b82f6",
+  themeColor2 = "#2563eb",
 }) => {
   const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
   const parsedCompany = (() => {
@@ -49,73 +54,21 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
 
   type Section = 'Services' | 'Portfolio' | 'Skills' | 'Experience' | 'Review';
   const [activePanel, setActivePanel] = useState<Section | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const update = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 768);
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
-
-  const skillsList = skills.split(',').map((s) => s.trim()).filter(Boolean);
-  const portfolioList = portfolio.split(',').map((s) => s.trim()).filter(Boolean);
-  const experienceList = experience.split(',').map((s) => s.trim()).filter(Boolean);
-
-  const renderItem = (title: string, subtitle?: string) => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
-        <div>
-          <div style={{ fontWeight: 700, color: '#111827' }}>{title}</div>
-          {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
-        </div>
-      </div>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-    </div>
-  );
-
-  const renderPanelContent = (section: Section) => {
-    if (section === 'Skills') {
-      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
-      return (
-        <div style={{ padding: isMobile ? 12 : 16 }}>
-          {items.map((it, idx) => renderItem(it))}
-        </div>
-      );
-    }
-    if (section === 'Services') {
-      const items = ['SEO Audits', 'Slogan Content Campaigns'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
-    }
-    if (section === 'Portfolio') {
-      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
-    }
-    if (section === 'Experience') {
-      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
-    }
-    if (section === 'Review') {
-      const items = ['John transformed our online presence!', 'Happy Client'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
-    }
-    return null;
-  };
 
   return (
-    <div style={{
-      width: "360px",
-      borderRadius: "28px",
-      overflow: "hidden",
-      boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)",
-      fontFamily: "system-ui, sans-serif",
-      position: "relative",
-      background: "#ffffff",
-    }}>
+    <div style={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
+      
+      <div style={{
+        width: "360px",
+        borderRadius: "28px",
+        overflow: "hidden",
+        boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)",
+        fontFamily: "system-ui, sans-serif",
+        position: "relative",
+        background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
+      }}>
       {/* Header */}
       <div style={{
-        background: "linear-gradient(180deg, #3b82f6 0%, #2563eb 45%, #1d4ed8 100%)",
         padding: "22px",
         color: "white",
         position: "relative",
@@ -163,10 +116,10 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           )}
           {location && <p style={{ margin: "10px 0 0", fontSize: "14px", color: "#FFFFFF" }}>{location}</p>}
 
-          {/* Social Row */}
-          <div style={{ display: "flex", gap: "10px", marginTop: "2px" }}>
+          {/* Social Row - Exact copy from edit page */}
+          <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}> 
             {/* Mail */}
-            <a href={`mailto:${email || 'example@MyKard.com'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#3B82F6", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <a href={`mailto:${email || 'example@mykard.com'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 4h16v16H4z" opacity="0"/>
                 <path d="M4 8l8 5 8-5"/>
@@ -174,17 +127,17 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
               </svg>
             </a>
             {/* Phone */}
-            <a href={`tel:${phone || '+911234567890'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#25D366", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <a href={`tel:${phone || '+911234567890'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
               </svg>
             </a>
             {/* LinkedIn */}
-            <a href={linkedin || 'https://linkedin.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#0A66C2", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <a href={linkedin || 'https://linkedin.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
             </a>
             {/* Globe */}
-            <a href={website || 'https://MyKard.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "#0ea5e9", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <a href={website || 'https://mykard.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="2" y1="12" x2="22" y2="12"/>
@@ -195,14 +148,14 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         </div>
       </div>
 
-      {/* Body */}
-      <div style={{ padding: "2px 20px 16px", background: "linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%)", color: "#FFFFFF", textAlign: "center" }}>
+      {/* Body - Exact copy from edit page */}
+      <div style={{ padding: "20px 20px 16px", color: "#FFFFFF", textAlign: "center" }}>
         <p style={{ fontSize: "13px", lineHeight: 1.6, margin: 0, color: "#FFFFFF", opacity: 1 }}>
           {about}
         </p>
 
-        {/* Pills */}
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "12px" }}>
+        {/* Pills - Exact copy from edit page */}
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
           {[
             { text: "Services" },
             { text: "Portfolio" },
@@ -215,14 +168,14 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
               onClick={() => setActivePanel(b.text as Section)}
               style={{
                 padding: "8px 14px",
-                background: "#ffffff",
-                color: "#374151",
-                border: "none",
+                background: "rgba(255, 255, 255, 0.2)",
+                color: "#FFFFFF",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
                 borderRadius: "12px",
                 fontSize: "13px",
                 fontWeight: 600,
                 cursor: "pointer",
-                boxShadow: "0 3px 8px rgba(0,0,0,0.12)",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.04)",
               }}
             >
               {b.text}
@@ -231,22 +184,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         </div>
       </div>
 
-      {activePanel && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setActivePanel(null)}>
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{ width: isMobile ? '100%' : 520, height: isMobile ? '100%' : 'auto', maxHeight: isMobile ? '100%' : '80vh', background: '#fff', borderRadius: isMobile ? 0 : 16, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }}
-          >
-            <div style={{ background: 'linear-gradient(180deg, #3b82f6 0%, #2563eb 45%, #1d4ed8 100%)', color: '#fff', padding: isMobile ? '16px' : '18px', textAlign: 'center' }}>
-              <div style={{ fontSize: 20, fontWeight: 800 }}>{activePanel}</div>
-            </div>
-            <button onClick={() => setActivePanel(null)} aria-label="Close" style={{ position: 'absolute', top: 10, right: 10, width: 36, height: 36, borderRadius: 9999, border: 'none', background: 'rgba(0,0,0,0.6)', color: '#fff', cursor: 'pointer' }}>×</button>
-            <div style={{ padding: 16, background: isMobile ? '#f3f4f6' : '#fff', overflowY: 'auto', height: isMobile ? 'calc(100% - 72px)' : 'auto' }}>
-              {renderPanelContent(activePanel)}
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

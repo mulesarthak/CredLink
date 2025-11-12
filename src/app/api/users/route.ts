@@ -8,10 +8,14 @@ const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'your-secret-key'
 // Get all users
 export async function GET() {
   try {
+    console.log('🔍 GET /api/users - Starting...');
     const cookieStore = await cookies()
     const token = cookieStore.get('admin_token')?.value
 
+    console.log('🍪 Admin token:', token ? 'Present' : 'Missing');
+
     if (!token) {
+      console.log('❌ No admin token found');
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
@@ -21,11 +25,21 @@ export async function GET() {
       permissions: string[]
     }
 
+    console.log('✅ Decoded token:', decoded);
+
     // Check if admin has permission to view users
     if (!decoded.adminId) {
+      console.log('❌ No adminId in token');
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
+    // Check for MANAGE_USERS permission or SUPER_ADMIN role
+    if (decoded.role !== 'SUPER_ADMIN' && !decoded.permissions.includes('MANAGE_USERS')) {
+      console.log('❌ Insufficient permissions for user management');
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+    }
+
+    console.log('📊 Fetching users from database...');
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -33,6 +47,8 @@ export async function GET() {
         fullName: true,
         phone: true,
         status: true,
+        location: true,
+        company: true,
         createdAt: true,
         updatedAt: true
       },
@@ -41,9 +57,23 @@ export async function GET() {
       }
     })
 
-    return NextResponse.json({ users })
+    // Map database fields to frontend expected format
+    const mappedUsers = users.map(user => ({
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      phone: user.phone,
+      city: user.location || '',
+      category: user.company || '',
+      status: user.status || 'active', // Default to active if status is null
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    }))
+
+    console.log(`✅ Found ${users.length} users`);
+    return NextResponse.json({ users: mappedUsers })
   } catch (error) {
-    console.error('Get users error:', error)
+    console.error('❌ Get users error:', error)
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 })
   }
 }

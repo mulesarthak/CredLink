@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 /* -------------------------------------------------
    COLORS & STYLES
@@ -197,12 +198,88 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
 };
 
 /* -------------------------------------------------
+   PARTY POPUP COMPONENT
+   ------------------------------------------------- */
+interface PartyPopupProps {
+  onClose: () => void;
+}
+
+const PartyPopup: React.FC<PartyPopupProps> = ({ onClose }) => {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          background: 'white',
+          borderRadius: '24px',
+          padding: '48px 40px',
+          maxWidth: '400px',
+          textAlign: 'center',
+          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25)',
+          position: 'relative',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Party Emoji */}
+        <div style={{ fontSize: '64px', marginBottom: '24px' }}>🎉</div>
+        
+        {/* Message */}
+        <h2
+          style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            color: '#1F2937',
+            marginBottom: '16px',
+          }}
+        >
+          Your card has been created and ready to share!
+        </h2>
+        
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          style={{
+            marginTop: '24px',
+            padding: '14px 48px',
+            background: `linear-gradient(135deg, ${colors.primary}, ${colors.purple})`,
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            fontSize: '16px',
+            fontWeight: '600',
+            cursor: 'pointer',
+          }}
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/* -------------------------------------------------
    MAIN ONBOARDING PAGE
    ------------------------------------------------- */
 const OnboardingPage: React.FC = () => {
   const [step, setStep] = useState(0);
+  const router = useRouter();
+  const [showPartyPopup, setShowPartyPopup] = useState(false);
   const [formData, setFormData] = useState({
     photo: "",
+    photoFile: null as File | null,
     name: "",
     title: "",
     company: "",
@@ -222,7 +299,7 @@ const OnboardingPage: React.FC = () => {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  const handleContinue = () => {
+  const handleContinue = async() => {
     if (step === 1 && !formData.name.trim()) {
       alert('Please enter your name to continue.');
       return;
@@ -249,7 +326,75 @@ const OnboardingPage: React.FC = () => {
     }
 
     if (step < 10) setStep(step + 1);
-    else alert('Card Created! Ready to share.');
+    else {
+      try{
+        // Create FormData for card creation
+        const cardFormData = new FormData();
+        
+        // Map onboarding form data to card fields
+        cardFormData.append('fullName', formData.name || '');
+        cardFormData.append('title', formData.title || '');
+        cardFormData.append('company', formData.company || '');
+        cardFormData.append('location', formData.location || '');
+        cardFormData.append('bio', formData.about || '');
+        
+        // Combine skills, portfolio, and experience into description
+        const descriptionParts = [];
+        if (formData.skills) descriptionParts.push(`Skills: ${formData.skills}`);
+        if (formData.portfolio) descriptionParts.push(`Portfolio: ${formData.portfolio}`);
+        if (formData.experience) descriptionParts.push(`Experience: ${formData.experience}`);
+        if (descriptionParts.length > 0) {
+          cardFormData.append('description', descriptionParts.join('\n\n'));
+        }
+        
+        // Set default card properties
+        cardFormData.append('cardType', 'Personal');
+        cardFormData.append('selectedDesign', 'Classic');
+        cardFormData.append('selectedColor', '#145dfd');
+        cardFormData.append('selectedFont', 'Arial, sans-serif');
+        cardFormData.append('status', 'draft');
+        
+        // Handle profile image upload if provided
+        if (formData.photoFile) {
+          cardFormData.append('profileImage', formData.photoFile);
+        } else if (formData.photo && formData.photo.startsWith('data:')) {
+          // Fallback: convert data URL to File if file object not available
+          try {
+            const response = await fetch(formData.photo);
+            const blob = await response.blob();
+            const file = new File([blob], 'profile.jpg', { type: blob.type || 'image/jpeg' });
+            cardFormData.append('profileImage', file);
+          } catch (error) {
+            console.error('Error processing profile image:', error);
+            // Continue without image if conversion fails
+          }
+        }
+        
+        // Create card using card creation API
+        const response = await fetch('/api/card/create', {
+          method: 'POST',
+          credentials: 'include', // Include cookies for authentication
+          body: cardFormData,
+        });
+        
+        const data = await response.json();
+        console.log('Card creation response:', data);
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to create card');
+        }
+        
+        setShowPartyPopup(true);
+      }catch(error: any){
+        console.error('Error creating card:', error);
+        alert(error.message || 'Failed to create card. Please try again.');
+      }
+    }
+  };
+
+  const handlePopupClose = () => {
+    setShowPartyPopup(false);
+    router.push('/dashboard');
   };
 
   /* -------------------------------------------------
@@ -322,7 +467,7 @@ const OnboardingPage: React.FC = () => {
         {isLargeScreen && (
           <div style={leftPanelStyle}>
             <img
-              src="/assests/Welcome0.png"
+              src="/assets/Welcome0.png"
               alt="Collection of Digital Cards"
               style={fullImageStyle}
             />
@@ -391,383 +536,388 @@ const OnboardingPage: React.FC = () => {
      STEPS 1–9: FORM + LIVE PREVIEW
      ------------------------------------------------- */
   return (
-    <div style={containerStyle}>
-      {/* LEFT: Digital Card Preview + Floating Shapes (Hidden on Mobile) */}
-      <div style={leftPanelStyle}>
-        {/* Floating 3D Shapes */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '5%',
-            left: '5%',
-            width: '120px',
-            height: '120px',
-            background: 'linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%)',
-            borderRadius: '20px',
-            transform: 'rotate(-15deg)',
-            boxShadow:
-              '0 20px 60px rgba(59, 130, 246, 0.4), inset -5px -5px 20px rgba(0, 0, 0, 0.1), inset 5px 5px 20px rgba(255, 255, 255, 0.3)',
-          }}
-        ></div>
-
-        <div
-          style={{
-            position: 'absolute',
-            top: '40%',
-            right: '15%',
-            width: '100px',
-            height: '100px',
-            background: 'linear-gradient(135deg, #A855F7 0%, #7C3AED 100%)',
-            borderRadius: '18px',
-            transform: 'rotate(25deg)',
-            boxShadow:
-              '0 20px 60px rgba(168, 85, 247, 0.4), inset -5px -5px 20px rgba(0, 0, 0, 0.1), inset 5px 5px 20px rgba(255, 255, 255, 0.3)',
-          }}
-        ></div>
-
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '15%',
-            left: '8%',
-            width: '110px',
-            height: '110px',
-            background: 'linear-gradient(135deg, #22D3EE 0%, #06B6D4 100%)',
-            borderRadius: '18px',
-            transform: 'rotate(10deg)',
-            boxShadow:
-              '0 20px 60px rgba(34, 211, 238, 0.4), inset -5px -5px 20px rgba(0, 0, 0, 0.1), inset 5px 5px 20px rgba(255, 255, 255, 0.3)',
-          }}
-        ></div>
-
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '8%',
-            right: '5%',
-            width: '130px',
-            height: '130px',
-            background: 'linear-gradient(135deg, #FB923C 0%, #F97316 100%)',
-            borderRadius: '20px',
-            transform: 'rotate(-20deg)',
-            boxShadow:
-              '0 20px 60px rgba(251, 146, 60, 0.4), inset -5px -5px 20px rgba(0, 0, 0, 0.1), inset 5px 5px 20px rgba(255, 255, 255, 0.3)',
-          }}
-        >
+    <>
+      <div style={containerStyle}>
+        {/* LEFT: Digital Card Preview + Floating Shapes (Hidden on Mobile) */}
+        <div style={leftPanelStyle}>
+          {/* Floating 3D Shapes */}
           <div
             style={{
               position: 'absolute',
-              bottom: '15px',
-              right: '15px',
-              width: '20px',
-              height: '20px',
-              color: 'white',
-              fontSize: '20px',
-              opacity: 0.9,
+              top: '5%',
+              left: '5%',
+              width: '120px',
+              height: '120px',
+              background: 'linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%)',
+              borderRadius: '20px',
+              transform: 'rotate(-15deg)',
+              boxShadow:
+                '0 20px 60px rgba(59, 130, 246, 0.4), inset -5px -5px 20px rgba(0, 0, 0, 0.1), inset 5px 5px 20px rgba(255, 255, 255, 0.3)',
+            }}
+          ></div>
+
+          <div
+            style={{
+              position: 'absolute',
+              top: '40%',
+              right: '15%',
+              width: '100px',
+              height: '100px',
+              background: 'linear-gradient(135deg, #A855F7 0%, #7C3AED 100%)',
+              borderRadius: '18px',
+              transform: 'rotate(25deg)',
+              boxShadow:
+                '0 20px 60px rgba(168, 85, 247, 0.4), inset -5px -5px 20px rgba(0, 0, 0, 0.1), inset 5px 5px 20px rgba(255, 255, 255, 0.3)',
+            }}
+          ></div>
+
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '15%',
+              left: '8%',
+              width: '110px',
+              height: '110px',
+              background: 'linear-gradient(135deg, #22D3EE 0%, #06B6D4 100%)',
+              borderRadius: '18px',
+              transform: 'rotate(10deg)',
+              boxShadow:
+                '0 20px 60px rgba(34, 211, 238, 0.4), inset -5px -5px 20px rgba(0, 0, 0, 0.1), inset 5px 5px 20px rgba(255, 255, 255, 0.3)',
+            }}
+          ></div>
+
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '8%',
+              right: '5%',
+              width: '130px',
+              height: '130px',
+              background: 'linear-gradient(135deg, #FB923C 0%, #F97316 100%)',
+              borderRadius: '20px',
+              transform: 'rotate(-20deg)',
+              boxShadow:
+                '0 20px 60px rgba(251, 146, 60, 0.4), inset -5px -5px 20px rgba(0, 0, 0, 0.1), inset 5px 5px 20px rgba(255, 255, 255, 0.3)',
             }}
           >
-            Sparkle
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '15px',
+                right: '15px',
+                width: '20px',
+                height: '20px',
+                color: 'white',
+                fontSize: '20px',
+                opacity: 0.9,
+              }}
+            >
+              Sparkle
+            </div>
+          </div>
+
+          {/* Card Preview */}
+          <div style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '40px',
+            boxSizing: 'border-box',
+          }}>
+            <DigitalCardPreview
+              name={formData.name}
+              title={formData.title}
+              company={formData.company}
+              location={formData.location}
+              about={formData.about}
+              skills={formData.skills}
+              portfolio={formData.portfolio}
+              experience={formData.experience}
+              photo={formData.photo}
+            />
           </div>
         </div>
 
-        {/* Card Preview */}
-        <div style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '40px',
-          boxSizing: 'border-box',
-        }}>
-          <DigitalCardPreview
-            name={formData.name}
-            title={formData.title}
-            company={formData.company}
-            location={formData.location}
-            about={formData.about}
-            skills={formData.skills}
-            portfolio={formData.portfolio}
-            experience={formData.experience}
-            photo={formData.photo}
-          />
-        </div>
-      </div>
+        {/* RIGHT: Form (Always Visible) */}
+        <div style={rightPanelStyle}>
+          <div style={{ maxWidth: '448px', width: '100%' }}>
+            <h1
+              style={{
+                fontSize: '30px',
+                fontWeight: '700',
+                marginBottom: '24px',
+                color: colors.primary,
+              }}
+            >
+              {step === 1 && 'Your Name'}
+              {step === 2 && 'Professional Title'}
+              {step === 3 && 'Company Name'}
+              {step === 4 && 'Location'}
+              {step === 5 && 'Profile Photo'}
+              {step === 6 && 'About You'}
+              {step === 7 && 'Skills'}
+              {step === 8 && 'Portfolio'}
+              {step === 9 && 'Experience'}
+              {step === 10 && 'Review & Create'}
+            </h1>
 
-      {/* RIGHT: Form (Always Visible) */}
-      <div style={rightPanelStyle}>
-        <div style={{ maxWidth: '448px', width: '100%' }}>
-          <h1
-            style={{
-              fontSize: '30px',
-              fontWeight: '700',
-              marginBottom: '24px',
-              color: colors.primary,
-            }}
-          >
-            {step === 1 && 'Your Name'}
-            {step === 2 && 'Professional Title'}
-            {step === 3 && 'Company Name'}
-            {step === 4 && 'Location'}
-            {step === 5 && 'Profile Photo'}
-            {step === 6 && 'About You'}
-            {step === 7 && 'Skills'}
-            {step === 8 && 'Portfolio'}
-            {step === 9 && 'Experience'}
-            {step === 10 && 'Review & Create'}
-          </h1>
-
-          {/* Form Fields */}
-          {step === 1 && (
-            <input
-              placeholder="John Doe"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              onFocus={() => setFocusedInput('name')}
-              onBlur={() => setFocusedInput(null)}
-              style={inputStyle('name')}
-            />
-          )}
-          {step === 2 && (
-            <input
-              placeholder="Digital Marketer & Creator"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              onFocus={() => setFocusedInput('title')}
-              onBlur={() => setFocusedInput(null)}
-              style={inputStyle('title')}
-            />
-          )}
-          {step === 3 && (
-            <input
-              placeholder="Company (e.g., BoostNow LLP)"
-              value={formData.company}
-              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-              onFocus={() => setFocusedInput('company')}
-              onBlur={() => setFocusedInput(null)}
-              style={inputStyle('company')}
-            />
-          )}
-          {step === 4 && (
-            <input
-              placeholder="Mumbai"
-              value={formData.location}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              onFocus={() => setFocusedInput('location')}
-              onBlur={() => setFocusedInput(null)}
-              style={inputStyle('location')}
-            />
-          )}
-          {step === 5 && (
-            <div style={{ textAlign: 'center' }}>
+            {/* Form Fields */}
+            {step === 1 && (
               <input
-                id="photo-upload"
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                      setFormData({ ...formData, photo: reader.result as string });
-                    };
-                    reader.readAsDataURL(file);
-                  }
-                }}
-                style={{ display: 'none' }}
+                placeholder="John Doe"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onFocus={() => setFocusedInput('name')}
+                onBlur={() => setFocusedInput(null)}
+                style={inputStyle('name')}
               />
-              <label
-                htmlFor="photo-upload"
-                style={{
-                  display: 'inline-flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '80px',
-                  height: '80px',
-                  borderRadius: '50%',
-                  border: '3px dashed #D1D5DB',
-                  cursor: 'pointer',
-                  background: formData.photo ? 'transparent' : '#F3F4F6',
-                  transition: 'all 200ms',
-                  overflow: 'hidden',
-                  position: 'relative',
-                }}
-              >
-                {formData.photo ? (
-                  <img
-                    src={formData.photo}
-                    alt="Preview"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
-                  />
-                ) : (
-                  <>
-                    <svg
-                      width="48"
-                      height="48"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#9CA3AF"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                      <polyline points="17 8 12 3 7 8" />
-                      <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
-                    <span
+            )}
+            {step === 2 && (
+              <input
+                placeholder="Digital Marketer & Creator"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onFocus={() => setFocusedInput('title')}
+                onBlur={() => setFocusedInput(null)}
+                style={inputStyle('title')}
+              />
+            )}
+            {step === 3 && (
+              <input
+                placeholder="Company (e.g., BoostNow LLP)"
+                value={formData.company}
+                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                onFocus={() => setFocusedInput('company')}
+                onBlur={() => setFocusedInput(null)}
+                style={inputStyle('company')}
+              />
+            )}
+            {step === 4 && (
+              <input
+                placeholder="Mumbai"
+                value={formData.location}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                onFocus={() => setFocusedInput('location')}
+                onBlur={() => setFocusedInput(null)}
+                style={inputStyle('location')}
+              />
+            )}
+            {step === 5 && (
+              <div style={{ textAlign: 'center' }}>
+                <input
+                  id="photo-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setFormData({ ...formData, photo: reader.result as string, photoFile: file });
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  style={{ display: 'none' }}
+                />
+                <label
+                  htmlFor="photo-upload"
+                  style={{
+                    display: 'inline-flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '50%',
+                    border: '3px dashed #D1D5DB',
+                    cursor: 'pointer',
+                    background: formData.photo ? 'transparent' : '#F3F4F6',
+                    transition: 'all 200ms',
+                    overflow: 'hidden',
+                    position: 'relative',
+                  }}
+                >
+                  {formData.photo ? (
+                    <img
+                      src={formData.photo}
+                      alt="Preview"
                       style={{
-                        marginTop: '8px',
-                        fontSize: '14px',
-                        color: '#9CA3AF',
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
                       }}
-                    >
-                      Upload Photo
-                    </span>
-                  </>
-                )}
-              </label>
-            </div>
-          )}
-          {step === 6 && (
-            <textarea
-              placeholder="Crafting engaging content & SEO strategies"
-              value={formData.about}
-              onChange={(e) => setFormData({ ...formData, about: e.target.value })}
-              onFocus={() => setFocusedInput('about')}
-              onBlur={() => setFocusedInput(null)}
-              style={{ ...inputStyle('about'), height: '80px', resize: 'none' }}
-            />
-          )}
-          {step === 7 && (
-            <input
-              placeholder="SEO, Content Creation, Analytics, Social Media"
-              value={formData.skills}
-              onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
-              onFocus={() => setFocusedInput('skills')}
-              onBlur={() => setFocusedInput(null)}
-              style={inputStyle('skills')}
-            />
-          )}
-          {step === 8 && (
-            <input
-              placeholder="[Link] Latest Campaigns"
-              value={formData.portfolio}
-              onChange={(e) => setFormData({ ...formData, portfolio: e.target.value })}
-              onFocus={() => setFocusedInput('portfolio')}
-              onBlur={() => setFocusedInput(null)}
-              style={inputStyle('portfolio')}
-            />
-          )}
-          {step === 9 && (
-            <input
-              placeholder="Lead SEO Specialist @ TechCorp (2021-Present)"
-              value={formData.experience}
-              onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-              onFocus={() => setFocusedInput('experience')}
-              onBlur={() => setFocusedInput(null)}
-              style={inputStyle('experience')}
-            />
-          )}
+                    />
+                  ) : (
+                    <>
+                      <svg
+                        width="48"
+                        height="48"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#9CA3AF"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                      </svg>
+                      <span
+                        style={{
+                          marginTop: '8px',
+                          fontSize: '14px',
+                          color: '#9CA3AF',
+                        }}
+                      >
+                        Upload Photo
+                      </span>
+                    </>
+                  )}
+                </label>
+              </div>
+            )}
+            {step === 6 && (
+              <textarea
+                placeholder="Crafting engaging content & SEO strategies"
+                value={formData.about}
+                onChange={(e) => setFormData({ ...formData, about: e.target.value })}
+                onFocus={() => setFocusedInput('about')}
+                onBlur={() => setFocusedInput(null)}
+                style={{ ...inputStyle('about'), height: '80px', resize: 'none' }}
+              />
+            )}
+            {step === 7 && (
+              <input
+                placeholder="SEO, Content Creation, Analytics, Social Media"
+                value={formData.skills}
+                onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+                onFocus={() => setFocusedInput('skills')}
+                onBlur={() => setFocusedInput(null)}
+                style={inputStyle('skills')}
+              />
+            )}
+            {step === 8 && (
+              <input
+                placeholder="[Link] Latest Campaigns"
+                value={formData.portfolio}
+                onChange={(e) => setFormData({ ...formData, portfolio: e.target.value })}
+                onFocus={() => setFocusedInput('portfolio')}
+                onBlur={() => setFocusedInput(null)}
+                style={inputStyle('portfolio')}
+              />
+            )}
+            {step === 9 && (
+              <input
+                placeholder="Lead SEO Specialist @ TechCorp (2021-Present)"
+                value={formData.experience}
+                onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                onFocus={() => setFocusedInput('experience')}
+                onBlur={() => setFocusedInput(null)}
+                style={inputStyle('experience')}
+              />
+            )}
 
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '12px' }}>
-            {(step === 5 || step === 8 || step === 9) && (
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', gap: '12px' }}>
+              {(step === 5 || step === 8 || step === 9) && (
+                <button
+                  onClick={() => setStep(step + 1)}
+                  style={{
+                    flex: 1,
+                    padding: '14px 0',
+                    background: '#E5E7EB',
+                    color: '#6B7280',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Skip
+                </button>
+              )}
               <button
-                onClick={() => setStep(step + 1)}
+                onClick={handleContinue}
+                disabled={
+                  (step === 1 && !formData.name.trim()) ||
+                  (step === 2 && !formData.title.trim()) ||
+                  (step === 3 && !formData.company.trim()) ||
+                  (step === 4 && !formData.location.trim()) ||
+                  (step === 6 && !formData.about.trim()) ||
+                  (step === 7 && !formData.skills.trim())
+                }
                 style={{
-                  flex: 1,
+                  flex: (step === 5 || step === 8 || step === 9) ? 1 : 'auto',
+                  width: (step === 5 || step === 8 || step === 9) ? 'auto' : '100%',
                   padding: '14px 0',
-                  background: '#E5E7EB',
-                  color: '#6B7280',
+                  background: (
+                    (step === 1 && !formData.name.trim()) ||
+                    (step === 2 && !formData.title.trim()) ||
+                    (step === 3 && !formData.company.trim()) ||
+                    (step === 4 && !formData.location.trim()) ||
+                    (step === 6 && !formData.about.trim()) ||
+                    (step === 7 && !formData.skills.trim())
+                  )
+                    ? '#D1D5DB'
+                    : `linear-gradient(135deg, ${colors.primary}, ${colors.purple})`,
+                  color: 'white',
                   border: 'none',
                   borderRadius: '12px',
                   fontSize: '18px',
                   fontWeight: '600',
-                  cursor: 'pointer',
+                  cursor: (
+                    (step === 1 && !formData.name.trim()) ||
+                    (step === 2 && !formData.title.trim()) ||
+                    (step === 3 && !formData.company.trim()) ||
+                    (step === 4 && !formData.location.trim()) ||
+                    (step === 6 && !formData.about.trim()) ||
+                    (step === 7 && !formData.skills.trim())
+                  )
+                    ? 'not-allowed'
+                    : 'pointer',
+                  opacity: (
+                    (step === 1 && !formData.name.trim()) ||
+                    (step === 2 && !formData.title.trim()) ||
+                    (step === 3 && !formData.company.trim()) ||
+                    (step === 4 && !formData.location.trim()) ||
+                    (step === 6 && !formData.about.trim()) ||
+                    (step === 7 && !formData.skills.trim())
+                  )
+                    ? 0.6
+                    : 1,
                 }}
               >
-                Skip
+                {step < 10 ? 'Continue' : 'Create Card'}
               </button>
-            )}
-            <button
-              onClick={handleContinue}
-              disabled={
-                (step === 1 && !formData.name.trim()) ||
-                (step === 2 && !formData.title.trim()) ||
-                (step === 3 && !formData.company.trim()) ||
-                (step === 4 && !formData.location.trim()) ||
-                (step === 6 && !formData.about.trim()) ||
-                (step === 7 && !formData.skills.trim())
-              }
-              style={{
-                flex: (step === 5 || step === 8 || step === 9) ? 1 : 'auto',
-                width: (step === 5 || step === 8 || step === 9) ? 'auto' : '100%',
-                padding: '14px 0',
-                background: (
-                  (step === 1 && !formData.name.trim()) ||
-                  (step === 2 && !formData.title.trim()) ||
-                  (step === 3 && !formData.company.trim()) ||
-                  (step === 4 && !formData.location.trim()) ||
-                  (step === 6 && !formData.about.trim()) ||
-                  (step === 7 && !formData.skills.trim())
-                )
-                  ? '#D1D5DB'
-                  : `linear-gradient(135deg, ${colors.primary}, ${colors.purple})`,
-                color: 'white',
-                border: 'none',
-                borderRadius: '12px',
-                fontSize: '18px',
-                fontWeight: '600',
-                cursor: (
-                  (step === 1 && !formData.name.trim()) ||
-                  (step === 2 && !formData.title.trim()) ||
-                  (step === 3 && !formData.company.trim()) ||
-                  (step === 4 && !formData.location.trim()) ||
-                  (step === 6 && !formData.about.trim()) ||
-                  (step === 7 && !formData.skills.trim())
-                )
-                  ? 'not-allowed'
-                  : 'pointer',
-                opacity: (
-                  (step === 1 && !formData.name.trim()) ||
-                  (step === 2 && !formData.title.trim()) ||
-                  (step === 3 && !formData.company.trim()) ||
-                  (step === 4 && !formData.location.trim()) ||
-                  (step === 6 && !formData.about.trim()) ||
-                  (step === 7 && !formData.skills.trim())
-                )
-                  ? 0.6
-                  : 1,
-              }}
-            >
-              {step < 10 ? 'Continue' : 'Create Card'}
-            </button>
-          </div>
+            </div>
 
-          {/* Progress Dots */}
-          <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "32px" }}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-              <div
-                key={i}
-                style={{
-                  width: "40px",
-                  height: "4px",
-                  borderRadius: "9999px",
-                  backgroundColor: i <= step ? colors.primary : "#E5E7EB",
-                  transition: "all 300ms",
-                }}
-              />
-            ))}
+            {/* Progress Dots */}
+            <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "32px" }}>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                <div
+                  key={i}
+                  style={{
+                    width: "40px",
+                    height: "4px",
+                    borderRadius: "9999px",
+                    backgroundColor: i <= step ? colors.primary : "#E5E7EB",
+                    transition: "all 300ms",
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Party Popup */}
+      {showPartyPopup && <PartyPopup onClose={handlePopupClose} />}
+    </>
   );
 };
 

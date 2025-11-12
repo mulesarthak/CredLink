@@ -27,39 +27,6 @@ interface SupportTicket {
   status: "Pending" | "Resolved";
 }
 
-const dummyTickets: SupportTicket[] = [
-  {
-    id: "1",
-    userName: "John Smith",
-    userEmail: "john.smith@email.com",
-    subject: "Unable to update profile information",
-    message:
-      "I'm having trouble updating my profile details. Every time I try to save changes, I get an error message saying 'Failed to update profile'. Could you please help me resolve this issue?",
-    date: "2024-11-02",
-    status: "Pending",
-  },
-  {
-    id: "2",
-    userName: "Sarah Johnson",
-    userEmail: "sarah.j@email.com",
-    subject: "Payment processing issue",
-    message:
-      "My payment was charged but the transaction shows as failed in my account. The amount was deducted from my bank account but I don't see the credit in my balance.",
-    date: "2024-11-01",
-    status: "Resolved",
-  },
-  {
-    id: "3",
-    userName: "Mike Chen",
-    userEmail: "mike.chen@email.com",
-    subject: "Account verification problems",
-    message:
-      "I've uploaded my documents for verification multiple times but my account status still shows as unverified.",
-    date: "2024-10-31",
-    status: "Pending",
-  },
-];
-
 export default function SupportPage() {
   const router = useRouter();
   const [tickets, setTickets] = useState<SupportTicket[]>([]);

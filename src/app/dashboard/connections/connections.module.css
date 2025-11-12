@@ -3,6 +3,7 @@
   min-height: 100vh;
   background-color: #f9fafb; /* bg-gray-50 */
   font-family: Arial, sans-serif;
+  overflow-x: hidden;
 }
 
 .wFull {
@@ -33,7 +34,7 @@
   position: relative;
   padding: 16px 12px; /* tighter on mobile */
   background-color: white;
-  overflow: visible;
+  overflow: hidden;
 }
 
 @media (min-width: 640px) {
@@ -336,7 +337,7 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); /* shadow-lg */
   border: 1px solid #e5e7eb; /* border-gray-200 */
   width: 100%;
-  min-width: 320px;
+  min-width: 0;
   height: 40px; /* shorter */
   box-sizing: border-box;
   order: 1;
@@ -345,6 +346,7 @@
 @media (min-width: 640px) {
   .viewToggleContainer {
     width: auto;
+    min-width: 320px;
     order: 1;
   }
 }
@@ -382,6 +384,7 @@
   transition-duration: 300ms;
   border-radius: 8px; /* rounded-lg */
   height: 32px; /* shorter */
+  white-space: nowrap; /* keep label in one line */
 }
 
 .viewToggleActiveText {
@@ -406,6 +409,21 @@
 .viewToggleIcon {
   width: 16px;
   height: 16px;
+}
+
+/* tighter toggle on very small screens to avoid wrapping */
+@media (max-width: 360px) {
+  .viewToggleContainer {
+    height: 36px;
+  }
+  .viewToggleButton {
+    padding: 2px 10px;
+    font-size: 13px;
+  }
+  .viewToggleIcon {
+    width: 14px;
+    height: 14px;
+  }
 }
 
 /* --- Search Bar --- */
@@ -702,6 +720,7 @@
 
 .tableBody {
   /* Removed 'divide-y divide-gray-200' as it's better handled by .tableRow border */
+  background-color: transparent;
 }
 
 .tableRow {
@@ -1499,7 +1518,14 @@
 }
 
 .cardBackActionButtonSecondary {
-  composes: cardBackActionButton;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
   background-color: transparent;
   border: 1px solid white;
   color: white;

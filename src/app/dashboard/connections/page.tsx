@@ -14,9 +14,10 @@ if (typeof document !== 'undefined') {
 */
 
 import { Search, Filter, Download, Plus, ChevronDown, MoreHorizontal, Phone, Mail, MessageCircle, Calendar, TrendingUp, Users, Activity, Zap, Star, Clock, MapPin, Send, X } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface Contact {
-  id: number;
+  id: string; // Changed to string to match backend API
   name: string;
   title: string;
   company: string;
@@ -59,16 +60,18 @@ export default function DashboardContactPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedSortOption, setSelectedSortOption] = useState('a-z');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  const [showContactInfo, setShowContactInfo] = useState<{[key: number]: {type: 'phone' | 'email' | null}}>({});
-  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
-  const [contactsList, setContactsList] = useState<Contact[]>(contactsData);
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [showContactInfo, setShowContactInfo] = useState<{[key: string]: {type: 'phone' | 'email' | null}}>({});
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [contactsList, setContactsList] = useState<Contact[]>([]);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [messageModal, setMessageModal] = useState<{isOpen: boolean, contact: Contact | null}>({isOpen: false, contact: null});
   const [messageText, setMessageText] = useState('');
-  const [connectionRequests, setConnectionRequests] = useState<Contact[]>(connectionRequestsData);
+  const [connectionRequests, setConnectionRequests] = useState<Contact[]>([]);
   const [activeTab, setActiveTab] = useState<'connections' | 'requests'>('connections');
+  const [loading, setLoading] = useState(false);
+  const [requestsLoading, setRequestsLoading] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
 
   // Handle direct message - open message modal
@@ -125,8 +128,93 @@ export default function DashboardContactPage() {
     };
   }, [isFilterOpen]);
 
+  // Fetch accepted connections from backend
+  useEffect(() => {
+    const fetchAcceptedConnections = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/users/connections?type=accepted', {
+          credentials: 'include',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch connections');
+        }
+        
+        const data = await response.json();
+        
+        // Map backend data to frontend Contact structure
+        const mappedConnections: Contact[] = (data.requests || []).map((connection: any) => ({
+          id: connection.id,
+          name: connection.user?.fullName || 'Unknown User',
+          title: connection.user?.title || 'No Title',
+          company: connection.user?.company || 'No Company',
+          tags: ['Professional'],
+          associatedCard: 'Professional',
+          dateAdded: new Date(connection.updatedAt).toISOString().split('T')[0],
+          email: connection.user?.email,
+          phone: connection.user?.phone,
+          location: connection.user?.location,
+          connectionStatus: 'connected',
+          activityStatus: 'active' as const
+        }));
+        
+        setContactsList(mappedConnections);
+      } catch (error) {
+        console.error('Error fetching connections:', error);
+        toast.error('Failed to load connections');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAcceptedConnections();
+  }, []);
+
+  // Fetch connection requests from backend
+  useEffect(() => {
+    const fetchConnectionRequests = async () => {
+      try {
+        setRequestsLoading(true);
+        const response = await fetch('/api/users/connections?type=received', {
+          credentials: 'include',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch connection requests');
+        }
+        
+        const data = await response.json();
+        
+        // Map backend data to frontend Contact structure
+        const mappedRequests: Contact[] = (data.requests || []).map((request: any) => ({
+          id: request.id,
+          name: request.sender?.fullName || 'Unknown User',
+          title: request.sender?.title || 'No Title',
+          company: request.sender?.company || 'No Company',
+          tags: ['Professional'],
+          associatedCard: 'Professional',
+          dateAdded: new Date(request.createdAt).toISOString().split('T')[0],
+          email: request.sender?.email,
+          connectionStatus: 'pending',
+          isIncomingRequest: true,
+          activityStatus: 'new' as const
+        }));
+        
+        setConnectionRequests(mappedRequests);
+      } catch (error) {
+        console.error('Error fetching connection requests:', error);
+        toast.error('Failed to load connection requests');
+      } finally {
+        setRequestsLoading(false);
+      }
+    };
+    
+    fetchConnectionRequests();
+  }, []);
+
   // Handle showing contact info
-  const handleContactInfo = (contactId: number, type: 'phone' | 'email') => {
+  const handleContactInfo = (contactId: string, type: 'phone' | 'email') => {
     setShowContactInfo(prev => ({
       ...prev,
       [contactId]: { type: prev[contactId]?.type === type ? null : type }
@@ -134,7 +222,7 @@ export default function DashboardContactPage() {
   };
 
   // Handle delete connection
-  const handleDeleteConnection = (contactId: number) => {
+  const handleDeleteConnection = (contactId: string) => {
     setContactsList(prev => prev.filter(contact => contact.id !== contactId));
     setOpenDropdown(null);
   };
@@ -211,16 +299,60 @@ export default function DashboardContactPage() {
     }
   };
 
-  const handleApproveRequest = (contactId: number) => {
-    const request = connectionRequests.find(c => c.id === contactId);
-    if (request) {
-      setContactsList(prev => [...prev, {...request, connectionStatus: 'connected'}]);
-      setConnectionRequests(prev => prev.filter(c => c.id !== contactId));
+  const handleApproveRequest = async (contactId: string) => {
+    try {
+      const response = await fetch(`/api/users/connections/${contactId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ action: 'accept' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to approve connection request');
+      }
+
+      const data = await response.json();
+      
+      // Find the request and move it to connections
+      const request = connectionRequests.find(c => c.id === contactId);
+      if (request) {
+        setContactsList(prev => [...prev, {...request, connectionStatus: 'connected'}]);
+        setConnectionRequests(prev => prev.filter(c => c.id !== contactId));
+        toast.success(`Connection with ${request.name} approved!`);
+      }
+    } catch (error: any) {
+      console.error('Error approving connection request:', error);
+      toast.error(error.message || 'Failed to approve connection request');
     }
   };
 
-  const handleRejectRequest = (contactId: number) => {
-    setConnectionRequests(prev => prev.filter(c => c.id !== contactId));
+  const handleRejectRequest = async (contactId: string) => {
+    try {
+      const response = await fetch(`/api/users/connections/${contactId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ action: 'reject' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to reject connection request');
+      }
+
+      const data = await response.json();
+      
+      // Remove the request from the list
+      const request = connectionRequests.find(c => c.id === contactId);
+      setConnectionRequests(prev => prev.filter(c => c.id !== contactId));
+      
+      if (request) {
+        toast.success(`Connection request from ${request.name} rejected`);
+      }
+    } catch (error: any) {
+      console.error('Error rejecting connection request:', error);
+      toast.error(error.message || 'Failed to reject connection request');
+    }
   };
 
   return (
@@ -295,7 +427,7 @@ export default function DashboardContactPage() {
                     {/* Filter: Desktop Only in Header */}
                     {!isSidebarOpen && (
                       <div className={styles.desktopOnly}>
-                        <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown style={{zIndex: 10000}}>
+                        <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown>
                           <button 
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
                             className={styles.filterButton}
@@ -428,7 +560,7 @@ export default function DashboardContactPage() {
             <div className={styles.controlsFlexContainer}>
               <div className={styles.controlsGroup}>
                 <div className={styles.controlsInnerFlex}>
-                  <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown style={{zIndex: 10000}}>
+                  <div className={styles.filterContainer} ref={filterRef} data-filter-dropdown>
                     <button 
                       onClick={() => setIsFilterOpen(!isFilterOpen)}
                       className={styles.filterButton}
@@ -669,7 +801,7 @@ export default function DashboardContactPage() {
               <div className={styles.cardsViewContainer}>
                 <div className={styles.cardsWrapper}>
                   <div className={styles.cardsGrid}>
-                    {sortedContacts.map((contact) => (
+                    {sortedContacts.map((contact, index) => (
                       <div
                         key={contact.id}
                         className={styles.cardGroup}
@@ -684,18 +816,18 @@ export default function DashboardContactPage() {
                             
                             {/* Front of Card */}
                             <div className={`${styles.cardFace} ${styles.backfaceHidden} ${
-                              contact.id % 4 === 1 ? styles.cardFront1 :
-                              contact.id % 4 === 2 ? styles.cardFront2 :
-                              contact.id % 4 === 3 ? styles.cardFront3 :
+                              index % 4 === 1 ? styles.cardFront1 :
+                              index % 4 === 2 ? styles.cardFront2 :
+                              index % 4 === 3 ? styles.cardFront3 :
                               styles.cardFront4
                             }`}>
                               
                               {/* Decorative Elements */}
                               <div className={styles.cardDecorativeElement}>
                                 <div className={`${styles.cardCircle} ${
-                                  contact.id % 4 === 1 ? styles.circle1 :
-                                  contact.id % 4 === 2 ? styles.circle2 :
-                                  contact.id % 4 === 3 ? styles.circle3 :
+                                  index % 4 === 1 ? styles.circle1 :
+                                  index % 4 === 2 ? styles.circle2 :
+                                  index % 4 === 3 ? styles.circle3 :
                                   styles.circle4
                                 }`}></div>
                               </div>
@@ -722,9 +854,9 @@ export default function DashboardContactPage() {
 
                             {/* Back of Card - Different templates based on contact ID */}
                             <div className={`${styles.cardFace} ${styles.backfaceHidden} ${styles.rotateY180} ${
-                              contact.id % 4 === 1 ? styles.cardBack1 :
-                              contact.id % 4 === 2 ? styles.cardBack2 :
-                              contact.id % 4 === 3 ? styles.cardBack3 :
+                              index % 4 === 1 ? styles.cardBack1 :
+                              index % 4 === 2 ? styles.cardBack2 :
+                              index % 4 === 3 ? styles.cardBack3 :
                               styles.cardBack4
                             }`}>
                               <div className={styles.cardBackCenter}>
@@ -847,7 +979,14 @@ export default function DashboardContactPage() {
                       <div className={styles.requestActions}>
                         <button 
                           onClick={() => handleApproveRequest(request.id)}
-                          className={styles.requestApproveButton}
+                          style={{
+                            background: 'linear-gradient(to bottom right, #1e3a8a, #2563eb)',
+                            color: 'white',
+                            padding: '8px 16px',
+                            borderRadius: '8px',
+                            fontWeight: '500',
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                          }}
                         >
                           Approve
                         </button>

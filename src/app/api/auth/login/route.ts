@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
-import { sign } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
+import { signToken } from '@/lib/jwt'
 
-const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key'
 const TOKEN_EXPIRY = '7d' // 7 days
 
 export async function POST(request: NextRequest) {
@@ -19,9 +18,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Normalize email to lowercase for consistency
+    const normalizedEmail = email.toLowerCase().trim()
+
     // Find user by email
-    const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() }
+    const user = await prisma.user.findFirst({
+      where: { 
+        email: normalizedEmail
+      }
     })
 
     if (!user) {
@@ -54,14 +58,20 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Login successful for user:', email)
 
+    // Check if user has any cards (first-time login check)
+    const cardCount = await prisma.card.count({
+      where: { userId: user.id }
+    })
+
+    const needsOnboarding = cardCount === 0
+
     // Create JWT token
-    const token = sign(
+    const token = signToken(
       {
         userId: user.id,
         email: user.email,
         fullName: user.fullName
       },
-      JWT_SECRET,
       { expiresIn: TOKEN_EXPIRY }
     )
 
@@ -77,10 +87,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      token,
+      needsOnboarding,
       user: {
         id: user.id,
         email: user.email,
         fullName: user.fullName,
+        username: user.username,
         phone: user.phone
       }
     })

@@ -1,174 +1,106 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Mail, Eye, EyeOff, Loader2, Check } from "lucide-react"
-import { toast } from "react-hot-toast"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
-import { signupSchema } from "@/lib/validations/auth"
-import type { z } from "zod"
-import { auth, RecaptchaVerifier, signInWithPhoneNumber } from "@/lib/firebase"
-
-// Augment window for reCAPTCHA handle (must be top-level)
-// declare global {
-//   interface Window {
-//     recaptchaVerifier?: RecaptchaVerifier
-//   }
-// }
-
-type SignupForm = z.infer<typeof signupSchema>
+import "../../globals.css"
 
 export default function SignupPage() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [identifier, setIdentifier] = useState('')
-  const [identifierType, setIdentifierType] = useState<'email' | 'phone' | null>(null)
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [captchaCode, setCaptchaCode] = useState('')
+  const [generatedCaptcha, setGeneratedCaptcha] = useState('')
+  const [acceptPrivacyPolicy, setAcceptPrivacyPolicy] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [otp, setOtp] = useState('')
-  const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setValue } = useForm<SignupForm>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: {
-      fullName: '',
-      email: '',
-      phone: '',
-      password: '',
-      confirmPassword: ''
-    }
-  })
 
-  // Detect input type
-  const detectInputType = (value: string) => {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    const phonePattern = /^\d{10}$/
-    if (emailPattern.test(value)) return 'email'
-    if (phonePattern.test(value)) return 'phone'
-    return null
+  // Generate random captcha code
+  const generateCaptcha = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    let result = ''
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    setGeneratedCaptcha(result)
+    setCaptchaCode('')
   }
 
-  const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.trim()
-    setIdentifier(value)
-    setError('')
-    const type = detectInputType(value)
-    setIdentifierType(type)
-    
-    // Update form values based on detected type
-    if (type === 'email') {
-      setValue('email', value)
-      setValue('phone', '')
-    } else if (type === 'phone') {
-      setValue('phone', value)
-      setValue('email', '')
-    }
-  }
-
-  const recaptchaRef = useRef<RecaptchaVerifier | null>(null)
-
+  // Generate captcha on component mount
   useEffect(() => {
-    return () => {
-      try { recaptchaRef.current?.clear() } catch {}
-      recaptchaRef.current = null
-    }
+    generateCaptcha()
   }, [])
 
-  const sendOtp = async (rawPhone?: string) => {
-    try {
-      const input = rawPhone ?? watch('phone')
-      const normalized = (input || '').replace(/\D/g, '')
-      const phoneNumber = input?.startsWith('+') ? input : (normalized.length === 10 ? `+91${normalized}` : `+${normalized}`)
-      const verifier = setupRecaptcha()
-      const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, verifier)
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('verificationId', confirmationResult.verificationId)
-        sessionStorage.setItem('otpPhone', phoneNumber)
-      }
-      toast.success('OTP sent!')
-      router.push(`/auth/verify-otp?phone=${encodeURIComponent(input || '')}`)
-    } catch (error: any) {
-      console.error(error)
-      toast.error(error?.message || 'Failed to send OTP')
-    }
-  }
-
-  // OTP verification happens on /auth/verify-otp page using verificationId
-  
-  const setupRecaptcha = () => {
-    if (recaptchaRef.current) return recaptchaRef.current
-    const container = typeof document !== 'undefined' ? document.getElementById('recaptcha-container-signup') : null
-    if (!container) throw new Error('reCAPTCHA container missing')
-    recaptchaRef.current = new RecaptchaVerifier(auth, 'recaptcha-container-signup', { size: 'invisible' })
-    return recaptchaRef.current
-  }
-
-  const onSubmit = async (data: SignupForm) => {
-    if (data.phone) {
-      try {
-        setLoading(true)
-        await sendOtp(data.phone)
-      } finally {
-        setLoading(false)
-      }
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    
+    if (!fullName || !email || !phone || !password || !confirmPassword) {
+      setError('Please fill in all required fields')
       return
     }
     
-    // For email signup, continue as before
-    try {
-      const loadingToast = toast.loading('Creating your account...')
-      
-      // Send register payload to backend JSON API
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-          fullName: data.fullName,
-          phone: data.phone
-        }),
-      })
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
 
-     /* const response = await fetch('/api/auth/signup', {
+    if (captchaCode !== generatedCaptcha) {
+      setError('Invalid captcha code. Please try again.')
+      generateCaptcha()
+      return
+    }
+
+    if (!acceptPrivacyPolicy) {
+      setError('Please accept the privacy policy to continue')
+      return
+    }
+    
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long')
+      return
+    }
+    
+    setLoading(true)
+    
+    try {
+      console.log('Signup attempt:', { fullName, email, phone, password })
+      
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-          fullName: data.fullName,
-          phone: data.phone
-        }),
+          fullName,
+          email,
+          phone,
+          password
+        })
       })
-*/
-      const result = await response.json()
-      toast.dismiss(loadingToast)
 
-      if (!response.ok) {
-        toast.error(result.error || 'Failed to create account')
-        setError(result.error || 'Failed to create account')
-        return
+      const data = await response.json()
+
+      if (response.ok) {
+        // Success - redirect to OTP verification
+        router.push(`/auth/verify-otp?phone=${encodeURIComponent(phone)}`)
+      } else {
+        // Error from API
+        setError(data.error || 'Failed to create account')
       }
-
-      // Show success message and redirect
-      toast.success('🎉 Account created successfully! Redirecting to login...', {
-        duration: 3000,
-      })
-      
-      // Wait a moment before redirecting so user sees the message
-      setTimeout(() => {
-        router.push('/auth/login')
-      }, 1500)
     } catch (error) {
       console.error('Signup error:', error)
-      toast.error('Failed to create account. Please try again.')
-      setError('Failed to create account. Please try again.')
+      setError('Network error. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
+
 
   return (
     <div className="auth-container">
@@ -188,14 +120,10 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <div
-          id="recaptcha-container-signup"
-          style={{ position: 'fixed', top: -1000, left: -1000, width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
-        />
 
         <form
           className="auth-form"
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSignup}
         >
           <div className="space-y-4">
             <div className="auth-input-group">
@@ -205,61 +133,42 @@ export default function SignupPage() {
               <input
                 id="fullName"
                 type="text"
-                {...register('fullName')}
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 className="auth-input"
-                placeholder="Enter your full name"
+                placeholder="Enter full name"
+                required
               />
-              {errors.fullName && (
-                <p className="form-error">{errors.fullName.message}</p>
-              )}
             </div>
 
             <div className="auth-input-group">
-              <label htmlFor="identifier" className="label">
-                 Phone Number
+              <label htmlFor="phone" className="label">
+                Phone Number
               </label>
               <input
-                id="identifier"
-                type="number"
-                {...register('phone')}
-                //onChange={handleIdentifierChange}
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 className="auth-input"
                 placeholder="Enter phone number"
-                maxLength={50}
-                //autoComplete="email tel"
                 required
               />
-              {identifierType && (
-                <p className="text-xs text-gray-500 mt-1">
-                  {identifierType === 'email' ? '✓ Valid email' : '✓ Valid phone number'}
-                </p>
-              )}
-              {error && <p className="form-error mt-2">{error}</p>}
-              {errors.email && <p className="form-error mt-2">{errors.email.message}</p>}
             </div>
 
             <div className="auth-input-group">
-              <label htmlFor="identifier" className="label">
-                Email 
+              <label htmlFor="email" className="label">
+                Email Address
               </label>
               <input
-                id="identifier"
+                id="email"
                 type="email"
-                {...register('email')}
-                //onChange={handleIdentifierChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="auth-input"
-                placeholder="Enter email"
-                maxLength={50}
-                autoComplete="email tel"
+                placeholder="Enter email address"
                 required
               />
-              {identifierType && (
-                <p className="text-xs text-gray-500 mt-1">
-                  {identifierType === 'email' ? '✓ Valid email' : '✓ Valid phone number'}
-                </p>
-              )}
-              {error && <p className="form-error mt-2">{error}</p>}
-              {errors.email && <p className="form-error mt-2">{errors.email.message}</p>}
             </div>
 
             <div className="auth-input-group">
@@ -270,29 +179,32 @@ export default function SignupPage() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  {...register('password')}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="auth-input"
                   placeholder="Create a strong password"
+                  required
                 />
                 <button
                   type="button"
-                  tabIndex={-1}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShowPassword(!showPassword);
-                  }}
+                  className="absolute inset-y-0 right-0 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                  style={{ paddingRight: '10px' }}
+                  onClick={() => setShowPassword(!showPassword)}
                 >
-                  {!showPassword ? (
-                    <EyeOff className="h-5 w-5" aria-label="Show password" />
+                  {showPassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
                   ) : (
-                    <Eye className="h-5 w-5" aria-label="Hide password" />
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />
+                    </svg>
                   )}
                 </button>
               </div>
-              {errors.password && (
-                <p className="form-error">{errors.password.message}</p>
-              )}
             </div>
 
             <div className="auth-input-group">
@@ -303,43 +215,105 @@ export default function SignupPage() {
                 <input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
-                  {...register('confirmPassword')}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   className="auth-input"
                   placeholder="Confirm your password"
+                  required
                 />
                 <button
                   type="button"
-                  tabIndex={-1}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShowConfirmPassword(!showConfirmPassword);
-                  }}
+                  className="absolute inset-y-0 right-0 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                  style={{ paddingRight: '10px' }}
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
-                  {!showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5" aria-label="Show password" />
+                  {showConfirmPassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
                   ) : (
-                    <Eye className="h-5 w-5" aria-label="Hide password" />
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />
+                    </svg>
                   )}
                 </button>
               </div>
-              {errors.confirmPassword && (
-                <p className="form-error">{errors.confirmPassword.message}</p>
-              )}
+            </div>
+
+            {/* Captcha Section */}
+            <div className="auth-input-group">
+              <label htmlFor="captcha" className="label">
+                Captcha Code
+              </label>
+              <div className="flex gap-3 items-center">
+                <div className="flex-1">
+                  <input
+                    id="captcha"
+                    type="text"
+                    value={captchaCode}
+                    onChange={(e) => setCaptchaCode(e.target.value)}
+                    className="auth-input"
+                    placeholder="Enter captcha code"
+                    required
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg font-mono text-lg font-bold text-gray-700 select-none"
+                    style={{ letterSpacing: '3px', minWidth: '120px', textAlign: 'center' }}
+                  >
+                    {generatedCaptcha}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={generateCaptcha}
+                    className="p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    title="Refresh captcha"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Privacy Policy Checkbox */}
+            <div className="auth-input-group">
+              <div className="flex items-start gap-3">
+                <input
+                  id="privacyPolicy"
+                  type="checkbox"
+                  checked={acceptPrivacyPolicy}
+                  onChange={(e) => setAcceptPrivacyPolicy(e.target.checked)}
+                  className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  required
+                />
+                <label htmlFor="privacyPolicy" className="text-sm text-gray-700">
+                  I agree to the{' '}
+                  <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-800 underline">
+                    Privacy Policy
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/terms-of-service" className="text-blue-600 hover:text-blue-800 underline">
+                    Terms of Service
+                  </Link>
+                </label>
+              </div>
             </div>
           </div>
 
+          {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
           <div>
             <button
               type="submit"
-              disabled={isSubmitting || loading}
-              className={`auth-submit-button ${(isSubmitting || loading) ? 'opacity-60 cursor-not-allowed' : ''}`}
+              disabled={loading}
+              className={`auth-submit-button w-full ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
-              {(isSubmitting || loading) ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                'Create Account'
-              )}
+              {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </div>
         </form>
