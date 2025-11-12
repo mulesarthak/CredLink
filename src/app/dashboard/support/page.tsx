@@ -26,7 +26,7 @@ type ContactOption = {
 type Faq = { q: string; a: string };
 
 export default function SupportPage() {
-  const [activeFaq, setActiveFaq] = useState<number | null>(0);
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [showChatModal, setShowChatModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
@@ -42,46 +42,13 @@ export default function SupportPage() {
       action: { type: "link", label: "support@mykard.com", href: "mailto:support@mykard.com" },
     },
   ], []);
-  const contactOptions = useMemo<ContactOption[]>(
-    () => [
-      {
-        title: "Email Support",
-        description:
-          "Drop us a note and our customer success team will respond within one business day.",
-        icon: Mail,
-        accentClass: "text-[#4F46E5]",
-        cardVariant: "highlight",
-        action: {
-          type: "link",
-          label: "support@MyKard.com",
-          href: "mailto:support@MyKard.com",
-        },
-      },
-      {
-        title: "Schedule a Call",
-        description:
-          "Speak with a MyKard specialist about onboarding, billing, or enterprise access.",
-        icon: Phone,
-        accentClass: "text-[#FF6B35]",
-        action: {
-          type: "link",
-          label: "+1 (415) 555-0134",
-          href: "tel:+14155550134",
-        },
-      },
-    ],
-    []
-  );
 
   const faqs = useMemo<Faq[]>(() => [
-    {
-      q: "I forgot my password. What should I do?",
-      a: "If you've forgotten your password, go to Account Settings and use the Reset Password option. You'll receive an email with a link to securely create a new password.",
+      {
+      q: "How does MyKard works",
+      a: "1)Create Your Profile – Add your professional details.2) Customize Your Card – Personalize with themes and logos.3)Share Anywhere – Use your link or QR code instantly.4)Track Insights – Monitor views, leads, and engagement.",
     },
-    {
-      q: "How can I view my analytics?",
-      a: "Open your Dashboard and check the Analytics card section. You can view engagement, profile visits, and connection stats in real time.",
-    },
+   
     {
       q: "How can I search for a professional?",
       a: "In the Dashboard, use the Search feature at the top. You can search by name, category, or email to quickly find any professional profile.",
@@ -90,32 +57,18 @@ export default function SupportPage() {
       q: "How can I see my connections?",
       a: "Go to your Dashboard and click on the Connections tab. You'll see all your active and pending connections in one place.",
     },
+
+    {
+      q: "How much does it cost to get started?",
+      a: "You can get started for free with a basic MyKard.Just click “Create Your Free Card Now” on the homepage to begin designing your digital card.",
+    },
+    {
+      q: "How does MyKard help grow my professional network?",
+      a: "MyKard helps you connect instantly through shareable QR or link — whether at events, meetings, or online.You can discover professionals, entrepreneurs, and creators nearby or in your industry, and stay connected effortlessly.",
+    },
+   
+
   ], []);
-  const faqs = useMemo<Faq[]>(
-    () => [
-      {
-        q: "How do I verify my profile on MyKard?",
-        a: "From your dashboard, open Profile Settings and upload the required documents. Our team reviews submissions within 24 hours and you’ll receive an email once verification is complete.",
-      },
-      {
-        q: "I forgot my password. What should I do?",
-        a: "Use the Forgot Password link on the sign-in page. If you no longer have access to your email, contact support with a valid government-issued ID for manual verification.",
-      },
-      {
-        q: "Can I downgrade or upgrade my subscription?",
-        a: "Yes. Navigate to Billing & Plans in your account settings, choose the desired plan, and confirm. Changes take effect at the next billing cycle and prorated credits are applied automatically.",
-      },
-      {
-        q: "How can I export my digital business card analytics?",
-        a: "Go to Analytics, pick a timeframe, and click Export Report. You’ll receive a CSV download and a copy will also be emailed to the address linked to your account.",
-      },
-      {
-        q: "Where can I report suspicious activity?",
-        a: "Head to Security Center in your settings and select Report Issue. Provide the details you have, and our trust & safety team will reach out within a few hours.",
-      },
-    ],
-    []
-  );
 
   const handleFaqToggle = useCallback((i: number) => {
     setActiveFaq((p) => (p === i ? null : i));
@@ -180,62 +133,6 @@ export default function SupportPage() {
       setIsSubmitting(false);
     }
   }, [formData]);
-  const handleFormSubmit = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      setIsSubmitting(true);
-      setSubmitStatus('idle');
-
-      try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        const { name, email, topic, message } = formData;
-        const subject = encodeURIComponent(`Support request${topic ? `: ${topic}` : ""}`);
-        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nTopic: ${topic}\n\n${message}`);
-
-        // Open email client as fallback
-        window.location.href = `mailto:support@MyKard.com?subject=${subject}&body=${body}`;
-        
-        setSubmitStatus('success');
-        // Reset form after success
-        setTimeout(() => {
-          setFormData({ name: "", email: "", topic: "", message: "" });
-          setSubmitStatus('idle');
-        }, 3000);
-      } catch (error) {
-        setSubmitStatus('error');
-      } finally {
-        setIsSubmitting(false);
-      }
-    },
-    [formData]
-  );
-
-  const handleChatStart = useCallback(() => {
-    // Simulate chat initialization with better UX
-    setShowChatModal(false);
-    
-    // Show a more professional message
-    setTimeout(() => {
-      const confirmed = confirm(
-        '🚀 Live Chat Feature\n\n' +
-        'Our live chat system is currently being upgraded for a better experience!\n\n' +
-        'In the meantime, you can:\n' +
-        '• Use the contact form below\n' +
-        '• Email us directly at support@MyKard.com\n' +
-        '• Call us at +1 (415) 555-0134\n\n' +
-        'Would you like to scroll to the contact form?'
-      );
-      
-      if (confirmed) {
-        document.getElementById("support-form")?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }, 300);
-  }, []);
 
   const handleKnowledgeBase = useCallback(() => {
     alert("Knowledge base coming soon! For now, check our FAQ section above.");
@@ -251,18 +148,6 @@ export default function SupportPage() {
           <p style={S.subtitle}>
             Whether you’re building a digital identity, managing team memberships, or monitoring
             engagement analytics, the MyKard support team is ready around the clock to keep you moving forward.
-    <section className="min-h-screen bg-[var(--background)] py-20 px-6 flex items-center justify-center">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-16 text-center items-center justify-center">
-        {/* Hero */}
-        <header className="space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-2 text-sm font-medium text-[#4F46E5] shadow-sm">
-            We're here to help
-          </div>
-          <h1 className="gradient-text text-4xl font-bold md:text-5xl">
-            MyKard Support & Help Centre
-          </h1>
-          <p className="mx-auto max-w-3xl text-lg text-[var(--text-secondary)]">
-            Whether you’re building a digital identity, managing team memberships, or monitoring engagement analytics, the MyKard support team is ready around the clock to keep you moving forward.
           </p>
         </header>
 
@@ -291,16 +176,6 @@ export default function SupportPage() {
           <p style={S.sectionSubtitle}>
             Quick answers to the most common questions about your MyKard workspace and profile.
           </p>
-        {/* FAQ */}
-        <section className="mx-auto w-full max-w-4xl text-left flex flex-col items-center">
-          <div className="text-center">
-            <h2 className="text-3xl font-semibold text-[var(--text-primary)]">
-              Frequently Asked Questions
-            </h2>
-            <p className="mt-2 text-[var(--text-secondary)]">
-              Quick answers to the most common questions about your MyKard workspace and profile.
-            </p>
-          </div>
 
           <div style={S.faqList}>
             {faqs.map((faq, i) => (
@@ -374,51 +249,6 @@ export default function SupportPage() {
         {/* ===== STATUS ===== */}
         {submitStatus === "success" && <div style={{ ...S.toast, background: "#10B981" }}>✅ Support request sent successfully!</div>}
         {submitStatus === "error" && <div style={{ ...S.toast, background: "#EF4444" }}>❌ Failed to send request. Please try again.</div>}
-              <div className="flex flex-col gap-4 border-t border-gray-100 pt-6 text-left md:flex-row md:items-center md:justify-between">
-                <p className="text-sm text-[var(--text-secondary)]">
-                  By submitting, you consent to MyKard contacting you at the email provided.
-                </p>
-                <button 
-                  type="submit" 
-                  className="btn btn-primary"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Sending...' : 'Send request'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="mx-auto w-full max-w-4xl flex flex-col items-center">
-          <div className="card light-beam text-center">
-            <h3 className="text-2xl font-semibold text-[var(--text-primary)]">
-              Still looking for something else?
-            </h3>
-            <p className="mt-3 text-[var(--text-secondary)]">
-              Explore the MyKard knowledge base for tutorials, product announcements, and best-practice guides curated for your role.
-            </p>
-            <button
-              className="btn btn-primary glow mt-6"
-              onClick={handleKnowledgeBase}
-            >
-              Visit the knowledge base
-            </button>
-          </div>
-        </section>
-
-        {/* Success/Error Messages */}
-        {submitStatus === 'success' && (
-          <div className="fixed top-4 right-4 bg-[#10B981] text-white px-6 py-3 rounded-lg shadow-lg z-50">
-            ✅ Support request sent successfully!
-          </div>
-        )}
-        {submitStatus === 'error' && (
-          <div className="fixed top-4 right-4 bg-[#EF4444] text-white px-6 py-3 rounded-lg shadow-lg z-50">
-            ❌ Failed to send request. Please try again.
-          </div>
-        )}
 
         {/* ===== CHAT MODAL ===== */}
         {showChatModal && (
@@ -427,29 +257,6 @@ export default function SupportPage() {
               <h3 style={S.modalTitle}>💬 Start Live Chat</h3>
               <p style={S.modalText}>
                 Our live chat system is being upgraded. Please use the contact form or email us at support@mykard.com.
-          <div 
-            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
-            style={{ zIndex: 9999 }}
-            onClick={(e) => {
-              if (e.target === e.currentTarget) {
-                setShowChatModal(false);
-              }
-            }}
-          >
-            <div className="card max-w-md w-full space-y-6 bg-white border shadow-2xl">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-[var(--text-primary)]">
-                  💬 Start Live Chat
-                </h3>
-                <button
-                  onClick={() => setShowChatModal(false)}
-                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-2xl leading-none p-1 hover:bg-gray-100 rounded"
-                >
-                  ×
-                </button>
-              </div>
-              <p className="text-[var(--text-secondary)] leading-relaxed">
-                Connect with our support team for instant help with your MyKard account, billing questions, or technical issues.
               </p>
               <div style={S.modalActions}>
                 <button style={S.submitBtn} onClick={() => setShowChatModal(false)}>Okay</button>
