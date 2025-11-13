@@ -234,15 +234,6 @@ export default function SearchPage() {
               </select>
             </div>
 
-            {/* Clear Filters */}
-            <button
-              onClick={() => {
-                setCategory("")
-              }}
-              className="mt-6 text-sm font-semibold text-blue-600 hover:text-blue-700"
-            >
-              Clear all filters
-            </button>
           </div>
         </div>
 
@@ -277,7 +268,10 @@ export default function SearchPage() {
                         <h3 className={styles.userName}>
                           {p.name}
                         </h3>
-                        <p className={styles.userDesignation}>{p.designation}</p>
+                        {p.designation && (
+                          <p className={styles.userDesignation}>{p.designation}</p>
+                        )}
+                        <p className={styles.userCity}>📍 {p.city}</p>
                       </div>
                     </div>
 
@@ -296,10 +290,6 @@ export default function SearchPage() {
                     </button>
                   </div>
 
-                  <div className={styles.companyCity}>
-                    <p className={styles.company}>{p.company}</p>
-                    <p className={styles.city}>📍 {p.city}</p>
-                  </div>
 
                 </div>
               </article>

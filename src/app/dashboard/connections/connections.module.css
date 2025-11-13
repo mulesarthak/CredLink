@@ -40,12 +40,14 @@
 @media (min-width: 640px) {
   .heroSection {
     padding: 24px 20px; /* slightly reduced */
+    overflow: visible;
   }
 }
 
 @media (min-width: 1024px) {
   .heroSection {
     padding: 36px 28px; /* slightly reduced */
+    overflow: visible;
   }
 }
 
@@ -519,6 +521,11 @@
   width: 24px;
   height: 24px;
   color: #9ca3af; /* text-gray-400 */
+}
+
+.searchBarInner .relativeContainer {
+  display: block;
+  width: 100%;
 }
 
 .searchInput {
