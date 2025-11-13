@@ -225,7 +225,7 @@ const Dashboard = () => {
       <div className="h-10"></div>
 
       {/* Cards Bento Layout */}
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6 mt-4">
+      <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 mt-4" style={{ columnGap: '1.5rem' }}>
         {isLoadingCards ? (
           <div className="col-span-full text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-green mx-auto mb-4"></div>
@@ -243,7 +243,8 @@ const Dashboard = () => {
                   scale: 1.02,
                   y: -4,
                 }}
-                className="transition-all duration-300 cursor-pointer break-inside-avoid mb-6 inline-block w-full"
+                className="transition-all duration-300 cursor-pointer break-inside-avoid mb-6 block w-full"
+                style={{ marginBottom: '1.5rem' }}
                 onClick={() => router.push(`/cards/${card.id}`)}
               >
 {renderCardPreview(card)}
@@ -268,7 +269,8 @@ const Dashboard = () => {
                   scale: 1.02,
                   y: -4,
                 }}
-                className="transition-all duration-300 cursor-pointer break-inside-avoid mb-6 inline-block w-full"
+                className="transition-all duration-300 cursor-pointer break-inside-avoid mb-6 block w-full"
+                style={{ marginBottom: '1.5rem' }}
                 onClick={() => router.push(`/cards/${card.id}`)}
               >
                 <DigitalCardPreview
