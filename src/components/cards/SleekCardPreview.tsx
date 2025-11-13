@@ -35,7 +35,7 @@ const SleekCardPreview: React.FC<DigitalCardProps & { themeColor1?: string; them
         {/* Header Section with Cover and Profile - Exact copy from edit page */}
         <div style={{
           height: "120px", 
-          background: cover ? `url(${cover})` : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+          backgroundImage: cover ? `url(${cover})` : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
           backgroundSize: cover ? "cover" : "auto",
           backgroundPosition: cover ? "center" : "initial",
           position: "relative", 
