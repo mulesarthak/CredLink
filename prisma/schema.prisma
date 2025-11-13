@@ -56,6 +56,7 @@ model User {
   sentMessages     Message[] @relation("SentMessages")
   sentConnections  Connection[] @relation("SentConnections")
   receivedConnections Connection[] @relation("ReceivedConnections")
+   cardConnections  CardConnection[] @relation("CardConnectionOwner")
 
   @@index([username])
   @@map("users")
@@ -171,6 +172,7 @@ model Card {
   updatedAt        DateTime @updatedAt @map("updated_at")
 
   user             User     @relation("UserCards", fields: [userId], references: [id], onDelete: Cascade)
+  connections      CardConnection[]
 
   @@index([userId])
   @@index([createdAt])
@@ -210,6 +212,25 @@ model Connection {
   @@index([receiverId])
   @@index([status])
   @@map("connection_requests") // matches their naming convention
+}
+
+model CardConnection {
+  id          String   @id @default(uuid())
+  cardId      String   @map("card_id")
+  ownerUserId String?  @map("owner_user_id")
+  name        String   @db.VarChar(255)
+  email       String   @db.VarChar(320)
+  phone       String   @db.VarChar(50)
+  sourceUrl   String?  @map("source_url") @db.VarChar(2048)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  card        Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  owner       User?    @relation("CardConnectionOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@index([ownerUserId])
+  @@index([createdAt])
+  @@map("card_connections")
 }
 
 enum ConnectionStatus {
