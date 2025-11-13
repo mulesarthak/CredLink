@@ -140,6 +140,11 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
+          <p className="text-sm text-gray-600">
+            <Link href="/auth/forgot-password" className="text-primary-green hover:text-primary-green-dark">
+              Forgot Password?
+            </Link>
+          </p>
           {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
           <button
             type="submit"
