@@ -1,8 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { auth } from "@/lib/firebase"
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth"
+import { toast } from "react-hot-toast"
 import "../../globals.css"
 
 export default function SignupPage() {
@@ -19,6 +22,8 @@ export default function SignupPage() {
   const [acceptPrivacyPolicy, setAcceptPrivacyPolicy] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  
+  const recaptchaRef = useRef<RecaptchaVerifier | null>(null)
 
   // Generate random captcha code
   const generateCaptcha = () => {
@@ -34,7 +39,30 @@ export default function SignupPage() {
   // Generate captcha on component mount
   useEffect(() => {
     generateCaptcha()
+    
+    // Cleanup recaptcha on unmount
+    return () => {
+      try {
+        recaptchaRef.current?.clear()
+      } catch {}
+      recaptchaRef.current = null
+    }
   }, [])
+  
+  // Setup ReCaptcha for Firebase OTP
+  const setupRecaptcha = () => {
+    if (recaptchaRef.current) return recaptchaRef.current
+    
+    const container = typeof document !== 'undefined' ? document.getElementById('recaptcha-container') : null
+    if (!container) throw new Error('reCAPTCHA container missing')
+    
+    recaptchaRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      size: 'invisible',
+      callback: () => console.log('reCAPTCHA solved!')
+    })
+    
+    return recaptchaRef.current
+  }
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -69,33 +97,38 @@ export default function SignupPage() {
     setLoading(true)
     
     try {
-      console.log('Signup attempt:', { fullName, email, phone, password })
-      
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Store signup data in sessionStorage for after OTP verification
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('signupData', JSON.stringify({
           fullName,
           email,
           phone,
           password
-        })
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        // Success - redirect to OTP verification
-        router.push(`/auth/verify-otp?phone=${encodeURIComponent(phone)}`)
-      } else {
-        // Error from API
-        setError(data.error || 'Failed to create account')
+        }))
       }
-    } catch (error) {
+      
+      // Setup reCAPTCHA and send OTP via Firebase
+      const appVerifier = setupRecaptcha()
+      const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`
+      
+      console.log('📱 Sending OTP to:', formattedPhone)
+      const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier)
+      
+      // Store confirmation result in sessionStorage
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('verificationId', confirmation.verificationId)
+        sessionStorage.setItem('otpPhone', formattedPhone)
+      }
+      
+      toast.success('OTP sent successfully!')
+      
+      // Redirect to OTP verification page
+      router.push(`/auth/verify-otp?phone=${encodeURIComponent(formattedPhone)}`)
+      
+    } catch (error: any) {
       console.error('Signup error:', error)
-      setError('Network error. Please try again.')
+      setError(error.message || 'Failed to send OTP. Please try again.')
+      toast.error(error.message || 'Failed to send OTP')
     } finally {
       setLoading(false)
     }
@@ -119,6 +152,9 @@ export default function SignupPage() {
             </Link>
           </p>
         </div>
+
+        {/* Hidden reCAPTCHA container for Firebase */}
+        <div id="recaptcha-container" className="hidden" />
 
 
         <form
