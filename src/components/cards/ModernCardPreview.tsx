@@ -38,9 +38,10 @@ const ModernCardPreview: React.FC<DigitalCardProps & { themeColor1?: string; the
           width: "100%", 
           height: "140px", 
           overflow: "hidden",
-          background: cover ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+          backgroundImage: cover ? "none" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
           backgroundSize: cover ? "cover" : "auto",
           backgroundPosition: cover ? "center" : "initial",
+          backgroundColor: cover ? "transparent" : "transparent",
           borderRadius: "20px 20px 0 0"
         }}>
           {cover && (
