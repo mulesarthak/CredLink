@@ -923,7 +923,6 @@ const EditPage = () => {
   const cardId = searchParams.get('id');
   
   const [activeTab, setActiveTab] = useState('Display');
-  const [selectedColor, setSelectedColor] = useState('#145dfd');
   const [selectedColor1, setSelectedColor1] = useState('#145dfd');
   const [selectedColor2, setSelectedColor2] = useState('#145dfd');
   const [firstName, setFirstName] = useState('');
@@ -977,6 +976,8 @@ const EditPage = () => {
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [cardDescription, setCardDescription] = useState('');
@@ -1370,6 +1371,49 @@ const EditPage = () => {
     }
   };
 
+  // Delete card function
+  const handleDeleteCard = async () => {
+    if (!existingCardId && !cardId) {
+      toast.error('No card to delete');
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      console.log('🗑️ Deleting card:', existingCardId || cardId);
+
+      const response = await fetch('/api/card/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cardId: existingCardId || cardId
+        }),
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete card');
+      }
+
+      // Success!
+      toast.success('Card deleted successfully! 🗑️');
+      setIsDeleteConfirmOpen(false);
+      
+      // Redirect to dashboard after successful deletion
+      router.push('/dashboard');
+
+    } catch (error: any) {
+      console.error('Error deleting card:', error);
+      toast.error(error.message || 'Failed to delete card. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   // Function to render the appropriate template based on selectedDesign
   const renderTemplatePreview = () => {
     const commonProps = {
@@ -1426,7 +1470,7 @@ const EditPage = () => {
                       }
                     }}
                     style={{
-                      border: design === selectedDesign ? `2px solid ${selectedColor}` : '1px solid #ddd',
+                      border: design === selectedDesign ? `2px solid ${selectedColor1}` : '1px solid #ddd',
                       borderRadius: '10px',
                       padding: '10px',
                       width: 'calc(50% - 5px)',
@@ -1922,7 +1966,7 @@ const EditPage = () => {
                     top: '50%',
                     transform: 'translateY(-50%)',
                     pointerEvents: 'none',
-                    color: selectedColor
+                    color: selectedColor1
                   }}
                 >
                   <polyline points="6 9 12 15 18 9"></polyline>
@@ -2606,13 +2650,13 @@ const EditPage = () => {
                 onClick={() => setActiveTab(tab)}
                 style={{
                   padding: '10px 15px',
-                  fontSize: 'clamp(13px, 3.5vw, 16px)',
+                  fontSize: '14px',
                   fontWeight: 'bold',
                   border: 'none',
                   backgroundColor: 'transparent',
                   cursor: 'pointer',
-                  borderBottom: activeTab === tab ? `2px solid ${selectedColor}` : 'none',
-                  color: activeTab === tab ? selectedColor : '#777',
+                  borderBottom: activeTab === tab ? `2px solid ${selectedColor1}` : 'none',
+                  color: activeTab === tab ? selectedColor1 : '#777',
                   outline: 'none',
                   marginRight: '10px',
                   whiteSpace: 'nowrap'
@@ -2626,45 +2670,74 @@ const EditPage = () => {
           {renderContent()}
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px', flexWrap: 'wrap' }}>
-            <button style={{
-              backgroundColor: 'transparent',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              padding: '10px 20px',
-              fontSize: 'clamp(13px, 3.5vw, 16px)',
-              fontWeight: 'bold',
-              color: '#555',
-              cursor: 'pointer',
-              outline: 'none',
-              flex: '1',
-              minWidth: '100px'
-            }}>
+            <button 
+              type="button"
+              onClick={() => router.push('/dashboard')}
+              style={{
+                backgroundColor: 'transparent',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                color: '#555',
+                cursor: 'pointer',
+                outline: 'none',
+                flex: '1',
+                minWidth: '100px'
+              }}
+            >
               Cancel
             </button>
+            {/* Show delete button only when editing existing card */}
+            {(existingCardId || cardId) && (
+              <div 
+                onClick={() => {
+                  console.log('🗑️ DIV Delete clicked - opening custom dialog');
+                  setIsDeleteConfirmOpen(true);
+                }}
+                style={{
+                  backgroundColor: isDeleting ? '#999' : '#dc3545',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  color: 'white',
+                  cursor: isDeleting ? 'not-allowed' : 'pointer',
+                  outline: 'none',
+                  flex: '1',
+                  minWidth: '100px',
+                  textAlign: 'center',
+                  userSelect: 'none'
+                }}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </div>
+            )}
             <button 
+              type="button"
               onClick={handleSaveCard}
               disabled={isSaving}
               style={{
-              backgroundColor: isSaving ? '#999' : selectedColor,
-              border: 'none',
-              borderRadius: '8px',
-              padding: '10px 20px',
-              fontSize: 'clamp(13px, 3.5vw, 16px)',
-              fontWeight: 'bold',
-              color: 'white',
-              cursor: isSaving ? 'not-allowed' : 'pointer',
-              outline: 'none',
-              flex: '1',
-              minWidth: '100px'
-            }}>
+                backgroundColor: isSaving ? '#999' : selectedColor1,
+                border: 'none',
+                borderRadius: '8px',
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                color: 'white',
+                cursor: isSaving ? 'not-allowed' : 'pointer',
+                outline: 'none',
+                flex: '1',
+                minWidth: '100px'
+              }}
+            >
               {isSaving ? 'Saving...' : 'Save'}
             </button>
           </div>
-
-
-        </div>
-
-          } </div>
+        </div>}
+      </div>
 
       {/* Modal for adding a new field */}
       {isModalOpen && (
@@ -2806,6 +2879,102 @@ const EditPage = () => {
           >
             Got it!
           </button>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {isDeleteConfirmOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 1002,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClick={() => setIsDeleteConfirmOpen(false)}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '15px',
+              padding: '30px',
+              maxWidth: '400px',
+              width: '90%',
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+              textAlign: 'center'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ marginBottom: '20px' }}>
+              <svg 
+                width="48" 
+                height="48" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="#dc3545" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                style={{ margin: '0 auto 15px' }}
+              >
+                <polyline points="3,6 5,6 21,6"></polyline>
+                <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+              <h3 style={{ margin: '0 0 10px', fontSize: '20px', fontWeight: 'bold', color: '#333' }}>
+                Delete Card
+              </h3>
+              <p style={{ margin: '0', fontSize: '15px', color: '#666', lineHeight: 1.5 }}>
+                Are you sure you want to delete this card? This action cannot be undone.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button
+                onClick={() => setIsDeleteConfirmOpen(false)}
+                disabled={isDeleting}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  color: '#555',
+                  cursor: isDeleting ? 'not-allowed' : 'pointer',
+                  outline: 'none',
+                  minWidth: '100px'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteCard}
+                disabled={isDeleting}
+                style={{
+                  backgroundColor: isDeleting ? '#999' : '#dc3545',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  color: 'white',
+                  cursor: isDeleting ? 'not-allowed' : 'pointer',
+                  outline: 'none',
+                  minWidth: '100px'
+                }}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
