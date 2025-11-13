@@ -349,9 +349,10 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
       {/* Cover Image Section */}
       <div style={{
         width: "100%", height: "120px", overflow: "hidden",
-        background: cover ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+        backgroundImage: cover ? "none" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
         backgroundSize: cover ? "cover" : "auto",
-        backgroundPosition: cover ? "center" : "initial"
+        backgroundPosition: cover ? "center" : "initial",
+        backgroundColor: cover ? "transparent" : "transparent"
       }}>
         {cover && (
           <img src={cover} alt="Cover" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -551,9 +552,10 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
       {/* Cover Image Section */}
       <div style={{
         width: "100%", height: "140px", overflow: "hidden",
-        background: cover ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+        backgroundImage: cover ? "none" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
         backgroundSize: cover ? "cover" : "auto",
         backgroundPosition: cover ? "center" : "initial",
+        backgroundColor: cover ? "transparent" : "transparent",
         borderRadius: "20px 20px 0 0"
       }}>
         {cover && (
@@ -765,11 +767,11 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
     <div style={{
       width: "360px", borderRadius: "4px", overflow: "hidden",
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", fontFamily: fontFamily,
-      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `1px solid #e5e5e5`, position: 'relative'
+      backgroundImage: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `1px solid #e5e5e5`, position: 'relative'
     }}>
       <div style={{
         height: "120px", 
-        background: cover ? `url(${cover})` : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+        backgroundImage: cover ? `url(${cover})` : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
         backgroundSize: cover ? "cover" : "auto",
         backgroundPosition: cover ? "center" : "initial",
         position: "relative", display: "flex", alignItems: "flex-end", padding: "20px"
@@ -1153,6 +1155,75 @@ const EditPage = () => {
     }
   };
 
+  const handleColorInputChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const hex = e.target.value.toUpperCase();
+    setHexValue1(hex);
+    const newRgb = hexToRgb(hex);
+    setRValue1(newRgb.r);
+    setGValue1(newRgb.g);
+    setBValue1(newRgb.b);
+    setSelectedColor1(hex);
+  };
+
+  // Second color handlers
+  const handleRChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const r = Number(e.target.value);
+    if (!isNaN(r) && r >= 0 && r <= 255) {
+      setRValue2(r);
+      const newHex = rgbToHex(r, gValue2, bValue2);
+      setHexValue2(newHex);
+      setSelectedColor2(newHex);
+    }
+  };
+
+  const handleGChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const g = Number(e.target.value);
+    if (!isNaN(g) && g >= 0 && g <= 255) {
+      setGValue2(g);
+      const newHex = rgbToHex(rValue2, g, bValue2);
+      setHexValue2(newHex);
+      setSelectedColor2(newHex);
+    }
+  };
+
+  const handleBChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const b = Number(e.target.value);
+    if (!isNaN(b) && b >= 0 && b <= 255) {
+      setBValue2(b);
+      const newHex = rgbToHex(rValue2, gValue2, b);
+      setHexValue2(newHex);
+      setSelectedColor2(newHex);
+    }
+  };
+
+  const handleHexChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let hex = e.target.value.toUpperCase();
+    if (!hex.startsWith('#')) {
+        hex = '#' + hex;
+    }
+    
+    if (/^#([0-9A-F]{3}){1,2}$/i.test(hex)) {
+        setHexValue2(hex);
+        const newRgb = hexToRgb(hex);
+        if(newRgb) {
+            setRValue2(newRgb.r);
+            setGValue2(newRgb.g);
+            setBValue2(newRgb.b);
+            setSelectedColor2(hex);
+        }
+    }
+  };
+
+  const handleColorInputChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const hex = e.target.value.toUpperCase();
+    setHexValue2(hex);
+    const newRgb = hexToRgb(hex);
+    setRValue2(newRgb.r);
+    setGValue2(newRgb.g);
+    setBValue2(newRgb.b);
+    setSelectedColor2(hex);
+  };
+
   // Helper function to convert file to base64
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -1163,71 +1234,7 @@ const EditPage = () => {
     });
   };
 
-  const [rValue, setRValue] = useState(20);
-  const [gValue, setGValue] = useState(93);
-  const [bValue, setBValue] = useState(253);
-  const [hexValue, setHexValue] = useState('#145dfd');
 
-  // Update RGB values when selectedColor changes
-  React.useEffect(() => {
-    const newRgb = hexToRgb(selectedColor);
-    setRValue(newRgb.r);
-    setGValue(newRgb.g);
-    setBValue(newRgb.b);
-    setHexValue(selectedColor);
-  }, [selectedColor]);
-
-  const handleRChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const r = Number(e.target.value);
-    if (!isNaN(r) && r >= 0 && r <= 255) {
-      setRValue(r);
-      const newHex = rgbToHex(r, gValue, bValue);
-      setHexValue(newHex);
-      setSelectedColor(newHex);
-    }
-  };
-
-  const handleGChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const g = Number(e.target.value);
-    if (!isNaN(g) && g >= 0 && g <= 255) {
-      setGValue(g);
-      const newHex = rgbToHex(rValue, g, bValue);
-      setHexValue(newHex);
-      setSelectedColor(newHex);
-    }
-  };
-
-  const handleBChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const b = Number(e.target.value);
-    if (!isNaN(b) && b >= 0 && b <= 255) {
-      setBValue(b);
-      const newHex = rgbToHex(rValue, gValue, b);
-      setHexValue(newHex);
-      setSelectedColor(newHex);
-    }
-  };
-
-  const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const hex = e.target.value.toUpperCase();
-    if (/^#([0-9A-F]{3}){1,2}$/.test(hex)) {
-      setHexValue(hex);
-      const newRgb = hexToRgb(hex);
-      setRValue(newRgb.r);
-      setGValue(newRgb.g);
-      setBValue(newRgb.b);
-      setSelectedColor(hex);
-    }
-  };
-
-  const handleColorInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const hex = e.target.value.toUpperCase();
-    setHexValue(hex);
-    const newRgb = hexToRgb(hex);
-    setRValue(newRgb.r);
-    setGValue(newRgb.g);
-    setBValue(newRgb.b);
-    setSelectedColor(hex);
-  };
 
   // --- NEW HANDLER FUNCTIONS for "Add Field" ---
   const handleAddField = () => {
@@ -1305,6 +1312,11 @@ const EditPage = () => {
       if (selectedFont) formData.append('selectedFont', selectedFont);
       if (about) formData.append('bio', about);
       if (cardDescription) formData.append('description', cardDescription);
+      if (skills) formData.append('skills', skills);
+      if (portfolio) formData.append('portfolio', portfolio);
+      if (experience) formData.append('experience', experience);
+      if (services) formData.append('services', services);
+      if (reviews) formData.append('review', reviews);
       
       formData.append('status', 'draft');
 
@@ -1342,7 +1354,7 @@ const EditPage = () => {
       // Success!
       setExistingCardId(data.card.id);
       setIsPopupOpen(true);
-      setPopupMessage(isUpdating ? 'Card updated successfully! 🎉' : 'Card created successfully! 🎉');
+      setPopupMessage(isUpdating ? 'Card updated successfully! ' : 'Card created successfully! ');
       
       // If we just created a card, update the URL to include the ID
       if (!isUpdating && data.card.id) {
@@ -1684,93 +1696,190 @@ const EditPage = () => {
                 Color
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <input
-                    type="color"
-                    value={hexValue}
-                    onChange={handleColorInputChange}
-                    style={{ width: '50px', height: '30px', border: 'none', padding: '0' }}
-                  />
-                  <span style={{ fontSize: '14px', color: '#555' }}>Select Color</span>
+                {/* Color 1 */}
+                <div style={{ marginBottom: '15px'}}>
+                  <h4 style={{fontSize: '16px', marginBottom: '10px', color: '#333'}}>Color 1</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                    <input
+                      type="color"
+                      value={hexValue1}
+                      onChange={handleColorInputChange1}
+                      style={{ width: '50px', height: '30px', border: 'none', padding: '0' }}
+                    />
+                    <span style={{ fontSize: '14px', color: '#555' }}>Select Color 1</span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>R:</label>
+                      <input
+                        type="number"
+                        value={rValue1}
+                        onChange={handleRChange1}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>G:</label>
+                      <input
+                        type="number"
+                        value={gValue1}
+                        onChange={handleGChange1}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>B:</label>
+                      <input
+                        type="number"
+                        value={bValue1}
+                        onChange={handleBChange1}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ fontSize: '14px', color: '#555' }}>Hex:</label>
+                    <input
+                      type="text"
+                      value={hexValue1}
+                      onChange={handleHexChange1}
+                      maxLength={7}
+                      style={{
+                        flex: '1',
+                        padding: '8px',
+                        fontSize: '14px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        boxSizing: 'border-box',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
-                    <label style={{ fontSize: '14px', color: '#555' }}>R:</label>
+                {/* Color 2 */}
+                <div style={{ marginBottom: '15px'}}>
+                  <h4 style={{fontSize: '16px', marginBottom: '10px', color: '#333'}}>Color 2</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                     <input
-                      type="number"
-                      value={rValue}
-                      onChange={handleRChange}
-                      min="0"
-                      max="255"
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '14px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        boxSizing: 'border-box',
-                        outline: 'none',
-                      }}
+                      type="color"
+                      value={hexValue2}
+                      onChange={handleColorInputChange2}
+                      style={{ width: '50px', height: '30px', border: 'none', padding: '0' }}
                     />
+                    <span style={{ fontSize: '14px', color: '#555' }}>Select Color 2</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
-                    <label style={{ fontSize: '14px', color: '#555' }}>G:</label>
-                    <input
-                      type="number"
-                      value={gValue}
-                      onChange={handleGChange}
-                      min="0"
-                      max="255"
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '14px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        boxSizing: 'border-box',
-                        outline: 'none',
-                      }}
-                    />
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
-                    <label style={{ fontSize: '14px', color: '#555' }}>B:</label>
-                    <input
-                      type="number"
-                      value={bValue}
-                      onChange={handleBChange}
-                      min="0"
-                      max="255"
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '14px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        boxSizing: 'border-box',
-                        outline: 'none',
-                      }}
-                    />
-                  </div>
-                </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <label style={{ fontSize: '14px', color: '#555' }}>Hex:</label>
-                  <input
-                    type="text"
-                    value={hexValue}
-                    onChange={handleHexChange}
-                    maxLength={7}
-                    style={{
-                      flex: '1',
-                      padding: '8px',
-                      fontSize: '14px',
-                      border: '1px solid #ddd',
-                      borderRadius: '8px',
-                      boxSizing: 'border-box',
-                      outline: 'none',
-                    }}
-                  />
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>R:</label>
+                      <input
+                        type="number"
+                        value={rValue2}
+                        onChange={handleRChange2}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>G:</label>
+                      <input
+                        type="number"
+                        value={gValue2}
+                        onChange={handleGChange2}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>B:</label>
+                      <input
+                        type="number"
+                        value={bValue2}
+                        onChange={handleBChange2}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ fontSize: '14px', color: '#555' }}>Hex:</label>
+                    <input
+                      type="text"
+                      value={hexValue2}
+                      onChange={handleHexChange2}
+                      maxLength={7}
+                      style={{
+                        flex: '1',
+                        padding: '8px',
+                        fontSize: '14px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        boxSizing: 'border-box',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

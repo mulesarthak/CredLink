@@ -37,9 +37,10 @@ const FlatCardPreview: React.FC<DigitalCardProps & { themeColor1?: string; theme
           width: "100%", 
           height: "120px", 
           overflow: "hidden",
-          background: cover ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+          backgroundImage: cover ? "none" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
           backgroundSize: cover ? "cover" : "auto",
-          backgroundPosition: cover ? "center" : "initial"
+          backgroundPosition: cover ? "center" : "initial",
+          backgroundColor: cover ? "transparent" : "transparent"
         }}>
           {cover && (
             <img src={cover} alt="Cover" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />

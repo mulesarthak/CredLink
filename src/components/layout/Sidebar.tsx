@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -26,6 +27,7 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
+  const [pendingConnections, setPendingConnections] = useState(0);
 
   useEffect(() => {
     // Set mounted flag to ensure client-side only updates
@@ -63,6 +65,39 @@ const Sidebar = () => {
     };
 
     fetchUnread();
+  }, []);
+
+  // Fetch pending connection requests count for badge
+  useEffect(() => {
+    let intervalId: any;
+    const fetchPending = async () => {
+      try {
+        const res = await fetch('/api/users/connections?type=received', {
+          credentials: 'include',
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const count = (data.requests || []).length;
+        setPendingConnections(count);
+      } catch (_) {
+        // ignore
+      }
+    };
+
+    fetchPending();
+    // light polling to keep badge in sync
+    intervalId = setInterval(fetchPending, 15000);
+    // listen for manual refresh signals from pages (optional)
+    const onUpdated = () => fetchPending();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('connections-updated', onUpdated as any);
+    }
+    return () => {
+      clearInterval(intervalId);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('connections-updated', onUpdated as any);
+      }
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -123,11 +158,16 @@ const Sidebar = () => {
       >
         {/* Header */}
         <div className="sidebarHeader">
-          <Link href="/" className="logoArea">
-            <div className="logoIcon">
-              <LayoutDashboard />
-            </div>
-            <span className="logoText">MyKard</span>
+          <Link href="/" className="logoArea" style={{ paddingLeft: '2rem' }}>
+            <Image
+              src="/assets/mykard.png"
+              alt="Logo"
+              width={40}
+              height={40}
+              className="w-36 h-36 object-contain"
+              priority
+              unoptimized
+            />
           </Link>
         </div>
 
@@ -145,6 +185,9 @@ const Sidebar = () => {
                 <span>{item.name}</span>
                 {item.name === "Messages" && unreadCount > 0 && pathname !== "/dashboard/messages" && (
                   <span className="navBadge">{unreadCount}</span>
+                )}
+                {item.name === "Connections" && pendingConnections > 0 && pathname !== "/dashboard/connections" && (
+                  <span className="navBadge">{pendingConnections}</span>
                 )}
               </Link>
             );

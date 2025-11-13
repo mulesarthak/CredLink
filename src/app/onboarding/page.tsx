@@ -234,7 +234,7 @@ const PartyPopup: React.FC<PartyPopupProps> = ({ onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Party Emoji */}
-        <div style={{ fontSize: '64px', marginBottom: '24px' }}>🎉</div>
+        <div style={{ fontSize: '64px', marginBottom: '24px' }}></div>
         
         {/* Message */}
         <h2

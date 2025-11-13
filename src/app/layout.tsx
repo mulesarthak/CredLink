@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MyKard - Your Digital Identity Platform",
+  title: "MyKard",
   description: "Create a credible professional profile that showcases your expertise and connects you with opportunities.",
 };
 

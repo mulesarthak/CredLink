@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { toast } from "react-hot-toast";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 /**
  * Single-file inline-styled Account Settings page
@@ -299,6 +301,37 @@ const S: Record<string, React.CSSProperties> = {
     cursor: "pointer",
   },
 
+  // password input container
+  passwordInputContainer: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    maxWidth: 520,
+  },
+  passwordInputContainerMobile: {
+    width: "100%",
+    maxWidth: "100%",
+  },
+  passwordInput: {
+    width: "100%",
+    padding: "10px 40px 10px 12px", // Extra padding on right for eye icon
+    borderRadius: 8,
+    border: "1px solid #CBD5E1",
+    background: "#fff",
+    outline: "none",
+    fontSize: 14,
+    boxSizing: "border-box",
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 12,
+    cursor: "pointer",
+    color: "#64748b",
+    fontSize: 16,
+    zIndex: 1,
+  },
+
   // toggle (visual only)
   toggle: { position: "relative", width: 52, height: 28, display: "inline-block" },
   toggleSlider: {
@@ -424,6 +457,9 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [currentPassword, setCurrentPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState<boolean>(false);
+  const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
   const [phoneNumber, setPhoneNumber] = useState<string>("+1234567890");
 
@@ -465,28 +501,13 @@ export default function AccountSettingsPage(): React.JSX.Element {
       }
     };
     fetchUserProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // photo change: preview + upload
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validate file size (5MB limit)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      alert("File size too large. Maximum size is 5MB. Please choose a smaller image.");
-      e.target.value = ''; // Clear the input
-      return;
-    }
-
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      alert("Invalid file type. Only JPEG, PNG, and WebP images are allowed.");
-      e.target.value = ''; // Clear the input
-      return;
-    }
 
     // immediate preview
     const reader = new FileReader();
@@ -508,32 +529,24 @@ export default function AccountSettingsPage(): React.JSX.Element {
       const data = await res.json();
       if (res.ok && data.imageUrl) {
         setAccountPhoto(data.imageUrl);
-        alert("Profile image updated successfully!");
         // refresh auth state so header/avatar update if needed
         setTimeout(async () => {
           await checkAuth();
         }, 300);
       } else {
         console.error("Upload failed:", data?.error);
-        // Revert preview on error
-        setAccountPhoto(null);
-        
-        // Show specific error messages
-        if (data?.error?.includes('size')) {
-          alert("File size too large. Maximum size is 5MB.");
-        } else if (data?.error?.includes('type')) {
-          alert("Invalid file type. Only JPEG, PNG, and WebP images are allowed.");
-        } else {
-          alert("Failed to upload image: " + (data?.error ?? "Unknown error"));
-        }
+        alert("Failed to upload image: " + (data?.error ?? "Unknown error"));
       }
     } catch (err) {
       console.error("Upload error:", err);
-      // Revert preview on error
-      setAccountPhoto(null);
-      alert("Failed to upload image. Please check your internet connection and try again.");
+      alert("Failed to upload image. Try again.");
     }
   };
+
+  /**
+   * SIMPLIFIED: Instantly removes the photo from the UI by setting state to null, 
+   * no backend call or await needed.
+   */
   const handleRemovePhoto = () => {
     setAccountPhoto(null);
     alert('Profile photo removed from UI.');
@@ -616,11 +629,11 @@ export default function AccountSettingsPage(): React.JSX.Element {
 
   const changePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      alert('Please fill all password fields');
+      toast.error('Please fill all password fields');
       return;
     }
     if (newPassword !== confirmPassword) {
-      alert('New password and confirm password do not match');
+      toast.error('New password and confirm password do not match');
       return;
     }
     try {
@@ -628,20 +641,27 @@ export default function AccountSettingsPage(): React.JSX.Element {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ currentPassword, newPassword }),
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        alert(data.error || 'Failed to change password');
-        return;
+      
+      if (res.status === 200) {
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        toast.success('Password updated successfully!');
+      } else if (res.status === 400) {
+        toast.error('Invalid input or password mismatch');
+      } else if (res.status === 401) {
+        toast.error('Unauthorized request');
+      } else if (res.status === 500) {
+        toast.error('Something went wrong, please try again later');
+      } else {
+        toast.error(data.error || 'Failed to change password');
       }
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-      alert('Password changed successfully');
     } catch (e) {
       console.error('Change password error:', e);
-      alert('Failed to change password');
+      toast.error('Something went wrong, please try again later');
     }
   };
 
@@ -829,56 +849,86 @@ export default function AccountSettingsPage(): React.JSX.Element {
               fontSize: 14
             }, isMobile ? S.formLabelMobile : undefined)}>Password</label>
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
-              <input
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                type="password"
-                placeholder="Current password"
-                onFocus={() => setFocusedInput("currentPassword")}
-                onBlur={() => setFocusedInput(null)}
-                style={merge(
-                  S.input,
-                  S.inputMobile,
-                  focusedInput === "currentPassword" ? S.inputFocus : undefined
-                )}
-                aria-label="Current password"
-              />
-              <input
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                type="password"
-                placeholder="New password"
-                onFocus={() => setFocusedInput("newPassword")}
-                onBlur={() => setFocusedInput(null)}
-                style={merge(
-                  S.input,
-                  S.inputMobile,
-                  focusedInput === "newPassword" ? S.inputFocus : undefined
-                )}
-                aria-label="New password"
-              />
-              <input
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                type="password"
-                placeholder="Confirm new password"
-                onFocus={() => setFocusedInput("confirmPassword")}
-                onBlur={() => setFocusedInput(null)}
-                style={merge(
-                  S.input,
-                  S.inputMobile,
-                  focusedInput === "confirmPassword" ? S.inputFocus : undefined
-                )}
-                aria-label="Confirm new password"
-              />
-              <button 
-                className="change-password" 
-                style={S.smallBtn} 
-                onClick={changePassword}
-                suppressHydrationWarning
-              >
-                Change Password
-              </button>
+              {/* Current Password */}
+              <div style={merge(S.passwordInputContainer, isMobile ? S.passwordInputContainerMobile : undefined)}>
+                <input
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  type={showCurrentPassword ? "text" : "password"}
+                  placeholder="Current password"
+                  onFocus={() => setFocusedInput("currentPassword")}
+                  onBlur={() => setFocusedInput(null)}
+                  style={merge(
+                    S.passwordInput,
+                    focusedInput === "currentPassword" ? S.inputFocus : undefined
+                  )}
+                  aria-label="Current password"
+                />
+                <div
+                  style={S.eyeIcon}
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                >
+                  {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
+                </div>
+              </div>
+
+              {/* New Password */}
+              <div style={merge(S.passwordInputContainer, isMobile ? S.passwordInputContainerMobile : undefined)}>
+                <input
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  type={showNewPassword ? "text" : "password"}
+                  placeholder="New password"
+                  onFocus={() => setFocusedInput("newPassword")}
+                  onBlur={() => setFocusedInput(null)}
+                  style={merge(
+                    S.passwordInput,
+                    focusedInput === "newPassword" ? S.inputFocus : undefined
+                  )}
+                  aria-label="New password"
+                />
+                <div
+                  style={S.eyeIcon}
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                >
+                  {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div style={merge(S.passwordInputContainer, isMobile ? S.passwordInputContainerMobile : undefined)}>
+                <input
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm new password"
+                  onFocus={() => setFocusedInput("confirmPassword")}
+                  onBlur={() => setFocusedInput(null)}
+                  style={merge(
+                    S.passwordInput,
+                    focusedInput === "confirmPassword" ? S.inputFocus : undefined
+                  )}
+                  aria-label="Confirm new password"
+                />
+                <div
+                  style={S.eyeIcon}
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                </div>
+              </div>
+
+              {/* Change Password Button */}
+              <div style={{ display: "flex", justifyContent: "center", paddingRight: "1rem", marginTop: "8px" }}>
+                <button 
+                  className="change-password" 
+                  style={S.smallBtn} 
+                  onClick={changePassword}
+                  suppressHydrationWarning
+                >
+                  Change Password
+                </button>
+              </div>
             </div>
           </div>
 
@@ -889,7 +939,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
               color: "#4B5563",
               fontWeight: 600,
               fontSize: 14
-            }, isMobile ? S.formLabelMobile : undefined)}>Delete</label>
+            }, isMobile ? S.formLabelMobile : undefined)}>Deactivate</label>
             <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
               <button
                 style={merge(S.delete, deleteHover.hovered ? S.deleteHover : undefined)}
@@ -898,7 +948,7 @@ export default function AccountSettingsPage(): React.JSX.Element {
                 onClick={() => setShowDeleteModal(true)}
                 suppressHydrationWarning
               >
-                Delete Account
+                Deactivate Account
               </button>
             </div>
           </div>
