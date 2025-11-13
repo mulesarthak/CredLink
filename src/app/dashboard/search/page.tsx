@@ -6,7 +6,6 @@ import { Search, Filter } from "lucide-react";
 import { toast } from "react-hot-toast";
 import styles from "./search.module.css";
 import { Modal } from "@/components/ui/modal";
-import DigitalCardPreview from "@/components/cards/DigitalCardPreview";
 
 type Profile = {
   id: string;
@@ -37,8 +36,8 @@ export default function SearchPage() {
   const [showModal, setShowModal] = useState(false);
   const [connectionName, setConnectionName] = useState("");
   const [connectingUserId, setConnectingUserId] = useState<string | null>(null);
-  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
+  const [acceptedConnections, setAcceptedConnections] = useState<Set<string>>(new Set());
 
   // Fetch users from backend
   useEffect(() => {
@@ -86,6 +85,37 @@ export default function SearchPage() {
     };
 
     fetchUsers();
+  }, []);
+
+  // Prefetch connection statuses for current user
+  useEffect(() => {
+    const loadConnectionStatuses = async () => {
+      try {
+        // Accepted connections
+        const acceptedRes = await fetch('/api/users/connections?type=accepted', { credentials: 'include' });
+        if (acceptedRes.ok) {
+          const { requests } = await acceptedRes.json();
+          const ids = new Set<string>((requests || []).map((r: any) => r.user?.id).filter(Boolean));
+          setAcceptedConnections(ids);
+        }
+        // Pending requests sent by me
+        const sentRes = await fetch('/api/users/connections?type=sent', { credentials: 'include' });
+        if (sentRes.ok) {
+          const { requests } = await sentRes.json();
+          const ids = new Set<string>((requests || []).map((r: any) => r.receiver?.id).filter(Boolean));
+          setSentRequests(ids);
+        }
+      } catch (e) {
+        console.error('Failed to load connection statuses', e);
+      }
+    };
+    loadConnectionStatuses();
+
+    const handler = () => loadConnectionStatuses();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('connections-updated', handler);
+      return () => window.removeEventListener('connections-updated', handler);
+    }
   }, []);
 
   const handleConnect = async (userId: string, name: string) => {
@@ -148,28 +178,6 @@ export default function SearchPage() {
         primaryText="Close"
       />
 
-      {selectedProfile && (
-        <Modal 
-          isOpen={!!selectedProfile}
-          onClose={() => setSelectedProfile(null)}
-          title=""
-          message={null}
-          showActions={false}
-        >
-          <div style={{ padding: 20 }}>
-            <DigitalCardPreview
-              name={selectedProfile.name}
-              title={selectedProfile.designation || ''}
-              company={selectedProfile.company}
-              location={selectedProfile.city}
-              about={`${selectedProfile.designation} at ${selectedProfile.company}`}
-              skills=""
-              portfolio=""
-              experience=""
-            />
-          </div>
-        </Modal>
-      )}
 
       {/* HEADER */}
       <div className="mb-8">
@@ -260,7 +268,6 @@ export default function SearchPage() {
                 style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                onClick={() => setSelectedProfile(p)}
               >
                 <div className={styles.cardInner}>
                   <div className={styles.cardHeader}>
@@ -277,15 +284,15 @@ export default function SearchPage() {
                     <button 
                       type="button"
                       onClick={(e) => { e.stopPropagation(); handleConnect(p.id, p.name); }} 
-                      disabled={connectingUserId === p.id || sentRequests.has(p.id)}
-                      className={`${styles.connectBtn} ${sentRequests.has(p.id) ? styles.connectBtnSent : ''}`}
-                      style={sentRequests.has(p.id) ? { 
+                      disabled={connectingUserId === p.id || sentRequests.has(p.id) || acceptedConnections.has(p.id)}
+                      className={`${styles.connectBtn} ${(sentRequests.has(p.id) || acceptedConnections.has(p.id)) ? styles.connectBtnSent : ''}`}
+                      style={(sentRequests.has(p.id) || acceptedConnections.has(p.id)) ? { 
                         backgroundColor: '#9CA3AF', 
                         color: '#ffffff',
                         cursor: 'not-allowed'
                       } : {}}
                     >
-                      {connectingUserId === p.id ? "Connecting..." : sentRequests.has(p.id) ? "Sent" : "Connect"}
+                      {acceptedConnections.has(p.id) ? "Connected" : (connectingUserId === p.id ? "Connecting..." : (sentRequests.has(p.id) ? "Sent" : "Connect"))}
                     </button>
                   </div>
 
@@ -294,9 +301,6 @@ export default function SearchPage() {
                     <p className={styles.city}>📍 {p.city}</p>
                   </div>
 
-                  <div className={styles.stats}>
-                    <span>👁 {p.views ?? 0} views</span>
-                  </div>
                 </div>
               </article>
             ))}
