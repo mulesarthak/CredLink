@@ -68,6 +68,24 @@ export default function AdminSettingsPage() {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       return toast.error("Passwords do not match");
     }
+     try {
+      const response = await fetch("/api/admin/profile/change-password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ currentPassword: passwordData.currentPassword, newPassword: passwordData.newPassword }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to change password");
+      }
+      alert("Password changed successfully");
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred");
+      return;
+    }
+
     setSaving(true);
     await new Promise((res) => setTimeout(res, 900));
     toast.success("Password updated successfully");

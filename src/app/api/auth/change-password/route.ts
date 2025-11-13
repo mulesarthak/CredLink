@@ -1,51 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { verify } from 'jsonwebtoken'
-import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { prisma } from '@/lib/prisma'
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'your-secret-key'
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
+    // Get and verify authentication token
     const cookieStore = await cookies()
     const token = cookieStore.get('user_token')?.value
-
+    console.log(token)
     if (!token) {
       return NextResponse.json(
-        { error: 'Not authenticated' },
+        { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    // Verify token and get user ID
+    // Verify token
     const decoded = verify(token, JWT_SECRET) as {
-      userId: string
-      email: string
-      fullName: string
-    }
+    userId: string 
+    //  email: string
+   //   fullName: string
+   }
 
-    if (!decoded || !decoded.userId) {
+    // Parse request body
+    const body = await request.json()
+    const { currentPassword, newPassword, confirmPassword } = body
+
+    // Validate required fields
+    if (!currentPassword || !newPassword || !confirmPassword) {
       return NextResponse.json(
-        { error: 'Invalid token' },
-        { status: 401 }
-      )
-    }
-
-    // Get request body
-    const { currentPassword, newPassword } = await request.json()
-
-    if (!currentPassword || !newPassword) {
-      return NextResponse.json(
-        { error: 'Current password and new password are required' },
+        { error: 'Invalid input or password mismatch' },
         { status: 400 }
       )
     }
 
-    if (newPassword.length < 6) {
+    // Validate password confirmation
+    if (newPassword !== confirmPassword) {
       return NextResponse.json(
-        { error: 'New password must be at least 6 characters long' },
+        { error: 'Invalid input or password mismatch' },
         { status: 400 }
       )
     }
@@ -53,28 +49,30 @@ export async function POST(request: NextRequest) {
     // Get user from database
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      select: { id: true, password: true }
+      select: { id: true, password: true  }
     })
 
     if (!user) {
       return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
+        { error: 'Unauthorized' },
+        { status: 401 }
       )
     }
 
+    // Check if user is active
+   
+
     // Verify current password
     const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password)
-    
     if (!isCurrentPasswordValid) {
       return NextResponse.json(
-        { error: 'Current password is incorrect' },
+        { error: 'Invalid input or password mismatch' },
         { status: 400 }
       )
     }
 
     // Hash new password
-    const hashedNewPassword = await bcrypt.hash(newPassword, 12)
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10)
 
     // Update password in database
     await prisma.user.update({
@@ -84,25 +82,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Password changed successfully'
+      message: 'Password updated successfully'
     })
 
   } catch (error) {
     console.error('Change password error:', error)
-    
-    if (error instanceof Error) {
-      // Handle specific JWT errors
-      if (error.message.includes('jwt')) {
-        return NextResponse.json(
-          { error: 'Invalid or expired token' },
-          { status: 401 }
-        )
-      }
-    }
-
     return NextResponse.json(
-      { error: 'An error occurred while changing password' },
-      { status: 500 }
+      { error: 'Invalid or expired token' },
+      { status: 401 }
     )
   }
 }

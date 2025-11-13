@@ -140,8 +140,28 @@ const CardDetailsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const qrRef = useRef<HTMLDivElement>(null);
+const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this card? This action cannot be undone.")) {
+      return;
+    }
+    try {
+      const response = await fetch(`/api/card/delete`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cardId }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete card");
+      }
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("Error deleting card:", error);
+      toast.error(error.message || "Failed to delete card");
+    }
+  };
 
-  // Fetch card data from API
   useEffect(() => {
     const fetchCard = async () => {
       try {
@@ -578,7 +598,7 @@ const CardDetailsPage = () => {
                       </p>
                     </div>
                     <div className={styles.settingsControl}>
-                      <button className={`${styles.settingsButton} ${styles.deleteButton}`}>
+                      <button onClick={handleDelete} className={`${styles.settingsButton} ${styles.deleteButton}`}>
                         Delete Card
                       </button>
                     </div>

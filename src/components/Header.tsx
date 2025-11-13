@@ -6,6 +6,17 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import '../app/globals.css';
 
+// Smooth scroll function without changing URL
+const scrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  }
+};
+
 export default function Header() {
   const { data: session } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,35 +26,28 @@ export default function Header() {
       <nav className="max-w-7xl mx-auto px-8" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}>
         <div className="flex items-center justify-between h-20">
           {/* Logo - Left Side */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-xl group-hover:shadow-blue-500/40 transition-all duration-300 group-hover:scale-105 overflow-hidden">
-              <Image
-                src="/assets/headerlogo.jpeg"
-                alt="MyKard Logo"
-                width={48}
-                height={48}
-                className="w-full h-full object-cover scale-120 pl-2.5"
-                priority
-                unoptimized
-                onError={(e) => {
-                  console.log('Image failed to load:', e);
-                  e.currentTarget.style.display = 'none';
-                  const svg = e.currentTarget.nextElementSibling as HTMLElement;
-                  if (svg) svg.style.display = 'block';
-                }}
-                onLoad={() => {
-                  console.log('Image loaded successfully');
-                }}
-              />
-              <svg className="w-6 h-6 text-blue-600 absolute" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{display: 'none'}}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-              </svg>
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-400/0 to-blue-600/0 group-hover:from-blue-400/10 group-hover:to-blue-600/10 transition-all duration-300"></div>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">MyKard</span>
-              {/* <span className="text-[10px] font-medium text-blue-600/60 -mt-1 tracking-wider uppercase">Smart Finance</span> */}
-            </div>
+          <Link href="/" className="flex items-center group">
+            <Image
+              src="/assets/finalogo.png"
+              alt="Logo"
+              width={144}
+              height={144}
+              className="w-36 h-36 object-cover transition-all duration-300 group-hover:scale-105"
+              priority
+              unoptimized
+              onError={(e) => {
+                console.log('Image failed to load:', e);
+                e.currentTarget.style.display = 'none';
+                const svg = e.currentTarget.nextElementSibling as HTMLElement;
+                if (svg) svg.style.display = 'block';
+              }}
+              onLoad={() => {
+                console.log('Image loaded successfully');
+              }}
+            />
+            <svg className="w-6 h-6 text-blue-600 absolute" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{display: 'none'}}>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+            </svg>
           </Link>
 
           {/* Desktop Menu and Actions - Right Side */}
@@ -53,18 +57,30 @@ export default function Header() {
               <Link href="/" className="px-3 py-2 text-[15px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
                 Home
               </Link>
-              <Link href="#find-digital-card" className="px-3 py-2 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50">
+              <button 
+                onClick={() => scrollToSection('find-digital-card')}
+                className="px-3 py-2 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50 bg-transparent border-none cursor-pointer"
+              >
                 Search
-              </Link>
-              <Link href="#what-is-digital-card" className="px-3 py-2 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50">
+              </button>
+              <button 
+                onClick={() => scrollToSection('what-is-digital-card')}
+                className="px-3 py-2 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50 bg-transparent border-none cursor-pointer"
+              >
                 About
-              </Link>
-              <Link href="#build-credibility" className="px-3 py-2 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50">
+              </button>
+              <button 
+                onClick={() => scrollToSection('build-credibility')}
+                className="px-3 py-2 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50 bg-transparent border-none cursor-pointer"
+              >
                 Features
-              </Link>
-              <Link href="#how-it-works" className="px-3 py-2 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50">
+              </button>
+              <button 
+                onClick={() => scrollToSection('how-it-works')}
+                className="px-3 py-2 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50 bg-transparent border-none cursor-pointer"
+              >
                 How It Works
-              </Link>
+              </button>
               
             </div>
 
@@ -75,7 +91,7 @@ export default function Header() {
                   <a href="/auth/login" className="px-5 py-2.5 text-[15px] font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50/50" style={{ textDecoration: 'none' }}>
                     Login
                   </a>
-                  <a href="/auth/signup" className="relative px-12 py-2.5 text-[15px] font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-full transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 overflow-hidden group text-center" style={{ minWidth: '120px', textDecoration: 'none', display: 'block' }}>
+                  <a href="/auth/signup" className="relative px-12 py-2.5 text-[15px] font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-full transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 overflow-hidden group text-center" style={{ minWidth: '120px', minHeight: '40px', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <span className="relative z-10 flex items-center justify-center">
                       Create Card
                     </span>
