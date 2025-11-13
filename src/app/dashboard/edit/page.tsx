@@ -923,7 +923,6 @@ const EditPage = () => {
   const cardId = searchParams.get('id');
   
   const [activeTab, setActiveTab] = useState('Display');
-  const [selectedColor, setSelectedColor] = useState('#145dfd');
   const [selectedColor1, setSelectedColor1] = useState('#145dfd');
   const [selectedColor2, setSelectedColor2] = useState('#145dfd');
   const [firstName, setFirstName] = useState('');
@@ -1426,7 +1425,7 @@ const EditPage = () => {
                       }
                     }}
                     style={{
-                      border: design === selectedDesign ? `2px solid ${selectedColor}` : '1px solid #ddd',
+                      border: design === selectedDesign ? `2px solid ${selectedColor1}` : '1px solid #ddd',
                       borderRadius: '10px',
                       padding: '10px',
                       width: 'calc(50% - 5px)',
@@ -1922,7 +1921,7 @@ const EditPage = () => {
                     top: '50%',
                     transform: 'translateY(-50%)',
                     pointerEvents: 'none',
-                    color: selectedColor
+                    color: selectedColor1
                   }}
                 >
                   <polyline points="6 9 12 15 18 9"></polyline>
@@ -2606,13 +2605,13 @@ const EditPage = () => {
                 onClick={() => setActiveTab(tab)}
                 style={{
                   padding: '10px 15px',
-                  fontSize: 'clamp(13px, 3.5vw, 16px)',
+                  fontSize: '14px',
                   fontWeight: 'bold',
                   border: 'none',
                   backgroundColor: 'transparent',
                   cursor: 'pointer',
-                  borderBottom: activeTab === tab ? `2px solid ${selectedColor}` : 'none',
-                  color: activeTab === tab ? selectedColor : '#777',
+                  borderBottom: activeTab === tab ? `2px solid ${selectedColor1}` : 'none',
+                  color: activeTab === tab ? selectedColor1 : '#777',
                   outline: 'none',
                   marginRight: '10px',
                   whiteSpace: 'nowrap'
@@ -2631,7 +2630,7 @@ const EditPage = () => {
               border: '1px solid #ddd',
               borderRadius: '8px',
               padding: '10px 20px',
-              fontSize: 'clamp(13px, 3.5vw, 16px)',
+              fontSize: '14px',
               fontWeight: 'bold',
               color: '#555',
               cursor: 'pointer',
@@ -2645,26 +2644,24 @@ const EditPage = () => {
               onClick={handleSaveCard}
               disabled={isSaving}
               style={{
-              backgroundColor: isSaving ? '#999' : selectedColor,
-              border: 'none',
-              borderRadius: '8px',
-              padding: '10px 20px',
-              fontSize: 'clamp(13px, 3.5vw, 16px)',
-              fontWeight: 'bold',
-              color: 'white',
-              cursor: isSaving ? 'not-allowed' : 'pointer',
-              outline: 'none',
-              flex: '1',
-              minWidth: '100px'
-            }}>
+                backgroundColor: isSaving ? '#999' : selectedColor1,
+                border: 'none',
+                borderRadius: '8px',
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                color: 'white',
+                cursor: isSaving ? 'not-allowed' : 'pointer',
+                outline: 'none',
+                flex: '1',
+                minWidth: '100px'
+              }}
+            >
               {isSaving ? 'Saving...' : 'Save'}
             </button>
           </div>
-
-
-        </div>
-
-          } </div>
+        </div>}
+      </div>
 
       {/* Modal for adding a new field */}
       {isModalOpen && (
