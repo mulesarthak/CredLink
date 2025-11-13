@@ -62,14 +62,12 @@
   --spacing-3xl: 4rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 /* Dark theme disabled: site will always use the light theme variables above */
+
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
 
 /* ========================================
    Base Styles
@@ -128,6 +126,7 @@ h1 span::after, .heading-1 span::after {
   content: '';
   position: absolute;
   bottom: 8px;
+  display: none;
   left: 0;
   width: 100%;
   height: 8px;
@@ -499,6 +498,9 @@ p, .body-text {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-decoration: none;
+  border: none;
+  outline: none;
 }
 
 .text-center {
@@ -915,6 +917,163 @@ p, .body-text {
 @media (max-width: 768px) {
   h1, .heading-1 {
     font-size: 2.2rem; /* 35px */
+    text-align: center !important;
+  }
+  
+  h2, .heading-2 {
+    text-align: center !important;
+  }
+  
+  h3, .heading-3 {
+    text-align: center !important;
+  }
+  
+  /* Center all text content on mobile */
+  .body-large, .body-text, p {
+    text-align: center !important;
+  }
+  
+  /* Compact mobile sections */
+  .section {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  
+  .section.py-12 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+  
+  .section.lg\:py-20 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  
+  /* Center get started button */
+  .hero-button-container {
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+  
+  .hero-button-container a {
+    margin: 0 auto !important;
+    display: block !important;
+    width: fit-content !important;
+  }
+  
+  /* Reduce spacing between button and image */
+  .hero-content {
+    margin-bottom: 0.5rem !important;
+  }
+  
+  /* Reduce gap in hero grid for mobile */
+  .hero-grid-mobile {
+    gap: 2rem !important;
+  }
+  
+  /* Stats cards in one row (3 cards) */
+  .stats-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+  
+  .stats-card {
+    padding: 1rem 0.5rem !important;
+  }
+  
+  .stats-card h3 {
+    font-size: 1.5rem !important;
+  }
+  
+  .stats-card p {
+    font-size: 0.7rem !important;
+  }
+  
+  /* Build credibility - 2 cards per row */
+  .credibility-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+  }
+  
+  .credibility-card {
+    padding: 1rem 0.75rem !important;
+  }
+  
+  .credibility-card h3 {
+    font-size: 0.8rem !important;
+    min-height: 2rem !important;
+  }
+  
+  /* Professional needs - ensure consistent card heights on mobile */
+  .professional-cards-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+  
+  .professional-card {
+    padding: 0.75rem 0.5rem !important;
+    min-height: 120px !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .professional-card h3 {
+    font-size: 0.8rem !important;
+    margin-bottom: 0.25rem !important;
+    line-height: 1.2 !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .professional-card p {
+    font-size: 0.65rem !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+    flex-grow: 1 !important;
+  }
+  
+  /* How it works - 2 cards per row */
+  .how-it-works-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+  }
+  
+  .how-it-works-card {
+    padding: 1rem 0.75rem !important;
+  }
+  
+  .how-it-works-card h3 {
+    font-size: 0.9rem !important;
+  }
+  
+  .how-it-works-card p {
+    font-size: 0.75rem !important;
+  }
+  
+  /* Connect with people search button - reduce width on mobile */
+  .search-button-mobile {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    font-size: 13px !important;
+  }
+  
+  /* Increase height of header buttons on mobile */
+  header a[href="/auth/login"] {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    min-height: 48px !important;
+  }
+  
+  header a[href="/auth/signup"] {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    min-height: 48px !important;
   }
   
   h2, .heading-2 {
@@ -928,19 +1087,33 @@ p, .body-text {
   h4, .heading-4 {
     font-size: 1.1rem; /* 18px */
   }
-  
-  .body-large {
-    font-size: 0.9rem;
+}
+
+/* Desktop - Center 7th card in professional section */
+@media (min-width: 1024px) {
+  .professional-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
   }
   
-  .card {
-    padding: var(--spacing-md);
+  .professional-cards-grid .professional-card:nth-child(7) {
+    grid-column: 2 / 3;
+    justify-self: center;
   }
-  
-  .btn {
-    padding: 0.55rem 1.1rem;
-    font-size: 0.85rem;
-  }
+}
+
+.body-large {
+  font-size: 0.9rem;
+}
+
+.card {
+  padding: var(--spacing-md);
+}
+
+.btn {
+  padding: 0.55rem 1.1rem;
+  font-size: 0.85rem;
 }
 
 /* ========================================

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import { AuthProvider } from "@/components/providers/auth-provider";
+import { ToastProvider } from "@/components/providers/toast-provider";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -21,7 +22,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MyKard - Your Digital Identity Platform",
+  title: "MyKard",
   description: "Create a credible professional profile that showcases your expertise and connects you with opportunities.",
 };
 
@@ -37,6 +38,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           {children}
+          <ToastProvider />
         </AuthProvider>
       </body>
     </html>
