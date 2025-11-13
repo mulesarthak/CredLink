@@ -1342,7 +1342,7 @@ const EditPage = () => {
       // Success!
       setExistingCardId(data.card.id);
       setIsPopupOpen(true);
-      setPopupMessage(isUpdating ? 'Card updated successfully! 🎉' : 'Card created successfully! 🎉');
+      setPopupMessage(isUpdating ? 'Card updated successfully! ' : 'Card created successfully! ');
       
       // If we just created a card, update the URL to include the ID
       if (!isUpdating && data.card.id) {

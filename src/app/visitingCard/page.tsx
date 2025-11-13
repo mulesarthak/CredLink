@@ -65,7 +65,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   const renderItem = (title: string, subtitle?: string) => (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 12, padding: '12px 14px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>★</div>
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}></div>
         <div>
           <div style={{ fontWeight: 700, color: '#111827' }}>{title}</div>
           {subtitle && <div style={{ fontSize: 12, color: '#6B7280' }}>{subtitle}</div>}
