@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { verify } from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
-
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || "your-secret-key";
+import { verifyUserToken } from "@/lib/jwt";
 
 /**
  * DELETE /api/card/delete
@@ -25,11 +23,9 @@ async function handleDelete(req: NextRequest) {
             );
         }
 
-        // Verify token
-        let payload: any;
-        try {
-            payload = verify(token, JWT_SECRET);
-        } catch (err) {
+        // Verify token using centralized utility
+        const payload = verifyUserToken(token);
+        if (!payload) {
             return NextResponse.json(
                 { error: "Unauthorized - Invalid token" },
                 { status: 401 }
