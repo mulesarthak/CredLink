@@ -1293,7 +1293,7 @@ const EditPage = () => {
       // Success!
       setExistingCardId(data.card.id);
       setIsPopupOpen(true);
-      setPopupMessage('Card created successfully! 🎉');
+      setPopupMessage('Card created successfully!');
 
     } catch (error: any) {
       console.error('Error saving card:', error);

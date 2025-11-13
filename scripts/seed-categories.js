@@ -84,7 +84,7 @@ async function seedCategories() {
     // Check if categories already exist
     const existingCategories = await prisma.category.findMany()
     if (existingCategories.length > 0) {
-      console.log(`⚠️  Found ${existingCategories.length} existing categories. Skipping seed.`)
+      console.log(`  Found ${existingCategories.length} existing categories. Skipping seed.`)
       return
     }
 
@@ -93,12 +93,12 @@ async function seedCategories() {
       const created = await prisma.category.create({
         data: category
       })
-      console.log(`✅ Created category: ${created.name}`)
+      console.log(` Created category: ${created.name}`)
     }
 
-    console.log(`🎉 Successfully seeded ${categories.length} categories!`)
+    console.log(`Successfully seeded ${categories.length} categories!`)
   } catch (error) {
-    console.error('❌ Error seeding categories:', error)
+    console.error(' Error seeding categories:', error)
   } finally {
     await prisma.$disconnect()
   }
