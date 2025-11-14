@@ -8,6 +8,7 @@ import { ChevronDown, User, LogOut, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../app/globals.css';
 
+
 // Smooth scroll function without changing URL
 const scrollToSection = (sectionId: string) => {
   const element = document.getElementById(sectionId);
@@ -22,6 +23,7 @@ const scrollToSection = (sectionId: string) => {
 export default function Header() {
   const { user, isAuthenticated, checkAuth, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
@@ -38,7 +40,74 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-blue-100/50 shadow-sm">
+    <>
+      <style jsx global>{`
+        .mobile-fixed-header {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          width: 100vw !important;
+          min-height: 80px !important;
+          height: auto !important;
+          z-index: 999999 !important;
+          transform: translate3d(0, 0, 0) !important;
+          -webkit-transform: translate3d(0, 0, 0) !important;
+          will-change: transform !important;
+          backface-visibility: hidden !important;
+          -webkit-backface-visibility: hidden !important;
+          overflow: visible !important;
+        }
+        
+        @supports (-webkit-touch-callout: none) {
+          .mobile-fixed-header {
+            position: absolute !important;
+            top: 0 !important;
+          }
+        }
+        
+        @media screen and (max-width: 768px) {
+          html {
+            position: relative !important;
+            overflow-x: hidden !important;
+          }
+          
+          body {
+            position: relative !important;
+            -webkit-overflow-scrolling: touch !important;
+            overflow-scrolling: touch !important;
+            min-height: 100vh !important;
+          }
+          
+          .mobile-fixed-header {
+            position: fixed !important;
+            top: env(safe-area-inset-top, 0) !important;
+            transform: translateZ(0) !important;
+            -webkit-transform: translateZ(0) !important;
+          }
+        }
+      `}</style>
+      <header 
+        className="bg-white/95 backdrop-blur-xl border-b border-blue-100/50 shadow-sm mobile-fixed-header" 
+        style={{ 
+          position: 'fixed',
+          top: '0px',
+          left: '0px',
+          right: '0px',
+          width: '100%',
+          maxWidth: '100vw',
+          minHeight: '80px',
+          height: 'auto',
+          zIndex: 99999,
+          transform: 'translate3d(0px, 0px, 0px)',
+          WebkitTransform: 'translate3d(0px, 0px, 0px)',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          overflow: 'visible',
+          contain: 'layout style paint',
+          isolation: 'isolate'
+        }}
+      >
       <nav className="max-w-7xl mx-auto px-8" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}>
         <div className="flex items-center justify-between h-20">
           {/* Logo - Left Side */}
@@ -175,28 +244,93 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden py-6 border-t border-blue-100/50 animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="space-y-1">
-              <Link href="/" className="flex items-center gap-3 px-4 py-3 text-[15px] font-semibold text-blue-600 bg-blue-50/50 rounded-xl">
-                <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+          <div className="lg:hidden pt-6 border-t border-blue-100/50 animate-in fade-in slide-in-from-top-2 duration-300" style={{ paddingBottom: '0rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button 
+                onClick={() => {
+                  setActiveSection('home');
+                  window.location.href = '/';
+                  setIsMenuOpen(false);
+                }}
+                className={`flex items-center gap-3 px-4 py-3 text-[15px] font-semibold rounded-xl w-full text-left border-none cursor-pointer transition-colors ${
+                  activeSection === 'home' 
+                    ? 'text-blue-600 bg-blue-50/50' 
+                    : 'text-gray-700 hover:bg-blue-50/50 hover:text-blue-600'
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  activeSection === 'home' ? 'bg-blue-600' : 'bg-transparent'
+                }`}></span>
                 Home
-              </Link>
-              <Link href="#find-digital-card" className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-700 hover:bg-blue-50/50 rounded-xl transition-colors">
-                <span className="w-1.5 h-1.5 bg-transparent"></span>
+              </button>
+              <button 
+                onClick={() => {
+                  setActiveSection('find-digital-card');
+                  scrollToSection('find-digital-card');
+                  setIsMenuOpen(false);
+                }}
+                className={`flex items-center gap-3 px-4 py-3 text-[15px] font-medium rounded-xl w-full text-left border-none cursor-pointer transition-colors ${
+                  activeSection === 'find-digital-card' 
+                    ? 'text-blue-600 bg-blue-50/50 font-semibold' 
+                    : 'text-gray-700 hover:bg-blue-50/50 hover:text-blue-600'
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  activeSection === 'find-digital-card' ? 'bg-blue-600' : 'bg-transparent'
+                }`}></span>
                 Search
-              </Link>
-              <Link href="#what-is-digital-card" className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-700 hover:bg-blue-50/50 rounded-xl transition-colors">
-                <span className="w-1.5 h-1.5 bg-transparent"></span>
+              </button>
+              <button 
+                onClick={() => {
+                  setActiveSection('what-is-digital-card');
+                  scrollToSection('what-is-digital-card');
+                  setIsMenuOpen(false);
+                }}
+                className={`flex items-center gap-3 px-4 py-3 text-[15px] font-medium rounded-xl w-full text-left border-none cursor-pointer transition-colors ${
+                  activeSection === 'what-is-digital-card' 
+                    ? 'text-blue-600 bg-blue-50/50 font-semibold' 
+                    : 'text-gray-700 hover:bg-blue-50/50 hover:text-blue-600'
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  activeSection === 'what-is-digital-card' ? 'bg-blue-600' : 'bg-transparent'
+                }`}></span>
                 About
-              </Link>
-              <Link href="#build-credibility" className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-700 hover:bg-blue-50/50 rounded-xl transition-colors">
-                <span className="w-1.5 h-1.5 bg-transparent"></span>
+              </button>
+              <button 
+                onClick={() => {
+                  setActiveSection('build-credibility');
+                  scrollToSection('build-credibility');
+                  setIsMenuOpen(false);
+                }}
+                className={`flex items-center gap-3 px-4 py-3 text-[15px] font-medium rounded-xl w-full text-left border-none cursor-pointer transition-colors ${
+                  activeSection === 'build-credibility' 
+                    ? 'text-blue-600 bg-blue-50/50 font-semibold' 
+                    : 'text-gray-700 hover:bg-blue-50/50 hover:text-blue-600'
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  activeSection === 'build-credibility' ? 'bg-blue-600' : 'bg-transparent'
+                }`}></span>
                 Features
-              </Link>
-              <Link href="#how-it-works" className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-700 hover:bg-blue-50/50 rounded-xl transition-colors">
-                <span className="w-1.5 h-1.5 bg-transparent"></span>
+              </button>
+              <button 
+                onClick={() => {
+                  setActiveSection('how-it-works');
+                  scrollToSection('how-it-works');
+                  setIsMenuOpen(false);
+                }}
+                className={`flex items-center gap-3 px-4 py-3 text-[15px] font-medium rounded-xl w-full text-left border-none cursor-pointer transition-colors ${
+                  activeSection === 'how-it-works' 
+                    ? 'text-blue-600 bg-blue-50/50 font-semibold' 
+                    : 'text-gray-700 hover:bg-blue-50/50 hover:text-blue-600'
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  activeSection === 'how-it-works' ? 'bg-blue-600' : 'bg-transparent'
+                }`}></span>
                 How It Works
-              </Link>
+              </button>
               
             </div>
             <div className="pt-6 mt-6 border-t border-blue-100/50 space-y-3">
@@ -207,16 +341,17 @@ export default function Header() {
                       console.log('Mobile Login clicked');
                       window.location.href = '/auth/login';
                     }}
-                    className="block w-full text-center px-6 py-3 text-[15px] font-medium text-gray-700 bg-blue-50/50 rounded-xl hover:bg-blue-100/50 transition-colors border-none cursor-pointer"
+                    className="relative block w-full text-center px-6 py-3 text-[15px] font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg shadow-blue-500/30 overflow-hidden group border-none cursor-pointer"
                   >
-                    Login
+                    <span className="relative z-10" style={{ pointerEvents: 'none' }}>Login</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400/0 via-white/20 to-blue-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
                   </button>
                   <button 
                     onClick={() => {
                       console.log('Mobile Create Card clicked');
                       window.location.href = '/auth/signup';
                     }}
-                    className="relative block w-full text-center px-6 py-3 text-[15px] font-semibold text-white bg-linear-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg shadow-blue-500/30 overflow-hidden group border-none cursor-pointer"
+                    className="relative block w-full text-center px-6 py-3 text-[15px] font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg shadow-blue-500/30 overflow-hidden group border-none cursor-pointer"
                   >
                     <span className="relative z-10" style={{ pointerEvents: 'none' }}>Create Card</span>
                     <div className="absolute inset-0 bg-linear-to-r from-blue-400/0 via-white/20 to-blue-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -233,5 +368,6 @@ export default function Header() {
         )}
       </nav>
     </header>
+    </>
   );
 }
