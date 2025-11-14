@@ -109,21 +109,21 @@ export async function POST(request: NextRequest) {
     })
 
     // Send OTP to phone
-    const otpResponse = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/otp/send`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ phone })
-    })
+    // const otpResponse = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/otp/send`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ phone })
+    // })
 
-    if (!otpResponse.ok) {
-      console.error('Failed to send OTP:', await otpResponse.text())
-    }
+    // if (!otpResponse.ok) {
+    //   console.error('Failed to send OTP:', await otpResponse.text())
+    // }
 
     return NextResponse.json(
       { 
-        message: 'User created successfully. OTP sent to phone.',
+        message: 'User created successfully',
         user 
       },
       { status: 201 }

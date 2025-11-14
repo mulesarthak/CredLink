@@ -24,6 +24,8 @@ const colors = {
    ------------------------------------------------- */
 interface DigitalCardProps {
   name: string;
+  phone: string;
+  email: string;
   title: string;
   company?: string;
   location: string;
@@ -36,6 +38,8 @@ interface DigitalCardProps {
 
 const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   name = "",
+  phone = "",
+  email = "",
   title = "",
   company = "",
   location = "",
@@ -281,6 +285,8 @@ const OnboardingPage: React.FC = () => {
     photo: "",
     photoFile: null as File | null,
     name: "",
+    phone: "",
+    email: "",
     title: "",
     company: "",
     location: "",
@@ -299,44 +305,67 @@ const OnboardingPage: React.FC = () => {
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone: string) => {
+    // Simple validation for phone number (10-15 digits)
+    const phoneRegex = /^[+]?[\d\s-]{10,15}$/;
+    return phoneRegex.test(phone);
+  };
+
   const handleContinue = async() => {
+    // Step 1: Full Name (Required)
     if (step === 1 && !formData.name.trim()) {
-      alert('Please enter your name to continue.');
+      alert('Please enter your full name to continue.');
       return;
     }
-    if (step === 2 && !formData.title.trim()) {
-      alert('Please enter your professional title to continue.');
-      return;
+    
+    // Step 2: Phone (Required)
+    if (step === 2) {
+      if (!formData.phone.trim()) {
+        alert('Please enter your phone number to continue.');
+        return;
+      }
+      if (!validatePhone(formData.phone)) {
+        alert('Please enter a valid phone number.');
+        return;
+      }
     }
-    if (step === 3 && !formData.company.trim()) {
-      alert('Please enter your company name to continue.');
-      return;
-    }
-    if (step === 4 && !formData.location.trim()) {
-      alert('Please enter your location to continue.');
-      return;
-    }
-    if (step === 6 && !formData.about.trim()) {
-      alert('Please enter information about yourself to continue.');
-      return;
-    }
-    if (step === 7 && !formData.skills.trim()) {
-      alert('Please enter your skills to continue.');
-      return;
+    
+    // Step 3: Email (Required)
+    if (step === 3) {
+      if (!formData.email.trim()) {
+        alert('Please enter your email address to continue.');
+        return;
+      }
+      if (!validateEmail(formData.email)) {
+        alert('Please enter a valid email address.');
+        return;
+      }
     }
 
-    if (step < 10) setStep(step + 1);
-    else {
-      try{
+    // All other steps are optional (4-10)
+    if (step < 10) {
+      setStep(step + 1);
+    } else {
+      // Final step - Create card
+      try {
         // Create FormData for card creation
         const cardFormData = new FormData();
         
-        // Map onboarding form data to card fields
+        // Required fields from signup
         cardFormData.append('fullName', formData.name || '');
-        cardFormData.append('title', formData.title || '');
-        cardFormData.append('company', formData.company || '');
-        cardFormData.append('location', formData.location || '');
-        cardFormData.append('bio', formData.about || '');
+        cardFormData.append('phone', formData.phone || '');
+        cardFormData.append('email', formData.email || '');
+        
+        // Optional fields
+        if (formData.title) cardFormData.append('title', formData.title);
+        if (formData.company) cardFormData.append('company', formData.company);
+        if (formData.location) cardFormData.append('location', formData.location);
+        if (formData.about) cardFormData.append('bio', formData.about);
         
         // Combine skills, portfolio, and experience into description
         const descriptionParts = [];
@@ -358,7 +387,6 @@ const OnboardingPage: React.FC = () => {
         if (formData.photoFile) {
           cardFormData.append('profileImage', formData.photoFile);
         } else if (formData.photo && formData.photo.startsWith('data:')) {
-          // Fallback: convert data URL to File if file object not available
           try {
             const response = await fetch(formData.photo);
             const blob = await response.blob();
@@ -366,14 +394,13 @@ const OnboardingPage: React.FC = () => {
             cardFormData.append('profileImage', file);
           } catch (error) {
             console.error('Error processing profile image:', error);
-            // Continue without image if conversion fails
           }
         }
         
         // Create card using card creation API
         const response = await fetch('/api/card/create', {
           method: 'POST',
-          credentials: 'include', // Include cookies for authentication
+          credentials: 'include',
           body: cardFormData,
         });
         
@@ -385,7 +412,7 @@ const OnboardingPage: React.FC = () => {
         }
         
         setShowPartyPopup(true);
-      }catch(error: any){
+      } catch(error: any) {
         console.error('Error creating card:', error);
         alert(error.message || 'Failed to create card. Please try again.');
       }
@@ -628,6 +655,8 @@ const OnboardingPage: React.FC = () => {
           }}>
             <DigitalCardPreview
               name={formData.name}
+              phone={formData.phone}
+              email={formData.email}
               title={formData.title}
               company={formData.company}
               location={formData.location}
@@ -651,15 +680,15 @@ const OnboardingPage: React.FC = () => {
                 color: colors.primary,
               }}
             >
-              {step === 1 && 'Your Name'}
-              {step === 2 && 'Professional Title'}
-              {step === 3 && 'Company Name'}
-              {step === 4 && 'Location'}
-              {step === 5 && 'Profile Photo'}
-              {step === 6 && 'About You'}
-              {step === 7 && 'Skills'}
-              {step === 8 && 'Portfolio'}
-              {step === 9 && 'Experience'}
+              {step === 1 && 'Your Full Name *'}
+              {step === 2 && 'Phone Number *'}
+              {step === 3 && 'Email Address *'}
+              {step === 4 && 'Professional Title'}
+              {step === 5 && 'Company Name'}
+              {step === 6 && 'Location'}
+              {step === 7 && 'Profile Photo'}
+              {step === 8 && 'About You'}
+              {step === 9 && 'Skills'}
               {step === 10 && 'Review & Create'}
             </h1>
 
@@ -672,9 +701,34 @@ const OnboardingPage: React.FC = () => {
                 onFocus={() => setFocusedInput('name')}
                 onBlur={() => setFocusedInput(null)}
                 style={inputStyle('name')}
+                autoFocus
               />
             )}
             {step === 2 && (
+              <input
+                placeholder="+1 234 567 8900"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onFocus={() => setFocusedInput('phone')}
+                onBlur={() => setFocusedInput(null)}
+                style={inputStyle('phone')}
+                type="tel"
+                autoFocus
+              />
+            )}
+            {step === 3 && (
+              <input
+                placeholder="john@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onFocus={() => setFocusedInput('email')}
+                onBlur={() => setFocusedInput(null)}
+                style={inputStyle('email')}
+                type="email"
+                autoFocus
+              />
+            )}
+            {step === 4 && (
               <input
                 placeholder="Digital Marketer & Creator"
                 value={formData.title}
@@ -684,7 +738,7 @@ const OnboardingPage: React.FC = () => {
                 style={inputStyle('title')}
               />
             )}
-            {step === 3 && (
+            {step === 5 && (
               <input
                 placeholder="Company (e.g., BoostNow LLP)"
                 value={formData.company}
@@ -694,7 +748,7 @@ const OnboardingPage: React.FC = () => {
                 style={inputStyle('company')}
               />
             )}
-            {step === 4 && (
+            {step === 6 && (
               <input
                 placeholder="Mumbai"
                 value={formData.location}
@@ -704,7 +758,7 @@ const OnboardingPage: React.FC = () => {
                 style={inputStyle('location')}
               />
             )}
-            {step === 5 && (
+            {step === 7 && (
               <div style={{ textAlign: 'center' }}>
                 <input
                   id="photo-upload"
@@ -780,17 +834,17 @@ const OnboardingPage: React.FC = () => {
                 </label>
               </div>
             )}
-            {step === 6 && (
+            {step === 8 && (
               <textarea
                 placeholder="Crafting engaging content & SEO strategies"
                 value={formData.about}
                 onChange={(e) => setFormData({ ...formData, about: e.target.value })}
                 onFocus={() => setFocusedInput('about')}
                 onBlur={() => setFocusedInput(null)}
-                style={{ ...inputStyle('about'), height: '80px', resize: 'none' }}
+                style={{ ...inputStyle('about'), height: '120px', resize: 'none' }}
               />
             )}
-            {step === 7 && (
+            {step === 9 && (
               <input
                 placeholder="SEO, Content Creation, Analytics, Social Media"
                 value={formData.skills}
@@ -800,30 +854,11 @@ const OnboardingPage: React.FC = () => {
                 style={inputStyle('skills')}
               />
             )}
-            {step === 8 && (
-              <input
-                placeholder="[Link] Latest Campaigns"
-                value={formData.portfolio}
-                onChange={(e) => setFormData({ ...formData, portfolio: e.target.value })}
-                onFocus={() => setFocusedInput('portfolio')}
-                onBlur={() => setFocusedInput(null)}
-                style={inputStyle('portfolio')}
-              />
-            )}
-            {step === 9 && (
-              <input
-                placeholder="Lead SEO Specialist @ TechCorp (2021-Present)"
-                value={formData.experience}
-                onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                onFocus={() => setFocusedInput('experience')}
-                onBlur={() => setFocusedInput(null)}
-                style={inputStyle('experience')}
-              />
-            )}
 
             {/* Action Buttons */}
             <div style={{ display: 'flex', gap: '12px' }}>
-              {(step === 5 || step === 8 || step === 9) && (
+              {/* Show Skip button for optional steps (4-9) */}
+              {step >= 4 && step <= 9 && (
                 <button
                   onClick={() => setStep(step + 1)}
                   style={{
@@ -845,23 +880,17 @@ const OnboardingPage: React.FC = () => {
                 onClick={handleContinue}
                 disabled={
                   (step === 1 && !formData.name.trim()) ||
-                  (step === 2 && !formData.title.trim()) ||
-                  (step === 3 && !formData.company.trim()) ||
-                  (step === 4 && !formData.location.trim()) ||
-                  (step === 6 && !formData.about.trim()) ||
-                  (step === 7 && !formData.skills.trim())
+                  (step === 2 && !formData.phone.trim()) ||
+                  (step === 3 && !formData.email.trim())
                 }
                 style={{
-                  flex: (step === 5 || step === 8 || step === 9) ? 1 : 'auto',
-                  width: (step === 5 || step === 8 || step === 9) ? 'auto' : '100%',
+                  flex: step >= 4 && step <= 9 ? 1 : 'auto',
+                  width: step >= 4 && step <= 9 ? 'auto' : '100%',
                   padding: '14px 0',
                   background: (
                     (step === 1 && !formData.name.trim()) ||
-                    (step === 2 && !formData.title.trim()) ||
-                    (step === 3 && !formData.company.trim()) ||
-                    (step === 4 && !formData.location.trim()) ||
-                    (step === 6 && !formData.about.trim()) ||
-                    (step === 7 && !formData.skills.trim())
+                    (step === 2 && !formData.phone.trim()) ||
+                    (step === 3 && !formData.email.trim())
                   )
                     ? '#D1D5DB'
                     : `linear-gradient(135deg, ${colors.primary}, ${colors.purple})`,
@@ -872,21 +901,15 @@ const OnboardingPage: React.FC = () => {
                   fontWeight: '600',
                   cursor: (
                     (step === 1 && !formData.name.trim()) ||
-                    (step === 2 && !formData.title.trim()) ||
-                    (step === 3 && !formData.company.trim()) ||
-                    (step === 4 && !formData.location.trim()) ||
-                    (step === 6 && !formData.about.trim()) ||
-                    (step === 7 && !formData.skills.trim())
+                    (step === 2 && !formData.phone.trim()) ||
+                    (step === 3 && !formData.email.trim())
                   )
                     ? 'not-allowed'
                     : 'pointer',
                   opacity: (
                     (step === 1 && !formData.name.trim()) ||
-                    (step === 2 && !formData.title.trim()) ||
-                    (step === 3 && !formData.company.trim()) ||
-                    (step === 4 && !formData.location.trim()) ||
-                    (step === 6 && !formData.about.trim()) ||
-                    (step === 7 && !formData.skills.trim())
+                    (step === 2 && !formData.phone.trim()) ||
+                    (step === 3 && !formData.email.trim())
                   )
                     ? 0.6
                     : 1,
