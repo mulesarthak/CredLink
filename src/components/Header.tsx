@@ -123,10 +123,20 @@ export default function Header() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg py-1 z-50"
+                        className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50"
                       >
-                        <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" style={{ padding: '12px 16px' }}>Dashboard</Link>
-                        <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100" style={{ padding: '12px 16px' }}>Logout</button>
+                        <Link
+                          href="/dashboard"
+                          className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left"
+                        >
+                          Dashboard
+                        </Link>
+                        <button
+                          onClick={handleLogout}
+                          className="block w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 text-left"
+                        >
+                          Logout
+                        </button>
                       </motion.div>
                     )}
                   </AnimatePresence>
