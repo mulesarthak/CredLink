@@ -610,6 +610,7 @@
 .settingsDescription {
   font-size: 0.875rem;
   color: var(--color-text-light);
+  text-align: left !important;
 }
 
 .settingsControl {
