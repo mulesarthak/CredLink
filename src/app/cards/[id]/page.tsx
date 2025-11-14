@@ -67,6 +67,7 @@ interface Card {
   selectedColor?: string;
   selectedColor2?: string;
   selectedFont?: string;
+  cardType?: string;
   views?: number;
   boost?: "Active" | "Inactive";
   user?: {
@@ -97,6 +98,7 @@ const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
       website: card.websiteUrl || card.website || '',
       themeColor1: card.selectedColor || '#3b82f6',
       themeColor2: card.selectedColor2 || '#2563eb',
+      cardType: card.cardType || '',
     };
 
     const design = card.selectedDesign || 'Classic';
@@ -277,30 +279,6 @@ const handleDelete = async () => {
     document.getElementById('qrLogoUpload')?.click();
   };
 
-  const handleSave = async () => {
-    if (!card) return;
-    try {
-      const formData = new FormData();
-      const fullName = card.fullName || card.name || '';
-      formData.append('fullName', fullName);
-      if (file) {
-        formData.append('profileImage', file);
-      }
-      const response = await fetch(`/api/card/update/${cardId}`, {
-        method: 'PATCH',
-        body: formData,
-        credentials: 'include',
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to update card');
-      setCard(data.card);
-      toast.success('Saved successfully');
-    } catch (err: any) {
-      console.error('Error saving card:', err);
-      toast.error(err.message || 'Failed to save');
-    }
-  };
-
   if (isLoading) {
     return (
       <div className={`${styles.pageContainer} flex items-center justify-center`}>
@@ -418,7 +396,7 @@ const handleDelete = async () => {
                 <div className={styles.actionButtons}>
                   <button onClick={() => copyToClipboard(mockUserData.cardUrl)} className={styles.actionBtn}>
                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    {copied ? "Copied!" : "My Link"}
+                    {copied ? "Copied!" : "Copy Link"}
                   </button>
                   <button onClick={downloadQR} className={styles.actionBtn}>
                     <Download className="w-4 h-4" /> Download QR
@@ -493,30 +471,20 @@ const handleDelete = async () => {
               >
                 {/* Card Configuration */}
                 <div className={styles.settingsCard}>
-                  <div className={styles.settingsCardTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>
-                      <span className={`${styles.dot}`} style={{ backgroundColor: 'var(--color-primary-light)' }}></span> Card Configuration
-                    </span>
-                    <button onClick={handleSave} className={styles.editCardBtn}>
-                      Save
-                    </button>
-                  </div>
+                  <h3 className={styles.settingsCardTitle}>
+                    <div className={`${styles.dot}`} style={{ backgroundColor: 'var(--color-primary-light)' }}></div> Card Configuration
+                  </h3>
                   
                   {/* Card Name */}
                   <div className={styles.settingsItem}>
                     <div className={styles.settingsInfo}>
-                      <h4 className={styles.settingsLabel}>Your Name</h4>
+                      <h4 className={styles.settingsLabel}>Card Name</h4>
                       <p className={styles.settingsDescription}>Change the name of this card.</p>
                     </div>
                     <div className={styles.settingsControl}>
                       <input
                         type="text"
-                        value={card.fullName || card.name || 'Personal'}
-                        onChange={(e) =>
-                          setCard((prev) =>
-                            prev ? { ...prev, fullName: e.target.value, name: e.target.value } : prev
-                          )
-                        }
+                        defaultValue={card.fullName || card.name || 'Personal'}
                         className={styles.settingsInput}
                       />
                     </div>
@@ -563,7 +531,7 @@ const handleDelete = async () => {
                     <div className={styles.settingsControl}>
                       <input
                         type="text"
-                        defaultValue={mockUserData.cardUrl}
+                        defaultValue="https://MyKard.com/hi/XXXX"
                         className={styles.settingsInput}
                         readOnly
                       />
@@ -599,7 +567,24 @@ const handleDelete = async () => {
                 </div>
 
                 {/* Advanced Settings */}
-                
+                <div className={styles.settingsCard}>
+                  <h3 className={styles.settingsCardTitle}>
+                    <div className={`${styles.dot}`} style={{ backgroundColor: 'var(--color-purple-600)' }}></div> Advanced Settings
+                  </h3>
+
+                  {/* Renew Link only */}
+                  <div className={styles.settingsItem}>
+                    <div className={styles.settingsInfo}>
+                      <h4 className={styles.settingsLabel}>Renew Link</h4>
+                      <p className={styles.settingsDescription}>Renew the link to your card.</p>
+                    </div>
+                    <div className={styles.settingsControl}>
+                      <button className={`${styles.settingsButton} ${styles.renewButton}`}>
+                        <FiRefreshCw size={16} /> Renew
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
 
                 {/* Danger Zone */}

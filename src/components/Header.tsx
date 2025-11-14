@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { ChevronDown, User, LogOut, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import '../app/globals.css';
 
 // Smooth scroll function without changing URL
 const scrollToSection = (sectionId: string) => {
@@ -413,7 +413,7 @@ export default function Header() {
                     <span className="relative z-10 flex items-center justify-center">
                       Create Card
                     </span>
-                    <div className="absolute inset-0 bg-linear-to-r from-blue-400/0 via-white/20 to-blue-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400/0 via-white/20 to-blue-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   </a>
                 </>
               )}
@@ -546,10 +546,12 @@ export default function Header() {
                       console.log('Mobile Create Card clicked');
                       window.location.href = '/auth/signup';
                     }}
-                    className="flex-1 flex items-center justify-center text-center px-4 text-[15px] font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg shadow-blue-500/30 overflow-hidden group border-none cursor-pointer"
+                    className="flex-1 relative flex items-center justify-center text-center px-4 text-[15px] font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-full transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 overflow-hidden group border-none cursor-pointer"
                     style={{ height: '40px', minWidth: '100px' }}
                   >
-                    <span className="relative z-10">Create Card</span>
+                    <span className="relative z-10 flex items-center justify-center">
+                      Create Card
+                    </span>
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-400/0 via-white/20 to-blue-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   </button>
                 </div>

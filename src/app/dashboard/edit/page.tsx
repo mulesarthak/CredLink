@@ -94,7 +94,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
-      const items = skillsList;
+      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
       return (
         <div style={{ padding: isMobile ? 12 : 16 }}>
           {items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}
@@ -102,19 +102,21 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       );
     }
     if (section === 'Services') {
-      const items = servicesList;
+      // Changed to use prop
+      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Portfolio') {
-      const items = portfolioList;
+      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Experience') {
-      const items = experienceList;
+      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Review') {
-      const items = reviewList;
+      // Changed to use prop
+      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     return null;
@@ -182,14 +184,20 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           {/* Social Row */}
           <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}> 
             {/* Mail */}
-            <a href={`mailto:${email || 'example@mykard.com'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <div
+              onClick={() => {
+                if (email) window.location.href = `mailto:${email}`;
+                else window.location.href = 'mailto:example@MyKard.com';
+              }}
+              style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer" }}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 4h16v16H4z" opacity="0"/>
                 <path d="M4 8l8 5 8-5"/>
                 <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
               </svg>
-            </a>
-            {/* Phone */}
+            </div>
+            
             <a href={`tel:${phone || '+911234567890'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
@@ -200,13 +208,16 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
             </a>
             {/* Globe */}
-            <a href={website || 'https://mykard.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <div
+              onClick={() => window.open(website || 'https://MyKard.com', '_blank', 'noopener noreferrer')}
+              style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer" }}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="2" y1="12" x2="22" y2="12"/>
                 <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
               </svg>
-            </a>
+            </div>
           </div>
         </div>
       </div>
@@ -961,6 +972,10 @@ const EditPage = () => {
   const [services, setServices] = useState('SEO Audits, Slogan Content Campaigns');
   const [reviews, setReviews] = useState('John transformed our online presence!, Happy Client');
 
+  const [customTypes, setCustomTypes] = useState<string[]>([]);
+  const [showCustomTypeInput, setShowCustomTypeInput] = useState(false);
+  const [customTypeInput, setCustomTypeInput] = useState('');
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newFieldName, setNewFieldName] = useState('');
   const [newFieldLink, setNewFieldLink] = useState('');
@@ -972,7 +987,6 @@ const EditPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [documentUrl, setDocumentUrl] = useState<string | null>(null);
   const [displayTypes, setDisplayTypes] = useState<string[]>(['Classic']);
   const [existingCardId, setExistingCardId] = useState<string | null>(null);
 
@@ -1079,7 +1093,6 @@ const EditPage = () => {
           setCardName(card.cardName || '');
           setCardType(card.cardType || 'Personal');
           setExistingCardId(card.id);
-          setDocumentUrl(card.documentUrl || null);
           
           toast.success('Card loaded for editing');
         } else {
@@ -1245,6 +1258,22 @@ const EditPage = () => {
     ));
   };
 
+  // Card Type helper functions
+  const builtInTypes = ['Personal', 'Professional', 'Business', 'Company', 'Creator', 'Influencer'];
+  
+  const handleAddCustomType = () => {
+    if (customTypeInput.trim() && !builtInTypes.includes(customTypeInput.trim()) && !customTypes.includes(customTypeInput.trim())) {
+      setCustomTypes([...customTypes, customTypeInput.trim()]);
+      setCardType(customTypeInput.trim());
+      setCustomTypeInput('');
+      setShowCustomTypeInput(false);
+    }
+  };
+
+  const getAllCardTypes = () => {
+    return [...builtInTypes, ...customTypes];
+  };
+
   const handleSaveCard = async () => {
     try {
       setIsSaving(true);
@@ -1305,10 +1334,6 @@ const EditPage = () => {
       
       if (bannerImageFile) {
         formData.append('bannerImage', bannerImageFile);
-      }
-
-      if (resumeFile) {
-        formData.append('document', resumeFile);
       }
 
       // Determine if we're updating or creating
@@ -1417,6 +1442,7 @@ const EditPage = () => {
       themeColor1: selectedColor1,
       themeColor2: selectedColor2,
       fontFamily: selectedFont,
+      cardType,
     };
 
     switch (selectedDesign) {
@@ -1961,11 +1987,11 @@ const EditPage = () => {
           <div>
             <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px', color: '#333' }}>Personal</h3>
             {[
-              // { label: 'Prefix', value: prefix, setter: setPrefix },
+              { label: 'Prefix', value: prefix, setter: setPrefix },
               { label: 'First Name', value: firstName, setter: setFirstName },
               { label: 'Middle Name', value: middleName, setter: setMiddleName },
               { label: 'Last Name', value: lastName, setter: setLastName },
-              // { label: 'Suffix', value: suffix, setter: setSuffix },
+              { label: 'Suffix', value: suffix, setter: setSuffix },
               // { label: 'Accreditations', value: accreditations, setter: setAccreditations },
               // { label: 'Preferred Name', value: preferredName, setter: setPreferredName },
               // { label: 'Maiden Name', value: maidenName, setter: setMaidenName },
@@ -2054,32 +2080,8 @@ const EditPage = () => {
                 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="17" x2="12" y2="11"></line><line x1="9" y1="14" x2="12" y2="11"></line><line x1="15" y1="14" x2="12" y2="11"></line></svg>
-                {resumeFile ? resumeFile.name : (documentUrl ? 'Replace Document' : 'Upload Document')}
+                {resumeFile ? resumeFile.name : 'Upload Document'}
               </button>
-              {documentUrl && (
-                <button
-                  onClick={() => {
-                    setDocumentUrl(null);
-                    setResumeFile(null);
-                    // Here you might want to call an API to delete the document from the server
-                  }}
-                  style={{
-                    backgroundColor: '#f44336',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '10px 15px',
-                    fontSize: '14px',
-                    color: 'white',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Remove
-                </button>
-              )}
-            </div>
-
-            <div style={{ marginBottom: '15px' }}>
-              {documentUrl && <a href={documentUrl} target="_blank" rel="noopener noreferrer">View Document</a>}
             </div>
 
           </div>
@@ -2532,7 +2534,7 @@ const EditPage = () => {
                   border: '1px solid #145dfd',
                   borderRadius: '8px',
                   boxSizing: 'border-box',
-                  outline: 'none',
+                  outline: 'none'
                 }}
               />
             </div>
@@ -2554,9 +2556,86 @@ const EditPage = () => {
                   appearance: 'none',
                 }}
               >
-                <option value="Personal">Personal</option>
-                <option value="Professional">Professional</option>
+                <option value="">Select card type...</option>
+                {getAllCardTypes().map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
               </select>
+              
+              {/* Custom Type Input */}
+              {!showCustomTypeInput ? (
+                <button
+                  type="button"
+                  onClick={() => setShowCustomTypeInput(true)}
+                  style={{
+                    marginTop: '8px',
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    color: selectedColor1 || '#2563eb',
+                    background: 'transparent',
+                    border: `1px solid ${selectedColor1 || '#2563eb'}`,
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  + Add custom type
+                </button>
+              ) : (
+                <div style={{ marginTop: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    value={customTypeInput}
+                    onChange={(e) => setCustomTypeInput(e.target.value)}
+                    placeholder="Enter custom type..."
+                    style={{
+                      flex: 1,
+                      padding: '6px 8px',
+                      fontSize: '12px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      outline: 'none'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomType}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      color: 'white',
+                      background: selectedColor1 || '#2563eb',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      outline: 'none'
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCustomTypeInput(false);
+                      setCustomTypeInput('');
+                    }}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      color: '#666',
+                      background: 'transparent',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      outline: 'none'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         );

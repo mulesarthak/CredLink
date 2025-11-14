@@ -26,7 +26,7 @@ type ContactOption = {
 type Faq = { q: string; a: string };
 
 export default function SupportPage() {
-  const [activeFaq, setActiveFaq] = useState<number | null>(0);
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [showChatModal, setShowChatModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
@@ -44,14 +44,11 @@ export default function SupportPage() {
   ], []);
 
   const faqs = useMemo<Faq[]>(() => [
-    {
-      q: "I forgot my password. What should I do?",
-      a: "If you've forgotten your password, go to Account Settings and use the Reset Password option. You'll receive an email with a link to securely create a new password.",
+      {
+      q: "How does MyKard works",
+      a: "1)Create Your Profile – Add your professional details.2) Customize Your Card – Personalize with themes and logos.3)Share Anywhere – Use your link or QR code instantly.4)Track Insights – Monitor views, leads, and engagement.",
     },
-    {
-      q: "How can I view my analytics?",
-      a: "Open your Dashboard and check the Analytics card section. You can view engagement, profile visits, and connection stats in real time.",
-    },
+   
     {
       q: "How can I search for a professional?",
       a: "In the Dashboard, use the Search feature at the top. You can search by name, category, or email to quickly find any professional profile.",
@@ -60,6 +57,17 @@ export default function SupportPage() {
       q: "How can I see my connections?",
       a: "Go to your Dashboard and click on the Connections tab. You'll see all your active and pending connections in one place.",
     },
+
+    {
+      q: "How much does it cost to get started?",
+      a: "You can get started for free with a basic MyKard.Just click “Create Your Free Card Now” on the homepage to begin designing your digital card.",
+    },
+    {
+      q: "How does MyKard help grow my professional network?",
+      a: "MyKard helps you connect instantly through shareable QR or link — whether at events, meetings, or online.You can discover professionals, entrepreneurs, and creators nearby or in your industry, and stay connected effortlessly.",
+    },
+   
+
   ], []);
 
   const handleFaqToggle = useCallback((i: number) => {

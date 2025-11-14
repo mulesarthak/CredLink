@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "react-hot-toast";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaCheckCircle } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 /**
  * Single-file inline-styled Account Settings page
@@ -461,7 +462,11 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
-  const [phoneNumber, setPhoneNumber] = useState<string>("+1234567890");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [isPhoneVerified, setIsPhoneVerified] = useState<boolean>(false);
+  const [showOtpModal, setShowOtpModal] = useState<boolean>(false);
+  const [isEditingPhone, setIsEditingPhone] = useState<boolean>(false);
+  const [tempPhoneNumber, setTempPhoneNumber] = useState<string>("");
 
   // modals / flows
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
@@ -550,6 +555,74 @@ export default function AccountSettingsPage(): React.JSX.Element {
   const handleRemovePhoto = () => {
     setAccountPhoto(null);
     alert('Profile photo removed from UI.');
+  };
+
+  // Send OTP function
+  const handleSendOTP = () => {
+    toast.success("OTP sent to " + phoneNumber);
+    setShowOtpModal(true);
+  };
+
+  // OTP verification function (always returns wrong)
+  const handleVerifyOTP = (otpValue: string) => {
+    if (otpValue.length !== 6) {
+      toast.error("Please enter complete OTP");
+      return;
+    }
+    
+    // Always show wrong OTP message
+    setTimeout(() => {
+      toast.error("Wrong OTP entered. Please try again.");
+    }, 1000);
+  };
+
+  // Handle phone number editing
+  const handleEditPhone = () => {
+    setTempPhoneNumber(phoneNumber);
+    setIsEditingPhone(true);
+  };
+
+  // Handle phone number save
+  const handleSavePhone = async () => {
+    if (!tempPhoneNumber.trim()) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
+
+    // Validate phone number format (basic validation)
+    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+    if (!phoneRegex.test(tempPhoneNumber.replace(/\s/g, ''))) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
+
+    try {
+      // Save phone number to backend
+      const res = await fetch("/api/profile/update-phone", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ phone: tempPhoneNumber })
+      });
+
+      if (res.ok) {
+        setPhoneNumber(tempPhoneNumber);
+        setIsEditingPhone(false);
+        setIsPhoneVerified(false); // Reset verification status
+        toast.success("Phone number updated successfully");
+      } else {
+        toast.error("Failed to update phone number");
+      }
+    } catch (error) {
+      console.error("Error updating phone:", error);
+      toast.error("Failed to update phone number");
+    }
+  };
+
+  // Handle cancel phone editing
+  const handleCancelPhoneEdit = () => {
+    setTempPhoneNumber("");
+    setIsEditingPhone(false);
   };
 
   const handleDeleteReasonToggle = (reason: string) => {
@@ -840,6 +913,166 @@ export default function AccountSettingsPage(): React.JSX.Element {
             </div>
           </div>
 
+          {/* Phone Number row */}
+          <div style={merge(S.formRow, isMobile ? S.formRowMobile : undefined)}>
+            <label style={merge({
+              width: 170,
+              color: "#4B5563",
+              fontWeight: 600,
+              fontSize: 14
+            }, isMobile ? S.formLabelMobile : undefined)}>Phone Number</label>
+            <div style={merge(S.formControl, isMobile ? S.formControlMobile : undefined)}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                
+                {/* Phone number display or input */}
+                {isEditingPhone ? (
+                  // Phone number input mode
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <input
+                      type="tel"
+                      value={tempPhoneNumber}
+                      onChange={(e) => setTempPhoneNumber(e.target.value)}
+                      placeholder="Enter phone number (e.g., +1234567890)"
+                      onFocus={() => setFocusedInput("phone")}
+                      onBlur={() => setFocusedInput(null)}
+                      style={merge(
+                        S.input,
+                        S.inputMobile,
+                        focusedInput === "phone" ? S.inputFocus : undefined
+                      )}
+                    />
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button
+                        onClick={handleSavePhone}
+                        style={{
+                          ...S.primaryBase,
+                          background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+                          fontSize: "12px",
+                          padding: "6px 12px"
+                        }}
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={handleCancelPhoneEdit}
+                        style={{
+                          ...S.primaryBase,
+                          background: "#6B7280",
+                          fontSize: "12px",
+                          padding: "6px 12px"
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Phone number display mode
+                  <>
+                    {phoneNumber ? (
+                      // When phone number exists
+                      <div style={{
+                        ...S.inputStatic,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px"
+                      }}>
+                        <span>{phoneNumber}</span>
+                        {isPhoneVerified ? (
+                          <div style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            background: "#D1FAE5",
+                            color: "#065F46",
+                            padding: "2px 8px",
+                            borderRadius: "12px",
+                            fontSize: "12px",
+                            fontWeight: 600
+                          }}>
+                            <FaCheckCircle style={{ fontSize: "12px" }} />
+                            Verified
+                          </div>
+                        ) : (
+                          <>
+                            <div style={{
+                              background: "#FEF3C7",
+                              color: "#92400E",
+                              padding: "2px 8px",
+                              borderRadius: "12px",
+                              fontSize: "12px",
+                              fontWeight: 600
+                            }}>
+                              Not Verified
+                            </div>
+                            <button
+                              onClick={handleEditPhone}
+                              style={{
+                                background: "none",
+                                border: "1px solid #D1D5DB",
+                                color: "#6B7280",
+                                fontSize: "12px",
+                                padding: "4px 8px",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                                fontWeight: 500,
+                                marginLeft: "auto"
+                              }}
+                            >
+                              Edit
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      // When no phone number
+                      <div style={{
+                        ...S.inputStatic,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between"
+                      }}>
+                        <span>Not provided</span>
+                        <button
+                          onClick={handleEditPhone}
+                          style={{
+                            background: "none",
+                            border: "1px solid #D1D5DB",
+                            color: "#6B7280",
+                            fontSize: "12px",
+                            padding: "4px 8px",
+                            borderRadius: "6px",
+                            cursor: "pointer",
+                            fontWeight: 500
+                          }}
+                        >
+                          Add Phone
+                        </button>
+                      </div>
+                    )}
+                    
+                    {/* Send OTP button */}
+                    {phoneNumber && !isPhoneVerified && (
+                      <button
+                        onClick={handleSendOTP}
+                        style={{
+                          ...S.primaryBase,
+                          background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+                          fontSize: "12px",
+                          padding: "8px 16px",
+                          alignSelf: "flex-start",
+                          minWidth: "120px"
+                        }}
+                      >
+                        Send OTP
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Password row */}
           <div style={merge(S.formRow, isMobile ? S.formRowMobile : undefined)}>
             <label style={merge({
@@ -1050,6 +1283,220 @@ export default function AccountSettingsPage(): React.JSX.Element {
           </div>
         </div>
       )}
+
+      {/* OTP Verification Modal */}
+      {showOtpModal && (
+        <OTPModal
+          phoneNumber={phoneNumber}
+          onClose={() => setShowOtpModal(false)}
+          onVerify={handleVerifyOTP}
+        />
+      )}
+    </div>
+  );
+}
+
+// OTP Modal Component
+function OTPModal({ phoneNumber, onClose, onVerify }: {
+  phoneNumber: string;
+  onClose: () => void;
+  onVerify: (otp: string) => void;
+}) {
+  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  useEffect(() => {
+    inputRefs.current[0]?.focus();
+  }, []);
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (value.length > 1) return;
+    
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleSubmit = () => {
+    const otpString = otp.join("");
+    setIsVerifying(true);
+    onVerify(otpString);
+    setTimeout(() => {
+      setIsVerifying(false);
+      setOtp(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
+    }, 1000);
+  };
+
+  const handleResend = () => {
+    toast.success("OTP resent to " + phoneNumber);
+    setOtp(["", "", "", "", "", ""]);
+    inputRefs.current[0]?.focus();
+  };
+
+  return (
+    <div style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0, 0, 0, 0.5)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1000,
+      padding: "20px"
+    }}>
+      <div style={{
+        background: "white",
+        borderRadius: "16px",
+        padding: "32px",
+        width: "100%",
+        maxWidth: "400px",
+        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)"
+      }}>
+        {/* Header */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "24px"
+        }}>
+          <h3 style={{
+            fontSize: "20px",
+            fontWeight: 700,
+            color: "#1F2937",
+            margin: 0
+          }}>
+            Verify Phone Number
+          </h3>
+          <button
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              fontSize: "20px",
+              color: "#6B7280",
+              cursor: "pointer",
+              padding: "4px"
+            }}
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Content */}
+        <div style={{ textAlign: "center" }}>
+          <div style={{
+            fontSize: "48px",
+            marginBottom: "16px"
+          }}>
+            📱
+          </div>
+          
+          <p style={{
+            color: "#6B7280",
+            fontSize: "14px",
+            margin: "0 0 8px 0"
+          }}>
+            We've sent a 6-digit code to
+          </p>
+          
+          <p style={{
+            color: "#1F2937",
+            fontSize: "16px",
+            fontWeight: 600,
+            margin: "0 0 24px 0"
+          }}>
+            {phoneNumber}
+          </p>
+
+          {/* OTP Inputs */}
+          <div style={{
+            display: "flex",
+            gap: "8px",
+            justifyContent: "center",
+            marginBottom: "24px"
+          }}>
+            {otp.map((digit, index) => (
+              <input
+                key={index}
+                ref={(el) => {
+                  inputRefs.current[index] = el;
+                }}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleOtpChange(index, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(index, e)}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  border: digit ? "2px solid #2563EB" : "2px solid #E5E7EB",
+                  borderRadius: "8px",
+                  textAlign: "center",
+                  fontSize: "16px",
+                  fontWeight: 600,
+                  color: "#1F2937",
+                  outline: "none",
+                  background: digit ? "#EFF6FF" : "white"
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Verify Button */}
+          <button
+            onClick={handleSubmit}
+            disabled={isVerifying || otp.join("").length !== 6}
+            style={{
+              width: "100%",
+              background: (isVerifying || otp.join("").length !== 6) 
+                ? "#9CA3AF" 
+                : "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+              color: "white",
+              border: "none",
+              borderRadius: "12px",
+              padding: "12px",
+              fontSize: "14px",
+              fontWeight: 600,
+              cursor: (isVerifying || otp.join("").length !== 6) ? "not-allowed" : "pointer",
+              marginBottom: "16px"
+            }}
+          >
+            {isVerifying ? "Verifying..." : "Verify OTP"}
+          </button>
+
+          {/* Resend */}
+          <div style={{ fontSize: "14px", color: "#6B7280" }}>
+            Didn't receive the code?{" "}
+            <button
+              onClick={handleResend}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#2563EB",
+                fontSize: "14px",
+                fontWeight: 600,
+                cursor: "pointer",
+                textDecoration: "underline"
+              }}
+            >
+              Resend OTP
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

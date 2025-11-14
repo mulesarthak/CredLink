@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Shield,
   Key,
@@ -15,6 +16,7 @@ import {
   Trash2,
   Search,
   X,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -50,6 +52,7 @@ const ROLE_PERMISSIONS = {
 } as const;
 
 export default function AdminSettingsPage() {
+  const router = useRouter();
   const [admin, setAdmin] = useState<AdminData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +62,7 @@ export default function AdminSettingsPage() {
     confirmPassword: "",
   });
   const [saving, setSaving] = useState(false);
-  const [show, setShow] = useState({ current: false, new: false, confirm: false });
+  const [show, setShow] = useState({ currentPassword: false, newPassword: false, confirmPassword: false });
 
   const [users, setUsers] = useState<AppUser[]>([
     {
@@ -102,7 +105,7 @@ export default function AdminSettingsPage() {
     // Mock current admin
     const mock: AdminData = {
       id: "1",
-      email: "admin@credlink.com",
+      email: "admin@MyKard.com",
       fullName: "Admin User",
       role: "Admin", // change to test: "Super Admin" | "Admin" | "Sub Admin"
     };
@@ -190,6 +193,23 @@ export default function AdminSettingsPage() {
     setIsModalOpen(false);
   };
 
+  // Navigation functions
+  const goBackToDashboard = () => {
+    router.push("/admin/dashboard");
+  };
+
+  const navigateToUsers = () => {
+    router.push("/admin/users");
+  };
+
+  const navigateToManageAdmins = () => {
+    router.push("/admin/manage-admins");
+  };
+
+  const navigateToSupport = () => {
+    router.push("/admin/support");
+  };
+
   if (loading)
     return (
       <div className="h-screen flex items-center justify-center text-slate-600">
@@ -273,7 +293,7 @@ export default function AdminSettingsPage() {
             <form onSubmit={handlePasswordChange} className="mt-4 space-y-4">
               {(["currentPassword", "newPassword", "confirmPassword"] as const).map(
                 (field, idx) => {
-                  const showKey = field === "currentPassword" ? "current" : field === "newPassword" ? "new" : "confirm";
+                  const showKey = field;
                   return (
                     <div key={field} className="space-y-1.5">
                       <label className={label}>

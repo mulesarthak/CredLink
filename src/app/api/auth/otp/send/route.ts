@@ -38,7 +38,7 @@ export async function POST(request: Request) {
         const body = new URLSearchParams({
           To: e164To,
           From: from,
-          Body: `Your CredLink verification code is ${otp}`,
+          Body: `Your MyKard verification code is ${otp}`,
         })
         const twilioRes = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
           method: 'POST',

@@ -10,20 +10,20 @@ interface FAQItem {
 
 const faqData: FAQItem[] = [
   {
-    question: "How do I get started with CredLink?",
+    question: "How do I get started with MyKard?",
     answer: "Getting started is easy! Simply sign up for an account, choose your plan, and follow our onboarding process. Our team will guide you through the setup."
   },
   {
     question: "What types of credentials can I manage?",
-    answer: "CredLink supports various types of credentials including educational certificates, professional certifications, licenses, and custom credentials from any issuing organization."
+    answer: "MyKard supports various types of credentials including educational certificates, professional certifications, licenses, and custom credentials from any issuing organization."
   },
   {
     question: "Is my data secure?",
     answer: "Yes, we use industry-standard encryption and security protocols to protect your data. All credentials are stored securely and access is controlled through advanced authentication methods."
   },
   {
-    question: "Can I integrate CredLink with other systems?",
-    answer: "Absolutely! CredLink offers robust API integration capabilities that allow you to connect with your existing HR systems, learning management systems, and other platforms."
+    question: "Can I integrate MyKard with other systems?",
+    answer: "Absolutely! MyKard offers robust API integration capabilities that allow you to connect with your existing HR systems, learning management systems, and other platforms."
   },
   {
     question: "What support options are available?",
@@ -109,8 +109,8 @@ export default function ContactPage() {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Email Us</h3>
                     
-                    <a href="mailto:hello@credlink.com" className="text-purple-600 hover:text-purple-700 font-medium">
-                      hello@credlink.com
+                    <a href="mailto:hello@MyKard.com" className="text-purple-600 hover:text-purple-700 font-medium">
+                      hello@MyKard.com
                     </a>
                   </div>
                 </div>
