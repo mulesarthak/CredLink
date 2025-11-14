@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
     // Fetch all card connections where the user is the owner
     // For existing records without ownerUserId, we'll also fetch by card ownership
-    const connections = await prisma.cardConnection.findMany({
+    const connections = await (prisma as any).cardConnection.findMany({
       where: { 
         OR: [
           { ownerUserId: userId },

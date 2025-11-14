@@ -698,20 +698,6 @@ export default function MessagesPage() {
           </div>
         </div>
       )}
-      <style jsx>{`
-        .no-scrollbar {
-          -ms-overflow-style: none; /* IE and Edge */
-          scrollbar-width: none; /* Firefox */
-        }
-        .no-scrollbar::-webkit-scrollbar {
-          display: none; /* Chrome, Safari, Opera */
-        }
-        .message-text-left {
-          text-align: left !important;
-          direction: ltr !important;
-          unicode-bidi: embed !important;
-        }
-      `}</style>
     </div>
   );
 }
