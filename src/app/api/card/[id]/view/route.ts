@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getToken } from "next-auth/jwt";
 
 // POST - Increment view count for a card
 export async function POST(
@@ -9,17 +10,25 @@ export async function POST(
   try {
     const { id: cardId } = await params;
 
-    // Check if card exists
+    // Fetch card with owner for comparison
     const card = await prisma.card.findUnique({
       where: { id: cardId },
-      select: { id: true, views: true }
+      select: { id: true, views: true, userId: true }
     });
 
     if (!card) {
       return NextResponse.json({ error: 'Card not found' }, { status: 404 });
     }
 
-    // Increment views count
+    // Get current session token (if any)
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+
+    // If the viewer is the owner, do NOT increment
+    if (token?.id && token.id === card.userId) {
+      return NextResponse.json({ success: true, message: 'Owner view ignored' });
+    }
+
+    // Increment views count for any other viewer
     await prisma.$executeRaw`UPDATE cards SET views = views + 1 WHERE id = ${cardId}`;
 
     return NextResponse.json({ 

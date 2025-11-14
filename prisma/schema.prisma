@@ -152,6 +152,7 @@ model Card {
   profileImage     String?  @map("profile_image") @db.VarChar(2048)
   bannerImage      String?  @map("banner_image") @db.VarChar(2048)
   coverImage       String?  @map("cover_image") @db.VarChar(2048)
+  documentUrl      String?  @map("document_url") @db.VarChar(2048)
   
   // Content
   bio              String?  @db.Text

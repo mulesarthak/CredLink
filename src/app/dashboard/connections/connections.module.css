@@ -1803,7 +1803,11 @@
 }
 
 .modalBody {
-  padding: 20px;
+  padding: 0; /* the Modal box already has inner padding */
+  margin: 0 0 0; /* subtle spacing below header */
+  text-align: left; /* left align description */
+  color: #475569; /* keep same tone as rest of UI */
+  line-height: 1.5;
 }
 
 .modalTextarea {
@@ -1835,6 +1839,9 @@
   padding: 8px 16px;
   border-radius: 8px;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* center text */
   background-color: #f3f4f6;
   color: #374151;
   transition: all 150ms;
@@ -1848,6 +1855,9 @@
   padding: 8px 16px;
   border-radius: 8px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* center text */
   background-color: #2563eb;
   color: white;
   display: flex;
