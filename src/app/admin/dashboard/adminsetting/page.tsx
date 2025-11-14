@@ -293,7 +293,7 @@ export default function AdminSettingsPage() {
             <form onSubmit={handlePasswordChange} className="mt-4 space-y-4">
               {(["currentPassword", "newPassword", "confirmPassword"] as const).map(
                 (field, idx) => {
-                  const showKey = field === "currentPassword" ? "current" : field === "newPassword" ? "new" : "confirm";
+                  const showKey = field;
                   return (
                     <div key={field} className="space-y-1.5">
                       <label className={label}>
