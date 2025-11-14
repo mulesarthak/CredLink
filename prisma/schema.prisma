@@ -54,7 +54,7 @@ model User {
   cards            Card[]    @relation("UserCards")
   receivedMessages Message[] @relation("ReceivedMessages")
   sentMessages     Message[] @relation("SentMessages")
-  cards            Card[]
+  
   contacts         Contact[]
 
   @@index([username])

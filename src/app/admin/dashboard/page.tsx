@@ -99,10 +99,10 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
             </div>
-            <button onClick={handleLogout} className={styles.logoutBtn}>
+            {/* <button onClick={handleLogout} className={styles.logoutBtn}>
               <LogOut />
               Logout
-            </button>
+            </button> */}
           </div>
         </div>
 
