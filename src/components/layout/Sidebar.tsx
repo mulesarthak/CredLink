@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   Users2,
+  Users,
   Search,
   Settings2,
   HelpCircle,
@@ -114,6 +115,7 @@ const Sidebar = () => {
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard /> },
     { name: "Messages", path: "/dashboard/messages", icon: <MessageSquare /> },
     { name: "Connections", path: "/dashboard/connections", icon: <Users2 /> },
+    { name: "Contacts", path: "/dashboard/contacts", icon: <Users /> },
     { name: "Search", path: "/dashboard/search", icon: <Search /> },
   ];
 

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import { AuthProvider } from "@/components/providers/auth-provider";
-import { ToastProvider } from "@/components/providers/toast-provider";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -41,7 +40,6 @@ export default function RootLayout({
       >
         <AuthProvider>
           {children}
-          <ToastProvider />
         </AuthProvider>
       </body>
     </html>

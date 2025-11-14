@@ -92,30 +92,30 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
-      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      const items = skillsList;
       return (
         <div style={{ padding: isMobile ? 12 : 16 }}>
-          {items.map((it, idx) => renderItem(it))}
+          {items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}
         </div>
       );
     }
     if (section === 'Services') {
       // Changed to use prop
-      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = servicesList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Portfolio') {
-      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = portfolioList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Experience') {
-      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = experienceList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Review') {
       // Changed to use prop
-      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = reviewList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     return null;
   };
@@ -220,12 +220,14 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         {/* Pills */}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
           {[
-            { text: "Services" },
-            { text: "Portfolio" },
-            { text: "Skills" },
-            { text: "Experience" },
-            { text: "Review" },
-          ].map((b) => (
+            { text: "Services", value: services },
+            { text: "Portfolio", value: portfolio },
+            { text: "Skills", value: skills },
+            { text: "Experience", value: experience },
+            { text: "Review", value: review },
+          ]
+          .filter(b => b.value && b.value.trim() !== '')
+          .map((b) => (
             <button
               key={b.text}
               onClick={() => setActivePanel(b.text as Section)}
@@ -311,28 +313,28 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
-      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      const items = skillsList;
       return (
         <div style={{ padding: isMobile ? 12 : 16 }}>
-          {items.map((it, idx) => renderItem(it))}
+          {items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}
         </div>
       );
     }
     if (section === 'Services') {
-      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = servicesList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Portfolio') {
-      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = portfolioList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Experience') {
-      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = experienceList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Review') {
-      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = reviewList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     return null;
   };
@@ -390,7 +392,7 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
             border: "1px solid rgba(255, 255, 255, 0.4)"
           }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.63A2 2 0 01 3.08 2h3a2 2 0 01 2 1.72 12.84 12.84 0 00 .7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 00 6 6l1.27-1.27a2 2 0 01 2.11-.45 12.84 12.84 0 00 2.81.7A2 2 0 01 22 16.92z"/>
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.63A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
             </svg>
           </a>
           <a href={linkedin} style={{
@@ -418,12 +420,14 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
         {/* Pills Section */}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
           {[
-            { text: "Services" },
-            { text: "Portfolio" },
-            { text: "Skills" },
-            { text: "Experience" },
-            { text: "Review" },
-          ].map((b) => (
+            { text: "Services", value: services },
+            { text: "Portfolio", value: portfolio },
+            { text: "Skills", value: skills },
+            { text: "Experience", value: experience },
+            { text: "Review", value: review },
+          ]
+          .filter(b => b.value && b.value.trim() !== '')
+          .map((b) => (
             <button
               key={b.text}
               onClick={() => setActivePanel(b.text as Section)}
@@ -513,7 +517,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
-      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      const items = skillsList;
       return (
         <div style={{ padding: isMobile ? 12 : 16 }}>
           {items.map((it, idx) => renderItem(it))}
@@ -521,20 +525,20 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
       );
     }
     if (section === 'Services') {
-      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = servicesList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Portfolio') {
-      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = portfolioList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Experience') {
-      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = experienceList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Review') {
-      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = reviewList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     return null;
   };
@@ -638,12 +642,14 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
         {/* Pills Section */}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
           {[
-            { text: "Services" },
-            { text: "Portfolio" },
-            { text: "Skills" },
-            { text: "Experience" },
-            { text: "Review" },
-          ].map((b) => (
+            { text: "Services", value: services },
+            { text: "Portfolio", value: portfolio },
+            { text: "Skills", value: skills },
+            { text: "Experience", value: experience },
+            { text: "Review", value: review },
+          ]
+          .filter(b => b.value && b.value.trim() !== '')
+          .map((b) => (
             <button
               key={b.text}
               onClick={() => setActivePanel(b.text as Section)}
@@ -733,28 +739,28 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
-      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      const items = skillsList;
       return (
         <div style={{ padding: isMobile ? 12 : 16 }}>
-          {items.map((it, idx) => renderItem(it))}
+          {items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}
         </div>
       );
     }
     if (section === 'Services') {
-      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = servicesList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Portfolio') {
-      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = portfolioList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Experience') {
-      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = experienceList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Review') {
-      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
-      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it) => renderItem(it))}</div>;
+      const items = reviewList;
+      return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     return null;
   };
@@ -915,14 +921,14 @@ interface ExtraField {
 
 const EditPage = () => {
   const [activeTab, setActiveTab] = useState('Display');
-  const [selectedColor1, setSelectedColor1] = useState('#145dfd');
-  const [selectedColor2, setSelectedColor2] = useState('#00c0fd'); // New state for second color
-  const [firstName, setFirstName] = useState('Yaasnick');
-  const [email, setEmail] = useState('yaasnick01@gmail.com');
-  const [phone, setPhone] = useState('+91 75584 24907');
+  const [selectedColor1, setSelectedColor1] = useState('');
+  const [selectedColor2, setSelectedColor2] = useState(''); 
+  const [firstName, setFirstName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [emailLink, setEmailLink] = useState('');
   const [phoneLink, setPhoneLink] = useState('');
-  const [selectedDesign, setSelectedDesign] = useState('Classic');
+  const [selectedDesign, setSelectedDesign] = useState('');
   const [prefix, setPrefix] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -932,31 +938,75 @@ const EditPage = () => {
   const [maidenName, setMaidenName] = useState('');
   const [pronouns, setPronouns] = useState('');
   const [affiliation, setAffiliation] = useState('');
-  const [title, setTitle] = useState('Software Designer'); // Added default
+  const [title, setTitle] = useState('');
   const [department, setDepartment] = useState('');
-  const [company, setCompany] = useState('MyKard'); // Added default
+  const [company, setCompany] = useState('');
   const [headline, setHeadline] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [selectedFont, setSelectedFont] = useState('Arial, sans-serif');
+  const [selectedFont, setSelectedFont] = useState('');
   const [cardName, setCardName] = useState('');
-  const [cardType, setCardType] = useState('Personal');
+  const [cardType, setCardType] = useState('');
   const [bannerImage, setBannerImage] = useState<string | null>(null);
-  const [cardLocation, setCardLocation] = useState('California, USA');
+  const [cardLocation, setCardLocation] = useState('');
   
   // Renamed cardDescription to about
-  const [about, setAbout] = useState('A modern digital visiting card for software designer showcasing professional details, social links, and portfolio');
+  const [about, setAbout] = useState('');
 
   // --- NEW STATE for DigitalCardPreview ---
-  const [skills, setSkills] = useState('SEO, Content Creation, Analytics');
-  const [portfolio, setPortfolio] = useState('Case Study 1, Project X');
-  const [experience, setExperience] = useState('Lead Marketer @ MyKard (2023-Present)');
-  const [linkedin, setLinkedin] = useState('https://linkedin.com/in/yaasnick');
-  const [website, setWebsite] = useState('https://yaasnick.com');
+  const [skills, setSkills] = useState('');
+  const [portfolio, setPortfolio] = useState('');
+  const [experience, setExperience] = useState('');
+  const [linkedin, setLinkedin] = useState('');
+  const [website, setWebsite] = useState('');
   // --- ADDED NEW STATE ---
-  const [services, setServices] = useState('SEO Audits, Slogan Content Campaigns');
-  const [reviews, setReviews] = useState('John transformed our online presence!, Happy Client');
+  const [services, setServices] = useState('');
+  const [reviews, setReviews] = useState('');
   // --- END NEW STATE ---
+  
+  // Loading state for user data
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+
+  // Fetch current user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('/api/user/me', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const user = data.user;
+          
+          // Set user data with fallbacks
+          setFirstName(user.fullName?.split(' ')[0] || '');
+          setEmail(user.email || '');
+          setPhone(user.phone || '');
+          setProfileImage(user.profileImage || null);
+          
+          // Set some defaults
+          setSelectedColor1('#145dfd');
+          setSelectedColor2('#00c0fd');
+          setSelectedDesign('Classic');
+          setSelectedFont('Arial, sans-serif');
+          setCardType('Personal');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        // Set defaults even if fetch fails
+        setSelectedColor1('#145dfd');
+        setSelectedColor2('#00c0fd');
+        setSelectedDesign('Classic');
+        setSelectedFont('Arial, sans-serif');
+        setCardType('Personal');
+      } finally {
+        setIsLoadingUser(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   // --- NEW STATE for "Add Field" Modal ---
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -1217,6 +1267,11 @@ const EditPage = () => {
       if (selectedColor2) formData.append('selectedColor2', selectedColor2);
       if (selectedFont) formData.append('selectedFont', selectedFont);
       if (about) formData.append('bio', about);
+      if (skills) formData.append('skills', skills);
+      if (portfolio) formData.append('portfolio', portfolio);
+      if (experience) formData.append('experience', experience);
+      if (services) formData.append('services', services);
+      if (reviews) formData.append('review', reviews);
       
       formData.append('status', 'draft');
 
@@ -1244,7 +1299,7 @@ const EditPage = () => {
       // Success!
       setExistingCardId(data.card.id);
       setIsPopupOpen(true);
-      setPopupMessage('Card created successfully! 🎉');
+      setPopupMessage('Card created successfully!');
 
     } catch (error: any) {
       console.error('Error saving card:', error);
@@ -1819,11 +1874,9 @@ const EditPage = () => {
           <div>
             <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px', color: '#333' }}>Personal</h3>
             {[
-              { label: 'Prefix', value: prefix, setter: setPrefix },
               { label: 'First Name', value: firstName, setter: setFirstName },
               { label: 'Middle Name', value: middleName, setter: setMiddleName },
               { label: 'Last Name', value: lastName, setter: setLastName },
-              { label: 'Suffix', value: suffix, setter: setSuffix },
               { label: 'Title', value: title, setter: setTitle },
               { label: 'Company', value: company, setter: setCompany },
               { label: 'Location', value: cardLocation, setter: setCardLocation }
@@ -1870,43 +1923,6 @@ const EditPage = () => {
             
             {/* --- FIELDS MOVED TO "Fields" TAB --- */}
 
-
-            <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Upload Document</label>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                style={{ display: 'none' }}
-                id="resume-upload"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    setResumeFile(e.target.files[0]);
-                  }
-                }}
-              />
-              <button
-                onClick={() => document.getElementById('resume-upload')?.click()}
-                style={{
-                  backgroundColor: 'transparent',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  padding: '10px 15px',
-                  fontSize: '14px',
-                  color: '#555',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  outline: 'none',
-                  width: '100%',
-                  justifyContent: 'center'
-                }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="17" x2="12" y2="11"></line><line x1="9" y1="14" x2="12" y2="11"></line><line x1="15" y1="14" x2="12" y2="11"></line></svg>
-                {resumeFile ? resumeFile.name : 'Upload Document'}
-              </button>
-            </div>
-
           </div>
         );
       case 'Fields':
@@ -1920,9 +1936,9 @@ const EditPage = () => {
               {/* Email */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', marginBottom: '15px', backgroundColor: 'white' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Email
                   </span>
@@ -1965,9 +1981,9 @@ const EditPage = () => {
               {/* Phone */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Phone
                   </span>
@@ -2032,9 +2048,9 @@ const EditPage = () => {
               {/* Services */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Services
                   </span>
@@ -2066,9 +2082,9 @@ const EditPage = () => {
               {/* Portfolio */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Portfolio
                   </span>
@@ -2100,9 +2116,9 @@ const EditPage = () => {
               {/* Skills */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Skills
                   </span>
@@ -2134,9 +2150,9 @@ const EditPage = () => {
               {/* Experience */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Experience
                   </span>
@@ -2168,9 +2184,9 @@ const EditPage = () => {
               {/* Review */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Review
                   </span>
@@ -2202,9 +2218,9 @@ const EditPage = () => {
               {/* LinkedIn */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     LinkedIn
                   </span>
@@ -2230,9 +2246,9 @@ const EditPage = () => {
               {/* Website */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Website
                   </span>
@@ -2392,6 +2408,22 @@ const EditPage = () => {
         return null;
     }
   };
+
+  // Show loading while fetching user data
+  if (isLoadingUser) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh',
+        fontSize: '16px',
+        color: '#666'
+      }}>
+        Loading user information...
+      </div>
+    );
+  }
 
   return (
     <div style={{ 

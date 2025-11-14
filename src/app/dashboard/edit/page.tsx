@@ -349,9 +349,10 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
       {/* Cover Image Section */}
       <div style={{
         width: "100%", height: "120px", overflow: "hidden",
-        background: cover ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+        backgroundImage: cover ? "none" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
         backgroundSize: cover ? "cover" : "auto",
-        backgroundPosition: cover ? "center" : "initial"
+        backgroundPosition: cover ? "center" : "initial",
+        backgroundColor: cover ? "transparent" : "transparent"
       }}>
         {cover && (
           <img src={cover} alt="Cover" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -551,9 +552,10 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
       {/* Cover Image Section */}
       <div style={{
         width: "100%", height: "140px", overflow: "hidden",
-        background: cover ? "transparent" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+        backgroundImage: cover ? "none" : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
         backgroundSize: cover ? "cover" : "auto",
         backgroundPosition: cover ? "center" : "initial",
+        backgroundColor: cover ? "transparent" : "transparent",
         borderRadius: "20px 20px 0 0"
       }}>
         {cover && (
@@ -765,11 +767,11 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
     <div style={{
       width: "360px", borderRadius: "4px", overflow: "hidden",
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", fontFamily: fontFamily,
-      background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `1px solid #e5e5e5`, position: 'relative'
+      backgroundImage: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`, border: `1px solid #e5e5e5`, position: 'relative'
     }}>
       <div style={{
         height: "120px", 
-        background: cover ? `url(${cover})` : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
+        backgroundImage: cover ? `url(${cover})` : `linear-gradient(135deg, ${themeColor1}, ${themeColor2})`,
         backgroundSize: cover ? "cover" : "auto",
         backgroundPosition: cover ? "center" : "initial",
         position: "relative", display: "flex", alignItems: "flex-end", padding: "20px"
@@ -921,7 +923,6 @@ const EditPage = () => {
   const cardId = searchParams.get('id');
   
   const [activeTab, setActiveTab] = useState('Display');
-  const [selectedColor, setSelectedColor] = useState('#145dfd');
   const [selectedColor1, setSelectedColor1] = useState('#145dfd');
   const [selectedColor2, setSelectedColor2] = useState('#145dfd');
   const [firstName, setFirstName] = useState('');
@@ -952,38 +953,31 @@ const EditPage = () => {
   const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
   const [cardLocation, setCardLocation] = useState('California, USA');
   
-  // Renamed cardDescription to about
   const [about, setAbout] = useState('A modern digital visiting card for software designer showcasing professional details, social links, and portfolio');
 
-  // --- NEW STATE for DigitalCardPreview ---
   const [skills, setSkills] = useState('SEO, Content Creation, Analytics');
   const [portfolio, setPortfolio] = useState('Case Study 1, Project X');
   const [experience, setExperience] = useState('Lead Marketer @ MyKard (2023-Present)');
   const [linkedin, setLinkedin] = useState('https://linkedin.com/in/yaasnick');
   const [website, setWebsite] = useState('https://yaasnick.com');
-  // --- ADDED NEW STATE ---
   const [services, setServices] = useState('SEO Audits, Slogan Content Campaigns');
   const [reviews, setReviews] = useState('John transformed our online presence!, Happy Client');
-  // --- END NEW STATE ---
 
-  // --- NEW STATE for "Add Field" Modal ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newFieldName, setNewFieldName] = useState('');
   const [newFieldLink, setNewFieldLink] = useState('');
   const [extraFields, setExtraFields] = useState<ExtraField[]>([]);
-  // --- END NEW STATE ---
-
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [cardDescription, setCardDescription] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [displayTypes, setDisplayTypes] = useState<string[]>(['Classic']);
   const [existingCardId, setExistingCardId] = useState<string | null>(null);
 
   const hexToRgb = (hex: string) => {
-    // Ensure hex is valid
     if (!hex || hex.length < 4) hex = '#145DFD';
     const bigint = parseInt(hex.slice(1), 16);
     const r = (bigint >> 16) & 255;
@@ -1002,7 +996,7 @@ const EditPage = () => {
   const [bValue1, setBValue1] = useState(initialRgb1.b);
   const [hexValue1, setHexValue1] = useState(selectedColor1);
 
-  const initialRgb2 = hexToRgb(selectedColor2); // New state for second color
+  const initialRgb2 = hexToRgb(selectedColor2); 
   const [rValue2, setRValue2] = useState(initialRgb2.r);
   const [gValue2, setGValue2] = useState(initialRgb2.g);
   const [bValue2, setBValue2] = useState(initialRgb2.b);
@@ -1018,7 +1012,7 @@ const EditPage = () => {
     }
   }, [selectedColor1]);
 
-  React.useEffect(() => { // New useEffect for second color
+  React.useEffect(() => { 
     const newRgb2 = hexToRgb(selectedColor2);
     if (newRgb2) {
       setRValue2(newRgb2.r);
@@ -1028,7 +1022,6 @@ const EditPage = () => {
     }
   }, [selectedColor2]);
 
-  // Fetch card data if editing existing card
   useEffect(() => {
     const fetchCardData = async () => {
       if (!cardId) return;
@@ -1051,7 +1044,6 @@ const EditPage = () => {
           console.log('✅ Loaded card for editing:', data.card);
           const card = data.card;
           
-          // Populate all form fields with card data
           setFirstName(card.fullName || card.firstName || '');
           setMiddleName(card.middleName || '');
           setLastName(card.lastName || '');
@@ -1072,7 +1064,6 @@ const EditPage = () => {
           setAccreditations(card.accreditations || '');
           setCardLocation(card.location || '');
           setAbout(card.bio || card.about || card.description || '');
-          setCardDescription(card.description || '');
           setSkills(card.skills || '');
           setPortfolio(card.portfolio || '');
           setExperience(card.experience || '');
@@ -1153,7 +1144,74 @@ const EditPage = () => {
     }
   };
 
-  // Helper function to convert file to base64
+  const handleColorInputChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const hex = e.target.value.toUpperCase();
+    setHexValue1(hex);
+    const newRgb = hexToRgb(hex);
+    setRValue1(newRgb.r);
+    setGValue1(newRgb.g);
+    setBValue1(newRgb.b);
+    setSelectedColor1(hex);
+  };
+
+  const handleRChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const r = Number(e.target.value);
+    if (!isNaN(r) && r >= 0 && r <= 255) {
+      setRValue2(r);
+      const newHex = rgbToHex(r, gValue2, bValue2);
+      setHexValue2(newHex);
+      setSelectedColor2(newHex);
+    }
+  };
+
+  const handleGChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const g = Number(e.target.value);
+    if (!isNaN(g) && g >= 0 && g <= 255) {
+      setGValue2(g);
+      const newHex = rgbToHex(rValue2, g, bValue2);
+      setHexValue2(newHex);
+      setSelectedColor2(newHex);
+    }
+  };
+
+  const handleBChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const b = Number(e.target.value);
+    if (!isNaN(b) && b >= 0 && b <= 255) {
+      setBValue2(b);
+      const newHex = rgbToHex(rValue2, gValue2, b);
+      setHexValue2(newHex);
+      setSelectedColor2(newHex);
+    }
+  };
+
+  const handleHexChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let hex = e.target.value.toUpperCase();
+    if (!hex.startsWith('#')) {
+        hex = '#' + hex;
+    }
+    
+    if (/^#([0-9A-F]{3}){1,2}$/i.test(hex)) {
+        setHexValue2(hex);
+        const newRgb = hexToRgb(hex);
+        if(newRgb) {
+            setRValue2(newRgb.r);
+            setGValue2(newRgb.g);
+            setBValue2(newRgb.b);
+            setSelectedColor2(hex);
+        }
+    }
+  };
+
+  const handleColorInputChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const hex = e.target.value.toUpperCase();
+    setHexValue2(hex);
+    const newRgb = hexToRgb(hex);
+    setRValue2(newRgb.r);
+    setGValue2(newRgb.g);
+    setBValue2(newRgb.b);
+    setSelectedColor2(hex);
+  };
+
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -1163,73 +1221,6 @@ const EditPage = () => {
     });
   };
 
-  const [rValue, setRValue] = useState(20);
-  const [gValue, setGValue] = useState(93);
-  const [bValue, setBValue] = useState(253);
-  const [hexValue, setHexValue] = useState('#145dfd');
-
-  // Update RGB values when selectedColor changes
-  React.useEffect(() => {
-    const newRgb = hexToRgb(selectedColor);
-    setRValue(newRgb.r);
-    setGValue(newRgb.g);
-    setBValue(newRgb.b);
-    setHexValue(selectedColor);
-  }, [selectedColor]);
-
-  const handleRChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const r = Number(e.target.value);
-    if (!isNaN(r) && r >= 0 && r <= 255) {
-      setRValue(r);
-      const newHex = rgbToHex(r, gValue, bValue);
-      setHexValue(newHex);
-      setSelectedColor(newHex);
-    }
-  };
-
-  const handleGChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const g = Number(e.target.value);
-    if (!isNaN(g) && g >= 0 && g <= 255) {
-      setGValue(g);
-      const newHex = rgbToHex(rValue, g, bValue);
-      setHexValue(newHex);
-      setSelectedColor(newHex);
-    }
-  };
-
-  const handleBChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const b = Number(e.target.value);
-    if (!isNaN(b) && b >= 0 && b <= 255) {
-      setBValue(b);
-      const newHex = rgbToHex(rValue, gValue, b);
-      setHexValue(newHex);
-      setSelectedColor(newHex);
-    }
-  };
-
-  const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const hex = e.target.value.toUpperCase();
-    if (/^#([0-9A-F]{3}){1,2}$/.test(hex)) {
-      setHexValue(hex);
-      const newRgb = hexToRgb(hex);
-      setRValue(newRgb.r);
-      setGValue(newRgb.g);
-      setBValue(newRgb.b);
-      setSelectedColor(hex);
-    }
-  };
-
-  const handleColorInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const hex = e.target.value.toUpperCase();
-    setHexValue(hex);
-    const newRgb = hexToRgb(hex);
-    setRValue(newRgb.r);
-    setGValue(newRgb.g);
-    setBValue(newRgb.b);
-    setSelectedColor(hex);
-  };
-
-  // --- NEW HANDLER FUNCTIONS for "Add Field" ---
   const handleAddField = () => {
     if (newFieldName.trim()) {
       const newField: ExtraField = {
@@ -1253,14 +1244,11 @@ const EditPage = () => {
       field.id === id ? { ...field, link: value } : field
     ));
   };
-  // --- END NEW HANDLER FUNCTIONS ---
 
-  // Save card function
   const handleSaveCard = async () => {
     try {
       setIsSaving(true);
 
-      // Validate required fields
       const fullName = `${prefix} ${firstName} ${middleName} ${lastName} ${suffix}`.trim();
       const finalName = cardName || fullName;
       
@@ -1271,10 +1259,8 @@ const EditPage = () => {
         return;
       }
 
-      // Create FormData
       const formData = new FormData();
       
-      // Add all the card fields
       formData.append('fullName', finalName);
       if (firstName) formData.append('firstName', firstName);
       if (middleName) formData.append('middleName', middleName);
@@ -1304,7 +1290,11 @@ const EditPage = () => {
       if (selectedColor2) formData.append('selectedColor2', selectedColor2);
       if (selectedFont) formData.append('selectedFont', selectedFont);
       if (about) formData.append('bio', about);
-      if (cardDescription) formData.append('description', cardDescription);
+      if (skills) formData.append('skills', skills);
+      if (portfolio) formData.append('portfolio', portfolio);
+      if (experience) formData.append('experience', experience);
+      if (services) formData.append('services', services);
+      if (reviews) formData.append('review', reviews);
       
       formData.append('status', 'draft');
 
@@ -1342,7 +1332,7 @@ const EditPage = () => {
       // Success!
       setExistingCardId(data.card.id);
       setIsPopupOpen(true);
-      setPopupMessage(isUpdating ? 'Card updated successfully! 🎉' : 'Card created successfully! 🎉');
+      setPopupMessage(isUpdating ? 'Card updated successfully! ' : 'Card created successfully! ');
       
       // If we just created a card, update the URL to include the ID
       if (!isUpdating && data.card.id) {
@@ -1355,6 +1345,49 @@ const EditPage = () => {
       setPopupMessage(error.message || 'Failed to save card. Please try again.');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Delete card function
+  const handleDeleteCard = async () => {
+    if (!existingCardId && !cardId) {
+      toast.error('No card to delete');
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      console.log('🗑️ Deleting card:', existingCardId || cardId);
+
+      const response = await fetch('/api/card/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cardId: existingCardId || cardId
+        }),
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete card');
+      }
+
+      // Success!
+      toast.success('Card deleted successfully! 🗑️');
+      setIsDeleteConfirmOpen(false);
+      
+      // Redirect to dashboard after successful deletion
+      router.push('/dashboard');
+
+    } catch (error: any) {
+      console.error('Error deleting card:', error);
+      toast.error(error.message || 'Failed to delete card. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -1414,7 +1447,7 @@ const EditPage = () => {
                       }
                     }}
                     style={{
-                      border: design === selectedDesign ? `2px solid ${selectedColor}` : '1px solid #ddd',
+                      border: design === selectedDesign ? `2px solid ${selectedColor1}` : '1px solid #ddd',
                       borderRadius: '10px',
                       padding: '10px',
                       width: 'calc(50% - 5px)',
@@ -1684,93 +1717,190 @@ const EditPage = () => {
                 Color
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <input
-                    type="color"
-                    value={hexValue}
-                    onChange={handleColorInputChange}
-                    style={{ width: '50px', height: '30px', border: 'none', padding: '0' }}
-                  />
-                  <span style={{ fontSize: '14px', color: '#555' }}>Select Color</span>
+                {/* Color 1 */}
+                <div style={{ marginBottom: '15px'}}>
+                  <h4 style={{fontSize: '16px', marginBottom: '10px', color: '#333'}}>Color 1</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                    <input
+                      type="color"
+                      value={hexValue1}
+                      onChange={handleColorInputChange1}
+                      style={{ width: '50px', height: '30px', border: 'none', padding: '0' }}
+                    />
+                    <span style={{ fontSize: '14px', color: '#555' }}>Select Color 1</span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>R:</label>
+                      <input
+                        type="number"
+                        value={rValue1}
+                        onChange={handleRChange1}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>G:</label>
+                      <input
+                        type="number"
+                        value={gValue1}
+                        onChange={handleGChange1}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>B:</label>
+                      <input
+                        type="number"
+                        value={bValue1}
+                        onChange={handleBChange1}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ fontSize: '14px', color: '#555' }}>Hex:</label>
+                    <input
+                      type="text"
+                      value={hexValue1}
+                      onChange={handleHexChange1}
+                      maxLength={7}
+                      style={{
+                        flex: '1',
+                        padding: '8px',
+                        fontSize: '14px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        boxSizing: 'border-box',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
-                    <label style={{ fontSize: '14px', color: '#555' }}>R:</label>
+                {/* Color 2 */}
+                <div style={{ marginBottom: '15px'}}>
+                  <h4 style={{fontSize: '16px', marginBottom: '10px', color: '#333'}}>Color 2</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                     <input
-                      type="number"
-                      value={rValue}
-                      onChange={handleRChange}
-                      min="0"
-                      max="255"
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '14px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        boxSizing: 'border-box',
-                        outline: 'none',
-                      }}
+                      type="color"
+                      value={hexValue2}
+                      onChange={handleColorInputChange2}
+                      style={{ width: '50px', height: '30px', border: 'none', padding: '0' }}
                     />
+                    <span style={{ fontSize: '14px', color: '#555' }}>Select Color 2</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
-                    <label style={{ fontSize: '14px', color: '#555' }}>G:</label>
-                    <input
-                      type="number"
-                      value={gValue}
-                      onChange={handleGChange}
-                      min="0"
-                      max="255"
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '14px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        boxSizing: 'border-box',
-                        outline: 'none',
-                      }}
-                    />
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
-                    <label style={{ fontSize: '14px', color: '#555' }}>B:</label>
-                    <input
-                      type="number"
-                      value={bValue}
-                      onChange={handleBChange}
-                      min="0"
-                      max="255"
-                      style={{
-                        width: '100%',
-                        padding: '6px',
-                        fontSize: '14px',
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        boxSizing: 'border-box',
-                        outline: 'none',
-                      }}
-                    />
-                  </div>
-                </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <label style={{ fontSize: '14px', color: '#555' }}>Hex:</label>
-                  <input
-                    type="text"
-                    value={hexValue}
-                    onChange={handleHexChange}
-                    maxLength={7}
-                    style={{
-                      flex: '1',
-                      padding: '8px',
-                      fontSize: '14px',
-                      border: '1px solid #ddd',
-                      borderRadius: '8px',
-                      boxSizing: 'border-box',
-                      outline: 'none',
-                    }}
-                  />
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>R:</label>
+                      <input
+                        type="number"
+                        value={rValue2}
+                        onChange={handleRChange2}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>G:</label>
+                      <input
+                        type="number"
+                        value={gValue2}
+                        onChange={handleGChange2}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: '1', minWidth: '60px' }}>
+                      <label style={{ fontSize: '14px', color: '#555' }}>B:</label>
+                      <input
+                        type="number"
+                        value={bValue2}
+                        onChange={handleBChange2}
+                        min="0"
+                        max="255"
+                        style={{
+                          width: '100%',
+                          padding: '6px',
+                          fontSize: '14px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          boxSizing: 'border-box',
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ fontSize: '14px', color: '#555' }}>Hex:</label>
+                    <input
+                      type="text"
+                      value={hexValue2}
+                      onChange={handleHexChange2}
+                      maxLength={7}
+                      style={{
+                        flex: '1',
+                        padding: '8px',
+                        fontSize: '14px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        boxSizing: 'border-box',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1813,7 +1943,7 @@ const EditPage = () => {
                     top: '50%',
                     transform: 'translateY(-50%)',
                     pointerEvents: 'none',
-                    color: selectedColor
+                    color: selectedColor1
                   }}
                 >
                   <polyline points="6 9 12 15 18 9"></polyline>
@@ -1832,15 +1962,15 @@ const EditPage = () => {
               { label: 'Middle Name', value: middleName, setter: setMiddleName },
               { label: 'Last Name', value: lastName, setter: setLastName },
               { label: 'Suffix', value: suffix, setter: setSuffix },
-              { label: 'Accreditations', value: accreditations, setter: setAccreditations },
-              { label: 'Preferred Name', value: preferredName, setter: setPreferredName },
-              { label: 'Maiden Name', value: maidenName, setter: setMaidenName },
-              { label: 'Pronouns', value: pronouns, setter: setPronouns },
-              { label: 'Affiliation', value: affiliation, setter: setAffiliation },
+              // { label: 'Accreditations', value: accreditations, setter: setAccreditations },
+              // { label: 'Preferred Name', value: preferredName, setter: setPreferredName },
+              // { label: 'Maiden Name', value: maidenName, setter: setMaidenName },
+              // { label: 'Pronouns', value: pronouns, setter: setPronouns },
+              // { label: 'Affiliation', value: affiliation, setter: setAffiliation },
               { label: 'Title', value: title, setter: setTitle },
-              { label: 'Department', value: department, setter: setDepartment },
+              // { label: 'Department', value: department, setter: setDepartment },
               { label: 'Company', value: company, setter: setCompany },
-              { label: 'Headline', value: headline, setter: setHeadline },
+              // { label: 'Headline', value: headline, setter: setHeadline },
               { label: 'Location', value: cardLocation, setter: setCardLocation }
             ].map(field => (
               <div key={field.label} style={{ marginBottom: '15px' }}>
@@ -1867,18 +1997,20 @@ const EditPage = () => {
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Description</label>
               <textarea
-                value={cardDescription}
-                onChange={(e) => setCardDescription(e.target.value)}
-                rows={4}
+                value={about}
+                onChange={(e) => setAbout(e.target.value)}
+                placeholder="Enter a brief description for your card"
                 style={{
                   width: '100%',
+                  minHeight: '100px',
                   padding: '10px',
                   fontSize: '14px',
                   border: '1px solid #ddd',
                   borderRadius: '8px',
                   boxSizing: 'border-box',
-                  outline: 'none',
-                  resize: 'vertical'
+                  backgroundColor: 'white',
+                  color: '#555',
+                  outline: 'none'
                 }}
               />
             </div>
@@ -1934,9 +2066,9 @@ const EditPage = () => {
 
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', marginBottom: '15px', backgroundColor: 'white' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Email
                   </span>
@@ -1978,9 +2110,9 @@ const EditPage = () => {
 
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Phone
                   </span>
@@ -2045,9 +2177,9 @@ const EditPage = () => {
               {/* Services */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Services
                   </span>
@@ -2079,9 +2211,9 @@ const EditPage = () => {
               {/* Portfolio */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                    {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Portfolio
                   </span>
@@ -2113,9 +2245,9 @@ const EditPage = () => {
               {/* Skills */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Skills
                   </span>
@@ -2147,9 +2279,9 @@ const EditPage = () => {
               {/* Experience */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Experience
                   </span>
@@ -2181,9 +2313,9 @@ const EditPage = () => {
               {/* Review */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Review
                   </span>
@@ -2215,9 +2347,9 @@ const EditPage = () => {
               {/* LinkedIn */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     LinkedIn
                   </span>
@@ -2243,9 +2375,9 @@ const EditPage = () => {
               {/* Website */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Website
                   </span>
@@ -2497,13 +2629,13 @@ const EditPage = () => {
                 onClick={() => setActiveTab(tab)}
                 style={{
                   padding: '10px 15px',
-                  fontSize: 'clamp(13px, 3.5vw, 16px)',
+                  fontSize: '14px',
                   fontWeight: 'bold',
                   border: 'none',
                   backgroundColor: 'transparent',
                   cursor: 'pointer',
-                  borderBottom: activeTab === tab ? `2px solid ${selectedColor}` : 'none',
-                  color: activeTab === tab ? selectedColor : '#777',
+                  borderBottom: activeTab === tab ? `2px solid ${selectedColor1}` : 'none',
+                  color: activeTab === tab ? selectedColor1 : '#777',
                   outline: 'none',
                   marginRight: '10px',
                   whiteSpace: 'nowrap'
@@ -2517,45 +2649,74 @@ const EditPage = () => {
           {renderContent()}
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px', flexWrap: 'wrap' }}>
-            <button style={{
-              backgroundColor: 'transparent',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              padding: '10px 20px',
-              fontSize: 'clamp(13px, 3.5vw, 16px)',
-              fontWeight: 'bold',
-              color: '#555',
-              cursor: 'pointer',
-              outline: 'none',
-              flex: '1',
-              minWidth: '100px'
-            }}>
+            <button 
+              type="button"
+              onClick={() => router.push('/dashboard')}
+              style={{
+                backgroundColor: 'transparent',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                color: '#555',
+                cursor: 'pointer',
+                outline: 'none',
+                flex: '1',
+                minWidth: '100px'
+              }}
+            >
               Cancel
             </button>
+            {/* Show delete button only when editing existing card */}
+            {(existingCardId || cardId) && (
+              <div 
+                onClick={() => {
+                  console.log('🗑️ DIV Delete clicked - opening custom dialog');
+                  setIsDeleteConfirmOpen(true);
+                }}
+                style={{
+                  backgroundColor: isDeleting ? '#999' : '#dc3545',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  color: 'white',
+                  cursor: isDeleting ? 'not-allowed' : 'pointer',
+                  outline: 'none',
+                  flex: '1',
+                  minWidth: '100px',
+                  textAlign: 'center',
+                  userSelect: 'none'
+                }}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </div>
+            )}
             <button 
+              type="button"
               onClick={handleSaveCard}
               disabled={isSaving}
               style={{
-              backgroundColor: isSaving ? '#999' : selectedColor,
-              border: 'none',
-              borderRadius: '8px',
-              padding: '10px 20px',
-              fontSize: 'clamp(13px, 3.5vw, 16px)',
-              fontWeight: 'bold',
-              color: 'white',
-              cursor: isSaving ? 'not-allowed' : 'pointer',
-              outline: 'none',
-              flex: '1',
-              minWidth: '100px'
-            }}>
+                backgroundColor: isSaving ? '#999' : selectedColor1,
+                border: 'none',
+                borderRadius: '8px',
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                color: 'white',
+                cursor: isSaving ? 'not-allowed' : 'pointer',
+                outline: 'none',
+                flex: '1',
+                minWidth: '100px'
+              }}
+            >
               {isSaving ? 'Saving...' : 'Save'}
             </button>
           </div>
-
-
-        </div>
-
-          } </div>
+        </div>}
+      </div>
 
       {/* Modal for adding a new field */}
       {isModalOpen && (
@@ -2697,6 +2858,102 @@ const EditPage = () => {
           >
             Got it!
           </button>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {isDeleteConfirmOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 1002,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClick={() => setIsDeleteConfirmOpen(false)}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '15px',
+              padding: '30px',
+              maxWidth: '400px',
+              width: '90%',
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+              textAlign: 'center'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ marginBottom: '20px' }}>
+              <svg 
+                width="48" 
+                height="48" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="#dc3545" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                style={{ margin: '0 auto 15px' }}
+              >
+                <polyline points="3,6 5,6 21,6"></polyline>
+                <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+              <h3 style={{ margin: '0 0 10px', fontSize: '20px', fontWeight: 'bold', color: '#333' }}>
+                Delete Card
+              </h3>
+              <p style={{ margin: '0', fontSize: '15px', color: '#666', lineHeight: 1.5 }}>
+                Are you sure you want to delete this card? This action cannot be undone.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button
+                onClick={() => setIsDeleteConfirmOpen(false)}
+                disabled={isDeleting}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  color: '#555',
+                  cursor: isDeleting ? 'not-allowed' : 'pointer',
+                  outline: 'none',
+                  minWidth: '100px'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteCard}
+                disabled={isDeleting}
+                style={{
+                  backgroundColor: isDeleting ? '#999' : '#dc3545',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  color: 'white',
+                  cursor: isDeleting ? 'not-allowed' : 'pointer',
+                  outline: 'none',
+                  minWidth: '100px'
+                }}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

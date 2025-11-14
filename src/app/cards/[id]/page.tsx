@@ -132,7 +132,7 @@ const CardDetailsPage = () => {
   const params = useParams();
   const router = useRouter();
   const cardId = params.id as string;
-  const [activeTab, setActiveTab] = useState<"share" | "settings" | "analytics">("settings");
+  const [activeTab, setActiveTab] = useState<"share" | "settings" | "analytics">("share");
   const [searchIndexing, setSearchIndexing] = useState(true);
   const [copied, setCopied] = useState(false);
   const [shareMethod, setShareMethod] = useState<"qr" | "link">("link");
@@ -198,7 +198,7 @@ const handleDelete = async () => {
   }, [cardId, router]);
 
   const mockUserData = {
-    cardUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/cards/${cardId}`,
+    cardUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/cards/public/${cardId}`,
   };
 
   const copyToClipboard = async (text: string) => {
