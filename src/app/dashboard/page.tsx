@@ -43,6 +43,7 @@ interface Card {
   selectedColor?: string;
   selectedColor2?: string;
   selectedFont?: string;
+  cardType?: string;
 }
 
 // ----------------- Card Preview Renderer (Exact Copy from Edit Page) -----------------
@@ -68,6 +69,7 @@ const renderCardPreview = (card: Card) => {
     themeColor1: card.selectedColor || '#3b82f6',
     themeColor2: card.selectedColor2 || '#2563eb',
     fontFamily: card.selectedFont || 'system-ui, sans-serif',
+    cardType: card.cardType || '',
   };
 
   const selectedDesign = card.selectedDesign || 'Classic';
@@ -129,55 +131,21 @@ const Dashboard = () => {
   };
   const cards: Card[] = [
     {
-      id: 1,
-      name: "Josh Hazelwood",
-      title: "Software Designer",
-      company: "BoostNow LLP",
-      location: "California, USA",
-      about: "Crafting innovative software solutions and user experiences with modern design principles",
-      skills: "React, TypeScript, UI/UX Design, Figma, Node.js",
-      portfolio: "Mobile App Redesign, E-commerce Platform, Design System",
-      experience: "Senior Software Designer @ BoostNow LLP (2022-Present), UI Designer @ TechCorp (2020-2022)",
-      photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
-      cover: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&h=200&fit=crop",
-      email: "josh.hazelwood@boostnow.com",
-      phone: "+1-555-0123",
-      linkedin: "https://linkedin.com/in/joshhazelwood",
-      website: "https://joshhazelwood.dev",
-    },
-    {
-      id: 2,
-      name: "Sarah Chen",
-      title: "UX Designer",
-      company: "Design Studio",
-      location: "New York, USA",
-      about: "Passionate about creating intuitive user experiences that solve real-world problems",
-      skills: "User Research, Prototyping, Wireframing, Adobe Creative Suite, Sketch",
-      portfolio: "Banking App UX, Healthcare Dashboard, Mobile Game Interface",
-      experience: "Lead UX Designer @ Design Studio (2021-Present), UX Researcher @ StartupXYZ (2019-2021)",
+      id: 'demo',
+      name: "Demo Card",
+      title: "Sample Title",
+      company: "Sample Company",
+      location: "Sample Location",
+      about: "This is a demo card showing how your card will look",
+      skills: "Sample Skills",
+      portfolio: "Sample Portfolio",
+      experience: "Sample Experience",
       photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face",
-      cover: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=200&fit=crop",
-      email: "sarah.chen@designstudio.com",
-      phone: "+1-555-0456",
-      linkedin: "https://linkedin.com/in/sarahchen",
-      website: "https://sarahchen.design",
-    },
-    {
-      id: 3,
-      name: "Alex Rodriguez",
-      title: "Product Manager",
-      company: "Tech Innovations",
-      location: "San Francisco, USA",
-      about: "Driving product strategy and innovation to deliver exceptional user value and business growth",
-      skills: "Product Strategy, Agile, Analytics, Market Research, Roadmapping",
-      portfolio: "SaaS Platform Launch, Mobile App Growth, B2B Product Suite",
-      experience: "Senior Product Manager @ Tech Innovations (2023-Present), Product Analyst @ BigTech (2021-2023)",
-      photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face",
-      cover: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=200&fit=crop",
-      email: "alex.rodriguez@techinnovations.com",
-      phone: "+1-555-0789",
-      linkedin: "https://linkedin.com/in/alexrodriguez",
-      website: "https://alexrodriguez.pm",
+      email: "demo@example.com",
+      phone: "+1-555-0000",
+      linkedin: "https://linkedin.com",
+      website: "https://example.com",
+      cardType: "Demo",
     },
   ];
 
@@ -253,47 +221,28 @@ const Dashboard = () => {
           })
         ) : (
           <>
-            <div className="col-span-full text-center py-4">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 border border-yellow-300 rounded-lg text-yellow-800 text-sm">
+            <div className="w-full flex justify-center py-4 break-inside-avoid">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 border border-yellow-300 rounded-lg text-yellow-800 text-sm shadow-sm">
                 <span>⚠️</span>
-                <span>Showing demo cards - No cards found in database</span>
+                <span>Showing demo card - No cards found in database</span>
               </div>
             </div>
-            {cards.map((card, idx) => (
+            <div className="w-full flex justify-center break-inside-avoid">
               <motion.div
-                key={card.id}
+                key={cards[0].id}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 100, damping: 20, delay: idx * 0.1 }}
+                transition={{ type: "spring", stiffness: 100, damping: 20 }}
                 whileHover={{
                   scale: 1.02,
                   y: -4,
                 }}
-                className="transition-all duration-300 cursor-pointer break-inside-avoid mb-6 block w-full"
+                className="transition-all duration-300 cursor-pointer"
                 style={{ marginBottom: '1.5rem' }}
-                onClick={() => router.push(`/cards/${card.id}`)}
               >
-                <DigitalCardPreview
-                  name={card.name || ''}
-                  title={card.title || ''}
-                  company={card.company || ''}
-                  location={card.location || ''}
-                  about={card.about || ''}
-                  skills={card.skills || ''}
-                  portfolio={card.portfolio || ''}
-                  experience={card.experience || ''}
-                  photo={card.photo || ''}
-                  cover={card.cover || ''}
-                  email={card.email || ''}
-                  phone={card.phone || ''}
-                  linkedin={card.linkedin || ''}
-                  website={card.website || ''}
-                  design="Classic"
-                  themeColor1="#3b82f6"
-                  themeColor2="#2563eb"
-                />
+                {renderCardPreview(cards[0])}
               </motion.div>
-            ))}
+            </div>
           </>
         )}
       </div>

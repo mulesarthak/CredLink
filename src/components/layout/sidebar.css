@@ -173,7 +173,6 @@
 .mobileToggle {
   position: fixed;
   top: 1rem;
-  left: 1rem;
   z-index: 50;
   background: linear-gradient(to right, #1e40af, #2563eb);
   color: white;
@@ -183,6 +182,14 @@
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+.mobileToggleClosed {
+  left: 1rem;
+}
+
+.mobileToggleOpen {
+  right: 120px;
 }
 
 .mobileToggle:hover {

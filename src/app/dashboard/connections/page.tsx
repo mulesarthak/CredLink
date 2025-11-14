@@ -39,7 +39,22 @@ interface Contact {
   isIncomingRequest?: boolean;
 }
 
-// Removed dummy data - now fetched from backend
+// Enhanced sample contact data (Keeping this data structure)
+const contactsData: Contact[] = [
+  { id: 1, name: "Leo Garcia", title: "Full Stack Developer", company: "MyKard", tags: ["Personal"], associatedCard: "Personal", dateAdded: "2024-10-30", email: "leo@MyKard.com", phone: "+1 (555) 123-4567", location: "Mumbai, India", lastInteraction: "2024-10-29", activityStatus: "active" },
+  { id: 2, name: "John Smith", title: "Software Engineer", company: "Tech Corp", tags: ["Tech"], associatedCard: "Work", dateAdded: "2024-10-25", email: "john@techcorp.com", phone: "+1 (555) 234-5678", location: "San Francisco, CA", lastInteraction: "2024-10-28", activityStatus: "active" },
+  { id: 3, name: "Sarah Johnson", title: "Marketing Manager", company: "Creative Agency", tags: ["Marketing"], associatedCard: "Business", dateAdded: "2024-10-20", email: "sarah@creative.com", phone: "+1 (555) 345-6789", location: "New York, NY", lastInteraction: "2024-10-15", activityStatus: "inactive" },
+  { id: 4, name: "Mike Davis", title: "Product Designer", company: "Design Studio", tags: ["Design"], associatedCard: "Creative", dateAdded: "2024-10-15", email: "mike@designstudio.com", phone: "+1 (555) 456-7890", location: "Austin, TX", lastInteraction: "2024-10-30", activityStatus: "active" },
+  { id: 5, name: "Emily Chen", title: "Data Scientist", company: "Analytics Inc", tags: ["Professional"], associatedCard: "Professional", dateAdded: "2024-10-10", email: "emily@analytics.com", phone: "+1 (555) 567-8901", location: "Seattle, WA", lastInteraction: "2024-10-25", activityStatus: "active" },
+  { id: 6, name: "Alex Rodriguez", title: "Sales Director", company: "Sales Solutions", tags: ["Business"], associatedCard: "Business", dateAdded: "2024-10-05", email: "alex@sales.com", phone: "+1 (555) 678-9012", location: "Miami, FL", lastInteraction: "2024-09-20", activityStatus: "inactive" },
+  { id: 7, name: "Lisa Wang", title: "UX Researcher", company: "User Labs", tags: ["Creative"], associatedCard: "Creative", dateAdded: "2024-09-30", email: "lisa@userlabs.com", phone: "+1 (555) 789-0123", location: "Portland, OR", lastInteraction: "2024-10-28", activityStatus: "active" },
+  { id: 8, name: "David Brown", title: "DevOps Engineer", company: "Cloud Systems", tags: ["Technical"], associatedCard: "Technical", dateAdded: "2024-10-12", email: "david@cloudsys.com", phone: "+1 (555) 890-1234", location: "Denver, CO", lastInteraction: "2024-10-26", activityStatus: "new" }
+];
+
+const connectionRequestsData: Contact[] = [
+  { id: 9, name: "New User 1", title: "Developer", company: "Tech Inc", tags: ["Tech"], associatedCard: "Work", dateAdded: "2024-11-01", connectionStatus: "pending", isIncomingRequest: true },
+  { id: 10, name: "New User 2", title: "Designer", company: "Design Co", tags: ["Design"], associatedCard: "Creative", dateAdded: "2024-11-02", connectionStatus: "pending", isIncomingRequest: true }
+];
 
 export default function DashboardContactPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -60,6 +75,7 @@ export default function DashboardContactPage() {
   const [previewContact, setPreviewContact] = useState<Contact | null>(null);
   const [loading, setLoading] = useState(false);
   const [requestsLoading, setRequestsLoading] = useState(false);
+  const [approveModal, setApproveModal] = useState<{isOpen: boolean, request: Contact | null}>({isOpen: false, request: null});
   const filterRef = useRef<HTMLDivElement>(null);
 
   // Handle direct message - open message modal
@@ -216,9 +232,28 @@ export default function DashboardContactPage() {
   };
 
   // Handle delete connection
-  const handleDeleteConnection = (contactId: string) => {
-    setContactsList(prev => prev.filter(contact => contact.id !== contactId));
-    setOpenDropdown(null);
+  const handleDeleteConnection = async (contactId: string) => {
+    try {
+      const res = await fetch(`/api/users/connections/${contactId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || 'Failed to remove connection');
+      }
+
+      setContactsList(prev => prev.filter(contact => contact.id !== contactId));
+      setOpenDropdown(null);
+      toast.success('Connection removed successfully');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('connections-updated'));
+      }
+    } catch (e: any) {
+      console.error('Delete connection error:', e);
+      toast.error(e?.message || 'Failed to remove connection');
+    }
   };
 
   // Handle contact click to open sidebar
@@ -322,6 +357,14 @@ export default function DashboardContactPage() {
       console.error('Error approving connection request:', error);
       toast.error(error.message || 'Failed to approve connection request');
     }
+  };
+
+  const openApproveModal = (request: Contact) => {
+    setApproveModal({ isOpen: true, request });
+  };
+
+  const closeApproveModal = () => {
+    setApproveModal({ isOpen: false, request: null });
   };
 
   const handleRejectRequest = async (contactId: string) => {
@@ -1000,7 +1043,7 @@ export default function DashboardContactPage() {
                       </div>
                       <div className={styles.requestActions}>
                         <button 
-                          onClick={() => handleApproveRequest(request.id)}
+                          onClick={() => openApproveModal(request)}
                           style={{
                             background: 'linear-gradient(to bottom right, #1e3a8a, #2563eb)',
                             color: 'white',
@@ -1059,7 +1102,31 @@ export default function DashboardContactPage() {
             </div>
           </div>
         )}
+
+        {/* Approve Confirmation Modal */}
+        {approveModal.isOpen && approveModal.request && (
+          <Modal
+            isOpen={approveModal.isOpen}
+            onClose={closeApproveModal}
+            title={`Approve connection with ${approveModal.request.name}?`}
+            showActions={false}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <p className={styles.modalBody}>
+                Approving will allow this person to connect with you and see your shared profile information.
+              </p>
+              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                <button onClick={closeApproveModal} className={styles.modalCancelButton} style={{ flex: 1 }}>
+                  Cancel
+                </button>
+                <button onClick={() => { const id = approveModal.request!.id; closeApproveModal(); handleApproveRequest(id); }} className={styles.modalSendButton} style={{ flex: 1 }}>
+                  Approve
+                </button>
+              </div>
+            </div>
+          </Modal>
+        )}
       </div>
     </div>
   );
-}
+}   

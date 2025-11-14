@@ -138,6 +138,7 @@ export function Header() {
                           right: "0",
                           marginTop: "8px",
                           width: "220px",
+                          maxWidth: "calc(100vw - 32px)",
                           background: "rgba(255, 255, 255, 0.95)",
                           backdropFilter: "blur(8px)",
                           border: "1px solid rgba(229, 231, 235, 0.5)",
@@ -146,6 +147,7 @@ export function Header() {
                           paddingTop: "10px",
                           paddingBottom: "10px",
                           zIndex: 50,
+                          transform: "translateX(-16px)",
                         }}
                       >
                         <Link
@@ -244,7 +246,7 @@ export function Header() {
                           background: "rgba(2, 6, 23, 0.45)",
                           backdropFilter: "blur(4px)",
                           display: "flex",
-                          justifyContent: "flex-end",
+                          justifyContent: "center",
                           alignItems: "flex-start",
                           padding: "12px",
                         }}

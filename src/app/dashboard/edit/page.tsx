@@ -184,7 +184,13 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           {/* Social Row */}
           <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}> 
             {/* Mail */}
-            <a href={`mailto:${email || 'example@mykard.com'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <div
+              onClick={() => {
+                if (email) window.location.href = `mailto:${email}`;
+                else window.location.href = 'mailto:example@MyKard.com';
+              }}
+              style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer" }}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 4h16v16H4z" opacity="0"/>
                 <path d="M4 8l8 5 8-5"/>
@@ -202,7 +208,10 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
             </a>
             {/* Globe */}
-            <a href={website || 'https://mykard.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <div
+              onClick={() => window.open(website || 'https://MyKard.com', '_blank', 'noopener noreferrer')}
+              style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer" }}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="2" y1="12" x2="22" y2="12"/>
@@ -943,6 +952,7 @@ const EditPage = () => {
   const [title, setTitle] = useState('');
   const [department, setDepartment] = useState('');
   const [company, setCompany] = useState('MyKard'); // Added default
+  const [company, setCompany] = useState('MyKard'); // Added default
   const [headline, setHeadline] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
@@ -958,10 +968,15 @@ const EditPage = () => {
   const [skills, setSkills] = useState('SEO, Content Creation, Analytics');
   const [portfolio, setPortfolio] = useState('Case Study 1, Project X');
   const [experience, setExperience] = useState('Lead Marketer @ MyKard (2023-Present)');
+  const [experience, setExperience] = useState('Lead Marketer @ MyKard (2023-Present)');
   const [linkedin, setLinkedin] = useState('https://linkedin.com/in/yaasnick');
   const [website, setWebsite] = useState('https://yaasnick.com');
   const [services, setServices] = useState('SEO Audits, Slogan Content Campaigns');
   const [reviews, setReviews] = useState('John transformed our online presence!, Happy Client');
+
+  const [customTypes, setCustomTypes] = useState<string[]>([]);
+  const [showCustomTypeInput, setShowCustomTypeInput] = useState(false);
+  const [customTypeInput, setCustomTypeInput] = useState('');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newFieldName, setNewFieldName] = useState('');
@@ -1245,6 +1260,22 @@ const EditPage = () => {
     ));
   };
 
+  // Card Type helper functions
+  const builtInTypes = ['Personal', 'Professional', 'Business', 'Company', 'Creator', 'Influencer'];
+  
+  const handleAddCustomType = () => {
+    if (customTypeInput.trim() && !builtInTypes.includes(customTypeInput.trim()) && !customTypes.includes(customTypeInput.trim())) {
+      setCustomTypes([...customTypes, customTypeInput.trim()]);
+      setCardType(customTypeInput.trim());
+      setCustomTypeInput('');
+      setShowCustomTypeInput(false);
+    }
+  };
+
+  const getAllCardTypes = () => {
+    return [...builtInTypes, ...customTypes];
+  };
+
   const handleSaveCard = async () => {
     try {
       setIsSaving(true);
@@ -1413,6 +1444,7 @@ const EditPage = () => {
       themeColor1: selectedColor1,
       themeColor2: selectedColor2,
       fontFamily: selectedFont,
+      cardType,
     };
 
     switch (selectedDesign) {
@@ -2296,6 +2328,7 @@ const EditPage = () => {
                   value={experience}
                   onChange={(e) => setExperience(e.target.value)}
                   placeholder="e.g. Lead Marketer @ MyKard (2023-Present)"
+                  placeholder="e.g. Lead Marketer @ MyKard (2023-Present)"
                   rows={3}
                   style={{
                     width: '100%',
@@ -2504,7 +2537,7 @@ const EditPage = () => {
                   border: '1px solid #145dfd',
                   borderRadius: '8px',
                   boxSizing: 'border-box',
-                  outline: 'none',
+                  outline: 'none'
                 }}
               />
             </div>
@@ -2526,9 +2559,86 @@ const EditPage = () => {
                   appearance: 'none',
                 }}
               >
-                <option value="Personal">Personal</option>
-                <option value="Professional">Professional</option>
+                <option value="">Select card type...</option>
+                {getAllCardTypes().map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
               </select>
+              
+              {/* Custom Type Input */}
+              {!showCustomTypeInput ? (
+                <button
+                  type="button"
+                  onClick={() => setShowCustomTypeInput(true)}
+                  style={{
+                    marginTop: '8px',
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    color: selectedColor1 || '#2563eb',
+                    background: 'transparent',
+                    border: `1px solid ${selectedColor1 || '#2563eb'}`,
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  + Add custom type
+                </button>
+              ) : (
+                <div style={{ marginTop: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    value={customTypeInput}
+                    onChange={(e) => setCustomTypeInput(e.target.value)}
+                    placeholder="Enter custom type..."
+                    style={{
+                      flex: 1,
+                      padding: '6px 8px',
+                      fontSize: '12px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      outline: 'none'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomType}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      color: 'white',
+                      background: selectedColor1 || '#2563eb',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      outline: 'none'
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCustomTypeInput(false);
+                      setCustomTypeInput('');
+                    }}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      color: '#666',
+                      background: 'transparent',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      outline: 'none'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         );

@@ -60,36 +60,85 @@ export default function AdminSettingsPage() {
     setLoading(false);
   }, []);
 
+  const validatePassword = (password: string) => {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]+/.test(password);
+
+    if (password.length < minLength) {
+      return { valid: false, message: 'Password must be at least 8 characters long' };
+    }
+    if (!hasUpperCase) {
+      return { valid: false, message: 'Password must contain at least one uppercase letter' };
+    }
+    if (!hasLowerCase) {
+      return { valid: false, message: 'Password must contain at least one lowercase letter' };
+    }
+    if (!hasNumbers) {
+      return { valid: false, message: 'Password must contain at least one number' };
+    }
+    if (!hasSpecialChar) {
+      return { valid: false, message: 'Password must contain at least one special character' };
+    }
+    return { valid: true };
+  };
+
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
-      return toast.error("All fields required");
-    }
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      return toast.error("Passwords do not match");
-    }
-     try {
-      const response = await fetch("/api/admin/profile/change-password", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ currentPassword: passwordData.currentPassword, newPassword: passwordData.newPassword }),
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to change password");
-      }
-      alert("Password changed successfully");
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred");
-      return;
-    }
-
     setSaving(true);
-    await new Promise((res) => setTimeout(res, 900));
-    toast.success("Password updated successfully");
-    setSaving(false);
+
+    try {
+      // Validate all fields are filled
+      if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+        throw new Error('All fields are required');
+      }
+
+      // Check if new password and confirm password match
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        throw new Error('New password and confirm password do not match');
+      }
+
+      // Validate password strength
+      const passwordValidation = validatePassword(passwordData.newPassword);
+      if (!passwordValidation.valid) {
+        throw new Error(passwordValidation.message);
+      }
+
+      // Make API call to change password
+      const response = await fetch('/api/admin/profile/change-password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update password');
+      }
+
+      // Clear form on success
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+
+      // Show success message
+      toast.success('Password updated successfully!');
+    } catch (error: any) {
+      console.error('Password change error:', error);
+      toast.error(error.message || 'Failed to update password. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) return <div className={styles.loading}>Loading…</div>;

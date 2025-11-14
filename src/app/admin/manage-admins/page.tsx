@@ -357,7 +357,7 @@ export default function ManageAdminsPage() {
               <label>Email</label>
               <input
                 type="email"
-                placeholder="admin@credlink.com"
+                placeholder="admin@MyKard.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required

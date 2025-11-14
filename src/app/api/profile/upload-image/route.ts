@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     if (oldProfileImage && typeof oldProfileImage === 'string') {
       try {
         // Extract public_id from Cloudinary URL
-        // URL format: https://res.cloudinary.com/cloud_name/image/upload/v123456/credlink/profile-images/filename.ext
+        // URL format: https://res.cloudinary.com/cloud_name/image/upload/v123456/MyKard/profile-images/filename.ext
         const urlParts = oldProfileImage.split('/')
         const uploadIndex = urlParts.findIndex(part => part === 'upload')
         
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
 
     // Upload new image to Cloudinary
     const uploadResult = await uploadToCloudinary(buffer, {
-      folder: 'credlink/profile-images',
+      folder: 'MyKard/profile-images',
       public_id: `profile_${decoded.userId}_${Date.now()}`,
       transformation: {
         width: 400,

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { DigitalCardProps } from "./DigitalCardPreview";
+import styles from './cardType.module.css';
 
 const FlatCardPreview: React.FC<DigitalCardProps & { themeColor1?: string; themeColor2?: string }> = ({
   name = "",
@@ -17,6 +18,7 @@ const FlatCardPreview: React.FC<DigitalCardProps & { themeColor1?: string; theme
   website = "",
   themeColor1 = "#3b82f6",
   themeColor2 = "#60a5fa",
+  cardType = "",
 }) => {
   const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
 
@@ -32,6 +34,17 @@ const FlatCardPreview: React.FC<DigitalCardProps & { themeColor1?: string; theme
         background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
         border: `3px solid ${themeColor1}`,
       }}>
+        {/* Card Type Pill */}
+        {cardType && cardType.trim() !== "" && (
+          <div 
+            className={styles.cardTypePill}
+            style={{ 
+              '--pill-bg': themeColor1 || '#2563eb'
+            } as React.CSSProperties}
+          >
+            {cardType}
+          </div>
+        )}
         {/* Cover Image Section - Exact copy from edit page */}
         <div style={{
           width: "100%", 

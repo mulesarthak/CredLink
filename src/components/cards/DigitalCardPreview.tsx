@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import styles from './cardType.module.css';
 
 export interface DigitalCardProps {
   name: string;
@@ -20,6 +21,7 @@ export interface DigitalCardProps {
   design?: string; // Classic, Flat, Modern, Sleek
   themeColor1?: string;
   themeColor2?: string;
+  cardType?: string;
 }
 
 const DigitalCardPreview: React.FC<DigitalCardProps> = ({
@@ -39,6 +41,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
   website = "",
   themeColor1 = "#3b82f6",
   themeColor2 = "#2563eb",
+  cardType = "",
 }) => {
   const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
   const parsedCompany = (() => {
@@ -67,6 +70,17 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         position: "relative",
         background: `linear-gradient(135deg, ${themeColor1} 0%, ${themeColor2} 100%)`,
       }}>
+      {/* Card Type Pill */}
+      {cardType && cardType.trim() !== "" && (
+        <div 
+          className={styles.cardTypePill}
+          style={{ 
+            '--pill-bg': themeColor1 || '#2563eb'
+          } as React.CSSProperties}
+        >
+          {cardType}
+        </div>
+      )}
       {/* Header */}
       <div style={{
         padding: "22px",
