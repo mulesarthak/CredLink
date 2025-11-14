@@ -103,6 +103,17 @@ export async function POST(req: NextRequest) {
       cardData.coverImage = uploadResult.secure_url;
     }
 
+    // Handle document upload
+    const documentFile = formData.get('document') as File;
+    if (documentFile && documentFile.size > 0) {
+      const buffer = Buffer.from(await documentFile.arrayBuffer());
+      const uploadResult: any = await uploadToCloudinary(buffer, {
+        folder: 'credlink/cards/documents',
+        public_id: `${decoded.userId}_document_${Date.now()}`,
+      });
+      cardData.documentUrl = uploadResult.secure_url;
+    }
+
     // Validate required fields
     if (!cardData.fullName) {
       return NextResponse.json({ error: 'Full name is required' }, { status: 400 });

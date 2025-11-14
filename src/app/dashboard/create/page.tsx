@@ -1336,6 +1336,10 @@ const EditPage = () => {
         formData.append('bannerImage', bannerImageFile);
       }
 
+      if (resumeFile) {
+        formData.append('document', resumeFile);
+      }
+
       // Make API call
       const response = await fetch('/api/card/create', {
         method: 'POST',
@@ -1959,18 +1963,57 @@ const EditPage = () => {
               <textarea
                 value={about}
                 onChange={(e) => setAbout(e.target.value)}
-                rows={4}
+                placeholder="Enter a brief description for your card"
                 style={{
                   width: '100%',
+                  minHeight: '100px',
                   padding: '10px',
                   fontSize: '14px',
                   border: '1px solid #ddd',
                   borderRadius: '8px',
                   boxSizing: 'border-box',
+                  backgroundColor: 'white',
+                  color: '#555',
                   outline: 'none',
                   resize: 'vertical'
                 }}
               />
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Upload Document</label>
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                style={{ display: 'none' }}
+                id="resume-upload"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setResumeFile(e.target.files[0]);
+                  }
+                }}
+              />
+              <button
+                onClick={() => document.getElementById('resume-upload')?.click()}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  padding: '10px 15px',
+                  fontSize: '14px',
+                  color: '#555',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  outline: 'none',
+                  width: '100%',
+                  justifyContent: 'center'
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="17" x2="12" y2="11"></line><line x1="9" y1="14" x2="12" y2="11"></line><line x1="15" y1="14" x2="12" y2="11"></line></svg>
+                {resumeFile ? resumeFile.name : 'Upload Document'}
+              </button>
             </div>
             
             {/* --- FIELDS MOVED TO "Fields" TAB --- */}

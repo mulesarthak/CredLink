@@ -972,6 +972,7 @@ const EditPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [documentUrl, setDocumentUrl] = useState<string | null>(null);
   const [displayTypes, setDisplayTypes] = useState<string[]>(['Classic']);
   const [existingCardId, setExistingCardId] = useState<string | null>(null);
 
@@ -1078,6 +1079,7 @@ const EditPage = () => {
           setCardName(card.cardName || '');
           setCardType(card.cardType || 'Personal');
           setExistingCardId(card.id);
+          setDocumentUrl(card.documentUrl || null);
           
           toast.success('Card loaded for editing');
         } else {
@@ -1303,6 +1305,10 @@ const EditPage = () => {
       
       if (bannerImageFile) {
         formData.append('bannerImage', bannerImageFile);
+      }
+
+      if (resumeFile) {
+        formData.append('document', resumeFile);
       }
 
       // Determine if we're updating or creating
@@ -2048,8 +2054,32 @@ const EditPage = () => {
                 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="17" x2="12" y2="11"></line><line x1="9" y1="14" x2="12" y2="11"></line><line x1="15" y1="14" x2="12" y2="11"></line></svg>
-                {resumeFile ? resumeFile.name : 'Upload Document'}
+                {resumeFile ? resumeFile.name : (documentUrl ? 'Replace Document' : 'Upload Document')}
               </button>
+              {documentUrl && (
+                <button
+                  onClick={() => {
+                    setDocumentUrl(null);
+                    setResumeFile(null);
+                    // Here you might want to call an API to delete the document from the server
+                  }}
+                  style={{
+                    backgroundColor: '#f44336',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '10px 15px',
+                    fontSize: '14px',
+                    color: 'white',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+
+            <div style={{ marginBottom: '15px' }}>
+              {documentUrl && <a href={documentUrl} target="_blank" rel="noopener noreferrer">View Document</a>}
             </div>
 
           </div>
