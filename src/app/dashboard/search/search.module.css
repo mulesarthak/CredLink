@@ -232,7 +232,9 @@
   font-weight: 700;
   color: #1e293b;
   margin: 0;
+  text-align: left !important;
 }
+
 
 .userName a {
   text-decoration: none;
@@ -246,6 +248,8 @@
 .userDesignation {
   font-size: 13px;
   color: #64748b;
+  text-align: left !important;
+  margin: 2px 0 0 0;
 }
 
 .connectBtn {
@@ -265,7 +269,7 @@
 
 .companyCity {
   margin-bottom: 10px;
-}
+  }
 
 .company {
   font-weight: 600;
@@ -273,9 +277,20 @@
   font-size: 14px;
 }
 
+/* legacy city style retained for other places; not used in the new stacked layout */
 .city {
   font-size: 13px;
   color: #64748b;
+  text-align: left !important;
+  padding-left: 50px;
+}
+
+/* stacked location under name/title without extra padding */
+.userCity {
+  font-size: 13px;
+  color: #64748b;
+  text-align: left !important;
+  margin: 2px 0 0 0;
 }
 
 .stats {

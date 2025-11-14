@@ -40,12 +40,14 @@
 @media (min-width: 640px) {
   .heroSection {
     padding: 24px 20px; /* slightly reduced */
+    overflow: visible;
   }
 }
 
 @media (min-width: 1024px) {
   .heroSection {
     padding: 36px 28px; /* slightly reduced */
+    overflow: visible;
   }
 }
 
@@ -521,6 +523,11 @@
   color: #9ca3af; /* text-gray-400 */
 }
 
+.searchBarInner .relativeContainer {
+  display: block;
+  width: 100%;
+}
+
 .searchInput {
   display: block;
   width: 100%;
@@ -735,6 +742,8 @@
 
 .tableDataCell {
   padding: 20px 24px;
+  position: relative; /* anchor dropdown */
+  overflow: visible;  /* prevent clipping */
 }
 
 .tableDataDate {
@@ -800,45 +809,69 @@
 }
 
 .moreButton {
-  color: #9ca3af; /* text-gray-400 */
-  transition-property: color;
-  transition-duration: 150ms;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #6b7280; /* text-gray-600 for better contrast */
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 150ms;
+  z-index: 10;
 }
 
 .moreButton:hover {
-  color: #4b5563; /* hover:text-gray-600 */
+  color: #1f2937; /* text-gray-800 */
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
 }
 
 .moreIcon {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
 }
 
 /* Dropdown Menu (Table) */
 .dropdownMenu {
   position: absolute;
-  right: 0;
-  top: 32px; /* top-8 */
-  width: 192px; /* w-48 */
-  background-color: white;
+  right: 0; /* align to the button */
+  top: calc(100% + 8px); /* directly below the button */
+  min-width: 180px;
+  max-width: calc(100vw - 24px);
+  background-color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); /* shadow-lg */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  z-index: 50;
+  padding: 8px 0;
+  z-index: 9999;
+  overflow: hidden;
+  white-space: nowrap;
+  transform: none; /* keep it near the 3-dot button */
+}
+
+/* Ensure the dropdown stays within the viewport on very narrow windows */
+@media (max-width: 480px) {
+  .dropdownMenu {
+    right: 8px;
+    transform: none;
+    left: auto;
+    width: calc(100vw - 24px);
+  }
 }
 
 .dropdownItemDelete {
   width: 100%;
-  padding: 8px 16px;
+  padding: 10px 14px;
   text-align: left;
   color: #dc2626; /* text-red-600 */
-  transition-property: background-color;
-  transition-duration: 150ms;
+  transition: background-color 150ms ease;
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
 }
 
 .dropdownItemDelete:hover {
@@ -886,6 +919,7 @@
   border: 1px solid #e5e7eb;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   padding: 16px;
+  overflow: visible;
 }
 
 .mobileCardInner {
@@ -914,6 +948,7 @@
 .mobileCardContent {
   margin-left: 12px;
   flex: 1;
+  text-align: left;
 }
 
 .mobileCardHeader {
@@ -927,12 +962,14 @@
   font-weight: 600;
   color: #111827;
   line-height: 1.25;
+  text-align: left !important;
 }
 
 .mobileCardSubtitle {
   font-size: 14px;
   color: #4b5563;
   line-height: 1.25;
+   text-align: left !important;
 }
 
 .mobileCardActions {
@@ -978,17 +1015,36 @@
 
 .dropdownMenuMobile {
   position: absolute;
-  right: 0;
-  top: 28px;
+  right: 8px;
+  top: 36px;
   width: 192px;
+  max-width: calc(100vw - 24px);
   background-color: white;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding-top: 8px;
   padding-bottom: 8px;
-  z-index: 10;
+  z-index: 2000;
+  overflow: hidden;
+  white-space: nowrap;
 }
+
+/* Prevent clipping in narrow screens */
+@media (max-width: 360px) {
+  .dropdownMenuMobile {
+    right: 8px;
+    left: auto;
+    width: calc(100vw - 24px);
+  }
+}
+
+/* Optional: Hide the overflow menu entirely on very small screens
+@media (max-width: 360px) {
+  .dropdownMenuMobile { display: none; }
+}*/
+
+.relativeContainer { position: relative; overflow: visible; display: inline-block; }
 
 .dropdownItemDeleteMobile {
   width: 100%;
@@ -1021,6 +1077,7 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+   text-align: left !important;
 }
 
 .mobileDateText {
