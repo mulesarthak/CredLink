@@ -56,7 +56,8 @@ model User {
   sentMessages     Message[] @relation("SentMessages")
   sentConnections  Connection[] @relation("SentConnections")
   receivedConnections Connection[] @relation("ReceivedConnections")
-   cardConnections  CardConnection[] @relation("CardConnectionOwner")
+  cardConnections  CardConnection[] @relation("CardConnectionOwner")
+  contacts         Contact[]
 
   @@index([username])
   @@map("users")
