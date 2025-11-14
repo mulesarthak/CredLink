@@ -94,7 +94,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
-      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      const items = skillsList;
       return (
         <div style={{ padding: isMobile ? 12 : 16 }}>
           {items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}
@@ -102,21 +102,19 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       );
     }
     if (section === 'Services') {
-      // Changed to use prop
-      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
+      const items = servicesList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Portfolio') {
-      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
+      const items = portfolioList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Experience') {
-      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
+      const items = experienceList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Review') {
-      // Changed to use prop
-      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
+      const items = reviewList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     return null;
@@ -1957,11 +1955,11 @@ const EditPage = () => {
           <div>
             <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px', color: '#333' }}>Personal</h3>
             {[
-              { label: 'Prefix', value: prefix, setter: setPrefix },
+              // { label: 'Prefix', value: prefix, setter: setPrefix },
               { label: 'First Name', value: firstName, setter: setFirstName },
               { label: 'Middle Name', value: middleName, setter: setMiddleName },
               { label: 'Last Name', value: lastName, setter: setLastName },
-              { label: 'Suffix', value: suffix, setter: setSuffix },
+              // { label: 'Suffix', value: suffix, setter: setSuffix },
               // { label: 'Accreditations', value: accreditations, setter: setAccreditations },
               // { label: 'Preferred Name', value: preferredName, setter: setPreferredName },
               // { label: 'Maiden Name', value: maidenName, setter: setMaidenName },

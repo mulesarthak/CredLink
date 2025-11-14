@@ -66,13 +66,19 @@ export async function POST(req: NextRequest) {
 
     // Handle profile image upload
     const profileImageFile = formData.get('profileImage') as File;
+    const profileImageUrl = formData.get('profileImageUrl') as string;
+    
     if (profileImageFile && profileImageFile.size > 0) {
+      // Upload new profile image file
       const buffer = Buffer.from(await profileImageFile.arrayBuffer());
       const uploadResult: any = await uploadToCloudinary(buffer, {
         folder: 'credlink/cards/profiles',
         public_id: `${decoded.userId}_profile_${Date.now()}`,
       });
       cardData.profileImage = uploadResult.secure_url;
+    } else if (profileImageUrl) {
+      // Use existing profile image URL
+      cardData.profileImage = profileImageUrl;
     }
 
     // Handle banner image upload
