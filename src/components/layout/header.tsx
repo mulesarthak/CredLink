@@ -241,14 +241,18 @@ export function Header() {
                         transition={{ duration: 0.2 }}
                         style={{
                           position: "fixed",
-                          inset: 0,
-                          zIndex: 60,
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          zIndex: 1000,
                           background: "rgba(2, 6, 23, 0.45)",
                           backdropFilter: "blur(4px)",
                           display: "flex",
                           justifyContent: "center",
                           alignItems: "flex-start",
                           padding: "12px",
+                          overflow: 'auto'
                         }}
                         onClick={() => setIsDropdownOpen(false)}
                       >
@@ -265,6 +269,8 @@ export function Header() {
                             boxShadow:
                               "0 20px 40px rgba(0,0,0,0.25), 0 0 0 1px rgba(147,197,253,0.35) inset",
                             overflow: "hidden",
+                            marginTop: '60px', // Add some top margin to ensure it's below the header
+                            zIndex: 1001 // Ensure it's above the overlay
                           }}
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -375,7 +381,11 @@ export function Header() {
 
       {/* OUTSIDE CLICK HANDLER */}
       {isDropdownOpen && (
-        <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)} />
+        <div 
+          className="fixed inset-0 z-40" 
+          style={{ zIndex: 999 }} // Ensure it's below the mobile menu but above other content
+          onClick={() => setIsDropdownOpen(false)} 
+        />
       )}
     </>
   );
