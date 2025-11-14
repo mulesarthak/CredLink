@@ -65,19 +65,13 @@ export function Header() {
             >
               <div className="relative">
                 {isLgUp ? (
-                  <motion.button
+                  <motion.div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "50%",
-                      background: user?.profileImage
-                        ? "transparent"
-                        : "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-                      border: "2px solid white",
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
