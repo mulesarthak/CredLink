@@ -132,11 +132,12 @@ export default function Homepage() {
             </div>
 
             {/* Right Side - Front Image */}
-            <div className="relative flex justify-center items-center order-1 lg:order-2" style={{ minHeight: '500px', overflow: 'visible' }}>
+            <div className="relative flex justify-center items-center order-1 lg:order-2 min-h-[200px] lg:min-h-[500px]" style={{ overflow: 'visible' }}>
               <div className="relative" style={{ maxWidth: '500px', width: '100%' }}>
                 
                 {/* Front Image */}
                 <div 
+                  className="lg:pt-4 pt-0 lg:px-4 px-2"
                   style={{
                     width: '100%',
                     height: 'auto',
@@ -145,8 +146,7 @@ export default function Homepage() {
                     animation: 'fadeInUp 1.2s ease-out 0.3s both',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '1rem 0' // Reduced padding to maximize image space
+                    justifyContent: 'center'
                   }}
                 >
                   <div style={{

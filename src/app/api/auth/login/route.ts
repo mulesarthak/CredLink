@@ -70,7 +70,10 @@ export async function POST(request: NextRequest) {
       {
         userId: user.id,
         email: user.email,
-        fullName: user.fullName
+        fullName: user.fullName,
+        phone: user.phone,
+        username: user.username,
+        profileImage: user.profileImage
       },
       { expiresIn: TOKEN_EXPIRY }
     )

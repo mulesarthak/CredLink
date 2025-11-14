@@ -45,25 +45,60 @@ function VerifyOtpContent() {
 
     setLoading(true)
     try {
-      // Verify OTP with API
-      const verifyResponse = await fetch('/api/auth/otp/verify', {
+      // Get verification ID from sessionStorage
+      const verificationId = typeof window !== 'undefined' 
+        ? sessionStorage.getItem('verificationId')
+        : null
+
+      if (!verificationId) {
+        throw new Error('Verification ID not found. Please request OTP again.')
+      }
+
+      console.log('🔐 Verifying OTP with Firebase...')
+
+      // Verify OTP with Firebase
+      const credential = PhoneAuthProvider.credential(verificationId, otp)
+      await signInWithCredential(auth, credential)
+      
+      console.log('✅ Firebase OTP verified successfully!')
+      
+      // Get signup data from sessionStorage
+      const signupData = typeof window !== 'undefined' 
+        ? JSON.parse(sessionStorage.getItem('signupData') || '{}')
+        : {}
+
+      if (!signupData.email) {
+        throw new Error('Signup data not found. Please signup again.')
+      }
+
+      // Now create user account via API
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ phone, otp })
+        body: JSON.stringify(signupData)
       })
-      
-      const verifyData = await verifyResponse.json()
-      
-      if (!verifyResponse.ok || !verifyData.success) {
-        throw new Error('OTP verification failed')
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Account creation failed')
       }
 
-      toast.success("Phone verified successfully!")
+      // Clear session storage
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('signupData')
+        sessionStorage.removeItem('verificationId')
+        sessionStorage.removeItem('otpPhone')
+      }
+
+      toast.success("Account created successfully!")
       router.push("/auth/login")
-    } catch {
-      setError("Invalid or expired OTP. Please try again.")
+    } catch (error: any) {
+      console.error('❌ Verification error:', error)
+      setError(error.message || "Invalid or expired OTP. Please try again.")
+      toast.error(error.message || "Verification failed")
     } finally {
       setLoading(false)
     }

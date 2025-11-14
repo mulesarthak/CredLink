@@ -198,7 +198,7 @@ const handleDelete = async () => {
   }, [cardId, router]);
 
   const mockUserData = {
-    cardUrl: `https://MyKard.com/hi/XXXX`,
+    cardUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/cards/public/${cardId}`,
   };
 
   const copyToClipboard = async (text: string) => {
