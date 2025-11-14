@@ -70,28 +70,44 @@ export function Header() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     style={{
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "50%",
+                      background: user?.profileImage
+                        ? "transparent"
+                        : "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                      border: "2px solid white",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
                       display: "flex",
                       alignItems: "center",
-                      gap: "12px",
-                      padding: "8px 16px",
-                      background: "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
-                      borderRadius: "12px",
-                      border: "1px solid rgba(147, 197, 253, 0.5)",
-                      transition: "all 0.3s ease",
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                      cursor: "pointer",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      overflow: "hidden",
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background =
-                        "linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%)";
-                      e.currentTarget.style.boxShadow =
-                        "0 4px 12px rgba(0, 0, 0, 0.15)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background =
-                        "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)";
-                      e.currentTarget.style.boxShadow =
-                        "0 2px 8px rgba(0, 0, 0, 0.1)";
+                  >
+                    {user?.profileImage ? (
+                      <img
+                        src={user.profileImage}
+                        alt="Profile"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <User style={{ width: "16px", height: "16px", color: "white" }} />
+                    )}
+                  </div>
+
+                  {/* USER INFO */}
+                  <div
+                    className="hidden sm:block"
+                    style={{
+                      textAlign: "left",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
                     }}
                   >
                     {/* USER AVATAR */}
