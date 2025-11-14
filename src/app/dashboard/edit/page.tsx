@@ -196,8 +196,8 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
                 <path d="M4 8l8 5 8-5"/>
                 <rect x="4" y="6" width="16" height="12" rx="2" ry="2"/>
               </svg>
-            </a>
-            {/* Phone */}
+            </div>
+            
             <a href={`tel:${phone || '+911234567890'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
@@ -217,7 +217,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
                 <line x1="2" y1="12" x2="22" y2="12"/>
                 <path d="M12 2a15.3 15.3 0 010 20a15.3 15.3 0 010-20z"/>
               </svg>
-            </a>
+            </div>
           </div>
         </div>
       </div>
@@ -952,7 +952,6 @@ const EditPage = () => {
   const [title, setTitle] = useState('');
   const [department, setDepartment] = useState('');
   const [company, setCompany] = useState('MyKard'); // Added default
-  const [company, setCompany] = useState('MyKard'); // Added default
   const [headline, setHeadline] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
@@ -967,7 +966,6 @@ const EditPage = () => {
 
   const [skills, setSkills] = useState('SEO, Content Creation, Analytics');
   const [portfolio, setPortfolio] = useState('Case Study 1, Project X');
-  const [experience, setExperience] = useState('Lead Marketer @ MyKard (2023-Present)');
   const [experience, setExperience] = useState('Lead Marketer @ MyKard (2023-Present)');
   const [linkedin, setLinkedin] = useState('https://linkedin.com/in/yaasnick');
   const [website, setWebsite] = useState('https://yaasnick.com');
@@ -2327,7 +2325,6 @@ const EditPage = () => {
                 <textarea
                   value={experience}
                   onChange={(e) => setExperience(e.target.value)}
-                  placeholder="e.g. Lead Marketer @ MyKard (2023-Present)"
                   placeholder="e.g. Lead Marketer @ MyKard (2023-Present)"
                   rows={3}
                   style={{
