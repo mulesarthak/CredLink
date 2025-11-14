@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./publiccard.module.css";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
@@ -40,6 +40,7 @@ interface Card {
   selectedColor?: string;
   selectedColor2?: string;
   selectedFont?: string;
+  cardType?: string;
   views?: number;
   boost?: "Active" | "Inactive";
   user?: {
@@ -77,6 +78,7 @@ const CardPreview: React.FC<{ card: Card }> = ({ card }) => {
       website: card.websiteUrl || card.website || '',
       themeColor1: card.selectedColor || '#3b82f6',
       themeColor2: card.selectedColor2 || '#2563eb',
+      cardType: card.cardType || '',
     };
 
     const design = card.selectedDesign || 'Classic';
@@ -312,7 +314,6 @@ const PublicCardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const incrementedRef = useRef(false);
 
   useEffect(() => {
     const fetchCard = async () => {
@@ -333,7 +334,19 @@ const PublicCardPage = () => {
         if (data.success && data.card) {
           console.log('✅ Fetched public card:', data.card);
           setCard(data.card);
-                  } else {
+          
+          // Increment view count for public access
+          try {
+            await fetch(`/api/card/${cardId}/view`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+          } catch (viewError) {
+            console.warn('Failed to increment view count:', viewError);
+          }
+        } else {
           throw new Error('Card not found');
         }
       } catch (error: any) {
@@ -347,16 +360,6 @@ const PublicCardPage = () => {
     if (cardId) {
       fetchCard();
     }
-  }, [cardId]);
-
-  // Increment view count when this public page is opened/reloaded
-  useEffect(() => {
-    if (!cardId) return;
-    if (incrementedRef.current) return; // prevents double increment in React Strict Mode
-    incrementedRef.current = true;
-
-    // Fire-and-forget; server will ignore owner views
-    fetch(`/api/card/${cardId}/view`, { method: 'POST' }).catch(() => {});
   }, [cardId]);
 
   const handleConnectClick = () => {
