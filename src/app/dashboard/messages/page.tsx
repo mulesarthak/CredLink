@@ -1,9 +1,7 @@
 "use client";
 
-import React, { use, useEffect, useMemo, useState } from "react";
-import { Search, Trash2, X, MoreVertical } from "lucide-react";
-import { ca } from "zod/v4/locales";
-import { send } from "process";
+import React, { useEffect, useMemo, useState } from "react";
+import { Search, X, Trash2 } from "lucide-react";
 
 type MessageStatus = "New" | "Read" | "Replied" | "Pending" | "Archived" | "Deleted";
 type MessageTag = "Lead" | "Support" | "Pricing" | "Feedback" | null;
@@ -18,7 +16,7 @@ interface MessageItem {
   read: boolean;
   starred: boolean;
   tag: MessageTag;
-  senderId: string; // Store the original sender's ID for replies
+  senderId: string;
   replies?: {
     text: string;
     date: string;
@@ -28,6 +26,7 @@ interface MessageItem {
 export default function MessagesPage() {
   const [isMobile, setIsMobile] = useState(false);
   const [messages, setMessages] = useState<MessageItem[]>([]);
+  
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 640px)");
     const onChange = () => setIsMobile(mql.matches);
@@ -39,10 +38,11 @@ export default function MessagesPage() {
       (mql.removeEventListener ? mql.removeEventListener("change", onChange) : mql.removeListener(onChange));
     };
   }, []);
+
   useEffect(() => {
     fetchMessages();
-
   }, []);
+
   const fetchMessages = async () => {
     try{
       const token = localStorage.getItem('token');
@@ -53,13 +53,10 @@ export default function MessagesPage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        
       });
       if (response.ok) {
         const data = await response.json();
 
-        // Map API response (messages + senders) into the UI MessageItem shape
-        // API: { messages: [{ id, text, senderId, receiverId, createdAt }], senders: [{ id, fullName, email }] }
         const sendersMap: Record<string, { id: string; fullName?: string; email?: string }> = {};
         (data.senders || []).forEach((s: any) => {
           sendersMap[s.id] = s;
@@ -92,7 +89,7 @@ export default function MessagesPage() {
             read: typeof msg.read === 'boolean' ? msg.read : false,
             starred: false,
             tag: tagMap[String(msg.tag)] || null,
-            senderId: msg.senderId, // Store senderId for replies
+            senderId: msg.senderId,
             replies: [],
           } as MessageItem;
         });
@@ -116,50 +113,13 @@ export default function MessagesPage() {
     }).format(d);
   };
 
-  // const [messages, setMessages] = useState<MessageItem[]>([
-  //   {
-  //     id: "msg_001",
-  //     name: "Aarav Patel",
-  //     email: "aarav@example.com",
-  //     message: "Interested in your premium plan. Can we schedule a call?",
-  //     date: "2025-10-30T10:12:00",
-  //     status: "New",
-  //     read: false,
-  //     starred: true,
-  //     tag: "Lead",
-  //   },
-  //   {
-  //     id: "msg_002",
-  //     name: "Isha Gupta",
-  //     email: "isha.g@example.com",
-  //     message: "Loved the demo card. How do I embed it on my website?",
-  //     date: "2025-10-30T09:02:00",
-  //     status: "Replied",
-  //     read: true,
-  //     starred: false,
-  //     tag: "Support",
-  //   },
-  //   {
-  //     id: "msg_003",
-  //     name: "Rahul Verma",
-  //     email: "rahul.v@example.com",
-  //     message: "Can you share pricing for teams of 10?",
-  //     date: "2025-10-29T18:44:00",
-  //     status: "Pending",
-  //     read: false,
-  //     starred: false,
-  //     tag: "Pricing",
-  //   },
-  // ]);
-
-  const [activeFilter, setActiveFilter] = useState<"All" | "Unread" | "Replied" | "Pending" | "Archived" | "Deleted">("All");
+  const [activeFilter, setActiveFilter] = useState<"All" | "Unread" | "Replied" | "Pending" | "Archived">("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   const [detailId, setDetailId] = useState<string | null>(null);
   const [replyId, setReplyId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   const filteredMessages = useMemo(() => {
     let filtered = messages;
@@ -178,7 +138,6 @@ export default function MessagesPage() {
       case "Replied": filtered = filtered.filter(m => m.status === "Replied"); break;
       case "Pending": filtered = filtered.filter(m => m.status === "Pending"); break;
       case "Archived": filtered = filtered.filter(m => m.status === "Archived"); break;
-      case "Deleted": filtered = filtered.filter(m => m.status === "Deleted"); break;
       default: filtered = filtered.filter(m => m.status !== "Archived" && m.status !== "Deleted");
     }
 
@@ -192,13 +151,11 @@ export default function MessagesPage() {
   const openDetail = (id: string) => {
     setMessages(prev => prev.map(m => m.id === id ? { ...m, read: true, status: m.status === "New" ? "Read" : m.status } : m));
     setDetailId(id);
+    setReplyId(id);
   };
 
-  
-  
-
   const deleteMessage = (id: string) => {
-    setMessages(prev => prev.map(m => m.id === id ? { ...m, status: "Deleted" } : m));
+    setMessages(prev => prev.map(m => m.id === id ? { ...m, status: "Archived" } : m));
 
     const sendDeleteRequest = async () => {
       try {
@@ -233,7 +190,7 @@ export default function MessagesPage() {
         },
         body: JSON.stringify({
           message: replyText.trim(),
-          receiverId: originalMessage.senderId, // Send reply back to original sender
+          receiverId: originalMessage.senderId,
           status: 'REPLIED',
           tag: originalMessage.tag?.toUpperCase() || 'SUPPORT',
           read: false,
@@ -241,7 +198,6 @@ export default function MessagesPage() {
       });
 
       if (response.ok) {
-        // Update local state to reflect the reply
         setMessages(prev => prev.map(m => m.id === replyId ? { 
           ...m, 
           status: "Replied", 
@@ -256,8 +212,6 @@ export default function MessagesPage() {
         } : m));
         setReplyId(null);
         setReplyText("");
-        // Optionally refetch messages to sync with backend
-        // fetchMessages();
       } else {
         const errorData = await response.json();
         console.error('Failed to send reply:', errorData);
@@ -271,31 +225,36 @@ export default function MessagesPage() {
 
   const getStatusBadge = (status: MessageStatus) => {
     const styles: Record<MessageStatus, string> = {
-      New: "bg-blue-100 text-blue-700",
-      Read: "bg-gray-100 text-gray-600",
-      Replied: "bg-green-100 text-green-700",
-      Pending: "bg-yellow-100 text-yellow-700",
-      Archived: "bg-gray-50 text-gray-500",
-      Deleted: "bg-red-50 text-red-600",
+      New: "bg-blue-50 text-blue-700 border border-blue-200",
+      Read: "bg-gray-50 text-gray-600 border border-gray-200",
+      Replied: "bg-green-50 text-green-700 border border-green-200",
+      Pending: "bg-amber-50 text-amber-700 border border-amber-200",
+      Archived: "bg-gray-50 text-gray-500 border border-gray-200",
+      Deleted: "bg-red-50 text-red-600 border border-red-200",
     };
-    return `px-2 py-0.5 text-xs font-medium rounded-full ${styles[status]}`;
+    return `px-2.5 py-0.5 text-xs font-medium rounded ${styles[status]}`;
   };
 
   const getTagBadge = (tag: MessageTag) => {
     const styles: Record<NonNullable<MessageTag>, string> = {
-      Lead: "bg-purple-100 text-purple-700",
-      Support: "bg-blue-100 text-blue-700",
-      Pricing: "bg-green-100 text-green-700",
-      Feedback: "bg-orange-100 text-orange-700",
+      Lead: "bg-purple-50 text-purple-700 border border-purple-200",
+      Support: "bg-blue-50 text-blue-700 border border-blue-200",
+      Pricing: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+      Feedback: "bg-orange-50 text-orange-700 border border-orange-200",
     };
-    return tag ? `px-2 py-0.5 text-xs font-medium rounded-full ${styles[tag]}` : "";
+    return tag ? `px-2.5 py-0.5 text-xs font-medium rounded ${styles[tag]}` : "";
+  };
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
   return (
     <div
+      className="no-scrollbar"
       style={{
         minHeight: "100vh",
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "#F3F2EF",
         overflowX: "hidden",
       }}
     >
@@ -305,291 +264,297 @@ export default function MessagesPage() {
           maxWidth: "100%",
           margin: 0,
           boxSizing: "border-box",
-          padding: isMobile ? "16px 12px" : "24px 32px",
+          padding: isMobile ? "0px" : "24px", 
         }}
       >
-        {/* Header */}
-        {isMobile ? (
-          <div style={{ marginBottom: 24 }}>
-            <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>Messages</h1>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div className="relative" style={{ flex: 1 }}>
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#94A3B8" }} />
+        {/* Full-page Message Box */}
+        <div style={{ 
+          maxWidth: "100%",
+          margin: 0,
+          padding: 0,
+        }}>
+          <div style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: isMobile ? 0 : 8,
+            boxShadow: isMobile ? "none" : "0 0 0 1px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.08)",
+            minHeight: isMobile ? "100vh" : "auto", 
+          }}>
+            {/* Search Bar */}
+            <div style={{ padding: "16px 16px 0 16px" }}>
+              <div style={{ position: "relative" }}>
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#666666" }} />
                 <input
                   type="text"
-                  placeholder="Search messages..."
+                  placeholder="Search messages"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   className="w-full"
                   style={{
-                    padding: "10px 14px 10px 40px",
+                    padding: "8px 12px 8px 36px",
                     fontSize: 14,
-                    border: "1px solid #CBD5E1",
-                    borderRadius: 8,
+                    backgroundColor: "#EDF3F8",
+                    border: "none",
+                    borderRadius: 4,
                     outline: "none",
-                    backgroundColor: "#FFFFFF",
+                    color: "#000000",
                   }}
                 />
               </div>
-              <div style={{ position: "relative" }}>
-                <button
-                  aria-label="Filters"
-                  onClick={() => setMobileFilterOpen(v => !v)}
-                  style={{ padding: 6, color: "#94A3B8" }}
-                >
-                  <MoreVertical className="w-5 h-5" />
-                </button>
-                {mobileFilterOpen && (
-                  <div
-                    style={{
-                      position: "fixed",
-                      right: 16,
-                      top: 120,
-                      backgroundColor: "#FFFFFF",
-                      border: "1px solid #E5E7EB",
-                      borderRadius: 8,
-                      boxShadow: "0 8px 24px rgba(16,24,40,0.12)",
-                      zIndex: 1000,
-                      width: 200,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <button
-                      onClick={() => { setSortOrder("newest"); setMobileFilterOpen(false); }}
-                      style={{
-                        display: "block",
-                        width: "100%",
-                        textAlign: "left",
-                        padding: "10px 12px",
-                        background: sortOrder === "newest" ? "#EFF6FF" : "transparent",
-                        color: "#0F172A",
-                      }}
-                    >
-                      Newest First
-                    </button>
-                    <button
-                      onClick={() => { setSortOrder("oldest"); setMobileFilterOpen(false); }}
-                      style={{
-                        display: "block",
-                        width: "100%",
-                        textAlign: "left",
-                        padding: "10px 12px",
-                        background: sortOrder === "oldest" ? "#EFF6FF" : "transparent",
-                        color: "#0F172A",
-                      }}
-                    >
-                      Oldest First
-                    </button>
-                  </div>
-                )}
-              </div>
             </div>
-          </div>
-        ) : (
-          <div style={{ marginBottom: 32 }}>
-            <h1 style={{ fontSize: 28, fontWeight: 700, color: "#111827" }}>Messages</h1>
-            <p style={{ fontSize: 16, color: "#4B5563", marginTop: 8 }}>Manage incoming messages, leads, and conversations.</p>
-          </div>
-        )}
 
-        {/* Search & Actions */}
-        {!isMobile && (
-        <div
-          style={{
-            backgroundColor: "#FFFFFF",
-            borderRadius: 12,
-            boxShadow: "0 1px 2px rgba(16, 24, 40, 0.06)",
-            padding: 16,
-            marginBottom: 16,
-            border: "1px solid #E5E7EB",
-          }}
-        >
-          <div className="flex flex-col sm:flex-row gap-3 items-center">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#94A3B8" }} />
-              <input
-                type="text"
-                placeholder="Search messages..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="w-full"
-                style={{
-                  padding: "10px 14px 10px 40px",
-                  fontSize: 14,
-                  border: "1px solid #CBD5E1",
-                  borderRadius: 8,
-                  outline: "none",
-                }}
-              />
-            </div>
-            <select
-              value={sortOrder}
-              onChange={e => setSortOrder(e.target.value as any)}
-              style={{
-                padding: "10px 16px",
-                fontSize: 14,
-                border: "1px solid #CBD5E1",
-                borderRadius: 8,
-                outline: "none",
-                backgroundColor: "#FFFFFF",
-                color: "#0F172A",
-              }}
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-            </select>
-            
-          </div>
-        </div>
-        )}
-
-        {/* Filters & List */}
-        <div
-          style={{
-            backgroundColor: "transparent",
-            borderRadius: 12,
-            boxShadow: "none",
-            border: "none",
-          }}
-        >
-          {/* Filter Tabs */}
-          <div
-            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-            style={{ padding: 16, borderBottom: "1px solid #E5E7EB" }}
-          >
-            <div
-              className="flex items-center gap-2"
-              style={{
-                flexWrap: isMobile ? "nowrap" : "wrap",
+            {/* Tabs Section */}
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "space-between",
+              borderBottom: "1px solid #E0E0E0",
+              padding: "12px 16px 0 16px",
+            }}>
+              <div style={{ 
+                display: "flex", 
+                gap: 0,
                 overflowX: isMobile ? "auto" : "visible",
                 WebkitOverflowScrolling: "touch",
-                msOverflowStyle: isMobile ? "none" : undefined,
-                scrollbarWidth: isMobile ? "none" : undefined,
-              }}
-            >
-              {(["All", "Unread", "Replied", "Pending", "Archived", "Deleted"] as const).map(f => (
-                <button
-                  key={f}
-                  onClick={() => setActiveFilter(f)}
-                  style={{
-                    padding: "8px 12px",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    borderRadius: 9999,
-                    transition: "background-color .2s ease",
-                    backgroundColor: activeFilter === f ? "#2563EB" : "#F1F5F9",
-                    color: activeFilter === f ? "#FFFFFF" : "#334155",
-                    whiteSpace: "nowrap",
-                    flex: "0 0 auto",
-                  }}
-                >
-                  {f}
-                </button>
-              ))}
+              }}>
+                {(["All", "Unread", "Replied", "Pending", "Archived"] as const).map(f => (
+                  <button
+                    key={f}
+                    onClick={() => setActiveFilter(f)}
+                    style={{
+                      padding: "12px 16px",
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: activeFilter === f ? "#0A66C2" : "#666666",
+                      backgroundColor: "transparent",
+                      borderBottom: activeFilter === f ? "2px solid #0A66C2" : "2px solid transparent",
+                      whiteSpace: "nowrap",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+              <select
+                value={sortOrder}
+                onChange={e => setSortOrder(e.target.value as any)}
+                style={{
+                  padding: "6px 8px",
+                  fontSize: 13,
+                  border: "1px solid #E0E0E0",
+                  borderRadius: 4,
+                  outline: "none",
+                  backgroundColor: "#FFFFFF",
+                  color: "#666666",
+                }}
+              >
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+              </select>
             </div>
-            <span style={{ fontSize: 13, color: "#475569" }}>Showing {filteredMessages.length} message{filteredMessages.length !== 1 ? "s" : ""}</span>
-          </div>
 
-          {/* Message List */}
-          <ul>
-            {filteredMessages.length === 0 ? (
-              <li style={{ padding: 48, textAlign: "center", color: "#6B7280" }}>
-                <p style={{ fontSize: 18 }}>No messages found.</p>
-              </li>
-            ) : (
-              filteredMessages.map(m => (
-                <li
-                  key={m.id}
-                  className="last:border-b-0"
-                  onMouseEnter={() => !isMobile && setHoveredId(m.id)}
-                  onMouseLeave={() => !isMobile && setHoveredId(null)}
-                  style={{
-                    padding: 20,
-                    margin: "12px 0",
-                    backgroundColor: "#F9FAFB",
-                    border: "1px solid #E5E7EB",
-                    borderRadius: 12,
-                    boxShadow: hoveredId === m.id && !isMobile ? "0 8px 16px rgba(16,24,40,0.08)" : "0 1px 2px rgba(16,24,40,0.04)",
-                    transform: hoveredId === m.id && !isMobile ? "translateY(-2px)" : "translateY(0)",
-                    transition: "transform .15s ease, box-shadow .15s ease",
-                  }}
-                >
-                  <div className="flex items-start gap-3">
-                    
-
-                    {/* Content */}
-                    <div
-                      className="flex-1 min-w-0 cursor-pointer"
-                      onClick={() => openDetail(m.id)}
-                    >
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p
-                          className="font-semibold truncate"
-                          style={{ color: !m.read ? "#0F172A" : "#374151", fontWeight: !m.read ? 700 : 600 }}
-                        >
-                          {m.name}
-                        </p>
-                        <span style={{ fontSize: "var(--text-xs)", color: "#6B7280" }} className="truncate">{m.email}</span>
-                        {m.tag && <span className={getTagBadge(m.tag)}>{m.tag}</span>}
-                        <span className={getStatusBadge(m.status)}>{m.status}</span>
-                      </div>
-                      <p style={{ marginTop: 8, fontSize: 16, color: "#374151" }} className="line-clamp-2">{m.message}</p>
-                      {m.replies && m.replies.length > 0 && (
-                        <div style={{ marginTop: 8 }}>
-                          <p style={{ fontSize: "var(--text-xs)", color: "#6B7280" }}>Replies:</p>
-                          {m.replies.map(reply => (
-                            <p key={reply.date} style={{ fontSize: "var(--text-sm)", color: "#1F2937" }}>{reply.text}</p>
-                          ))}
+            {/* Message List */}
+            <div>
+              {filteredMessages.length === 0 ? (
+                <div style={{ padding: 48, textAlign: "center", color: "#666666" }}>
+                  <p style={{ fontSize: 16 }}>No messages found.</p>
+                </div>
+              ) : (
+                filteredMessages.map(m => (
+                  <div
+                    key={m.id}
+                    onMouseEnter={() => !isMobile && setHoveredId(m.id)}
+                    onMouseLeave={() => !isMobile && setHoveredId(null)}
+                    onClick={() => openDetail(m.id)}
+                    style={{
+                      padding: isMobile ? "16px" : "12px 16px",
+                      borderBottom: "1px solid #E0E0E0",
+                      backgroundColor: hoveredId === m.id && !isMobile ? "#F3F6F8" : m.read ? "#FFFFFF" : "#F7FBFF",
+                      cursor: "pointer",
+                      transition: "background-color 0.15s",
+                    }}
+                  >
+                    {/* === UPDATED LAYOUT LOGIC === */}
+                    {isMobile ? (
+                      /* --- MOBILE LAYOUT --- */
+                      <div>
+                        {/* Top Row: Avatar, Info, Actions */}
+                        <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                          {/* Avatar */}
+                          <div style={{
+                            width: 48, height: 48, borderRadius: "50%", backgroundColor: "#0A66C2",
+                            color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 16, fontWeight: 600, flexShrink: 0,
+                          }}>
+                            {getInitials(m.name)}
+                          </div>
+                          {/* Content Header (Name, Email, Date, Trash) */}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                                  <span style={{ fontSize: 14, fontWeight: m.read ? 400 : 600, color: "#000000" }}>
+                                    {m.name}
+                                  </span>
+                                </div>
+                                <p style={{ fontSize: 13, color: "#666666", marginTop: 2 }}>
+                                  {m.email}
+                                </p>
+                              </div>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <span style={{ fontSize: 12, color: "#666666", whiteSpace: "nowrap" }}>
+                                  {formatDate(m.date)}
+                                </span>
+                                <button
+                                  aria-label="Delete message"
+                                  onClick={e => { e.stopPropagation(); deleteMessage(m.id); }}
+                                  style={{
+                                    padding: 6, border: "none", background: "transparent",
+                                    cursor: "pointer", color: "#D11124", borderRadius: 6,
+                                  }}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      )}
-                    </div>
 
-                    {/* Date */}
-                    <div className="whitespace-nowrap self-center" style={{ minWidth: "90px", textAlign: "right", fontSize: 14, color: "#4B5563" }}>
-                      {formatDate(m.date)}
-                    </div>
+                        {/* Message Body and Reply Count (Same Row) */}
+                        <div style={{
+                          width: "100%",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
+                          marginTop: 12,
+                          paddingLeft: 55,
+                          paddingRight: 16,
+                        }}>
+                          <p 
+                            className="message-text-left"
+                            style={{
+                              fontSize: 14,
+                              color: m.read ? "#666666" : "#000000",
+                              margin: 0,
+                              padding: 0,
+                              flex: 1,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "pre-line", 
+                              wordBreak: "break-word",
+                            }}>
+                            {m.message}
+                          </p>
+                          
+                          {/* Reply count on the right */}
+                          {m.replies && m.replies.length > 0 && (
+                            <p style={{ 
+                              fontSize: 12, 
+                              color: "#666666", 
+                              fontWeight: 600,
+                              margin: 0,
+                              marginLeft: 16,
+                              whiteSpace: "nowrap",
+                              flexShrink: 0,
+                            }}>
+                              {m.replies.length} {m.replies.length === 1 ? 'reply' : 'replies'}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      /* --- DESKTOP LAYOUT (Original) --- */
+                      <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                        {/* Avatar */}
+                        <div style={{
+                          width: 48, height: 48, borderRadius: "50%", backgroundColor: "#0A66C2",
+                          color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 16, fontWeight: 600, flexShrink: 0,
+                        }}>
+                          {getInitials(m.name)}
+                        </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-2 self-center">
-                      <button
-                        onClick={e => { e.stopPropagation(); setReplyId(m.id); }}
-                        style={{
-                          padding: "6px 12px",
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: "#166534",
-                          backgroundColor: "#ECFDF5",
-                          borderRadius: 9999,
-                        }}
-                      >
-                        Reply
-                      </button>
-                      <button
-                        onClick={e => { e.stopPropagation(); deleteMessage(m.id); }}
-                        style={{ padding: 6, color: "#DC2626", borderRadius: 9999, background: "transparent" }}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                        {/* Content (all in one block) */}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          {/* Content Header */}
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                                <span style={{ fontSize: 14, fontWeight: m.read ? 400 : 600, color: "#000000" }}>
+                                  {m.name}
+                                </span>
+                              </div>
+                              <p style={{ fontSize: 13, color: "#666666", marginTop: 2 }}>
+                                {m.email}
+                              </p>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <span style={{ fontSize: 12, color: "#666666", whiteSpace: "nowrap" }}>
+                                {formatDate(m.date)}
+                              </span>
+                              <button
+                                aria-label="Delete message"
+                                onClick={e => { e.stopPropagation(); deleteMessage(m.id); }}
+                                style={{
+                                  padding: 6, border: "none", background: "transparent",
+                                  cursor: "pointer", color: "#D11124", borderRadius: 6,
+                                }}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Message Body */}
+                          <p style={{
+                            fontSize: 14,
+                            color: m.read ? "#666666" : "#000000",
+                            marginTop: 6,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            width: "100%",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            textAlign: "left", // This was the fix from last time
+                            alignSelf: "stretch",
+                            marginLeft: 0,
+                            marginRight: 0,
+                          }}>
+                            {m.message}
+                          </p>
+
+                          {/* Replies */}
+                          {m.replies && m.replies.length > 0 && (
+                            <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #E0E0E0" }}>
+                              <p style={{ fontSize: 12, color: "#666666", fontWeight: 600 }}>
+                                {m.replies.length} {m.replies.length === 1 ? 'reply' : 'replies'}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {/* === END UPDATED LAYOUT LOGIC === */}
                   </div>
-                </li>
-              ))
-            )}
-          </ul>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Detail Modal */}
       {detailId && messages.find(m => m.id === detailId) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setDetailId(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setDetailId(null)}>
           <div
             onClick={e => e.stopPropagation()}
             style={{
               backgroundColor: "#FFFFFF",
-              borderRadius: 12,
-              boxShadow: "0 8px 24px rgba(16,24,40,0.18)",
+              borderRadius: 8,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
               width: "100%",
-              maxWidth: 896,
+              maxWidth: 640,
               maxHeight: "90vh",
               overflowY: "auto",
             }}
@@ -597,77 +562,135 @@ export default function MessagesPage() {
             {(() => {
               const msg = messages.find(m => m.id === detailId)!;
               return (
-                <div style={{ padding: 24 }}>
-                  <div className="flex justify-between items-start" style={{ marginBottom: 16 }}>
-                    <div className="flex items-center gap-3">
+                <div>
+                  {/* Header */}
+                  <div style={{ 
+                    padding: "16px 20px", 
+                    borderBottom: "1px solid #E0E0E0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: "50%",
+                        backgroundColor: "#0A66C2",
+                        color: "#FFFFFF",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 16,
+                        fontWeight: 600,
+                      }}>
+                        {getInitials(msg.name)}
+                      </div>
                       <div>
-                        <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0F172A" }}>{msg.name}</h2>
-                        <p style={{ fontSize: 13, color: "#475569" }}>{msg.email}</p>
+                        <h2 style={{ fontSize: 18, fontWeight: 600, color: "#000000" }}>{msg.name}</h2>
+                        <p style={{ fontSize: 13, color: "#666666" }}>{msg.email}</p>
                       </div>
                     </div>
-                    <button onClick={() => setDetailId(null)} style={{ color: "#94A3B8" }}>
+                    <button onClick={() => setDetailId(null)} style={{ color: "#666666" }}>
                       <X className="w-5 h-5" />
                     </button>
                   </div>
 
-                  <div className="flex gap-2" style={{ marginBottom: 16 }}>
-                    {msg.tag && <span className={`px-3 py-1 rounded-full text-xs font-medium ${getTagBadge(msg.tag)}`}>{msg.tag}</span>}
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(msg.status)}`}>{msg.status}</span>
-                  </div>
+                  {/* Content */}
+                  <div style={{ padding: 0, display: "flex", flexDirection: "column", height: "100%" }}>
+                    {/* Meta strip removed: tag/status badges hidden per request */}
 
-                  <p style={{ fontSize: 14, color: "#475569", marginBottom: 8 }}>
-                    Received: {new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(msg.date))}
-                  </p>
+                    {/* Scrollable conversation area */}
+                    <div className="no-scrollbar" style={{ padding: 20, overflowY: "auto", maxHeight: "60vh" }}>
+                      {/* Date separator */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 12, color: "#666", fontSize: 12, margin: "8px 0 16px" }}>
+                        <div style={{ flex: 1, height: 1, background: "#E0E0E0" }} />
+                        {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(msg.date))}
+                        <div style={{ flex: 1, height: 1, background: "#E0E0E0" }} />
+                      </div>
 
-                  <div
-                    className="whitespace-pre-line"
-                    style={{
-                      marginTop: 16,
-                      padding: 16,
-                      backgroundColor: "#F3F4F6",
-                      borderRadius: 8,
-                      border: "1px solid #E5E7EB",
-                      color: "#1F2937",
-                    }}
-                  >
-                    {msg.message}
-                  </div>
+                      {/* Incoming message (sender) */}
+                      <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 16 }}>
+                        <div style={{
+                          width: 36, height: 36, borderRadius: "50%", background: "#0A66C2", color: "#fff",
+                          display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 600
+                        }}>{getInitials(msg.name)}</div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                            <span style={{ fontWeight: 700, color: "#000" }}>{msg.name}</span>
+                            <span style={{ fontSize: 12, color: "#666" }}>{formatDate(msg.date)}</span>
+                          </div>
+                          <div style={{
+                            marginTop: 6,
+                            background: "#F3F6F8",
+                            borderRadius: 8,
+                            padding: 12,
+                            color: "#000",
+                            lineHeight: 1.5,
+                            whiteSpace: "pre-line",
+                          }}>{msg.message}</div>
+                        </div>
+                      </div>
 
-                  {msg.replies && msg.replies.length > 0 && (
-                    <div style={{ marginTop: 16 }}>
-                      <p style={{ fontSize: "var(--text-xs)", color: "#6B7280" }}>Replies:</p>
-                      {msg.replies.map(reply => (
-                        <p key={reply.date} style={{ fontSize: "var(--text-sm)", color: "#1F2937" }}>{reply.text}</p>
+                      {/* Replies (our messages) */}
+                      {(msg.replies || []).map((reply, idx) => (
+                        <div key={idx} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 12, justifyContent: "flex-end" }}>
+                          <div style={{ maxWidth: "70%" }}>
+                            <div style={{ textAlign: "right", fontSize: 12, color: "#666", marginBottom: 4 }}>You • {formatDate(reply.date)}</div>
+                            <div style={{
+                              background: "#E6F3FF",
+                              borderRadius: 8,
+                              padding: 12,
+                              color: "#000",
+                              lineHeight: 1.5,
+                              whiteSpace: "pre-line",
+                            }}>{reply.text}</div>
+                          </div>
+                          <div style={{
+                            width: 28, height: 28, borderRadius: "50%", background: "#E0E0E0",
+                            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#555"
+                          }}>You</div>
+                        </div>
                       ))}
                     </div>
-                  )}
 
-                  <div className="flex gap-3" style={{ marginTop: 24 }}>
-                    <button
-                      onClick={() => { setDetailId(null); setReplyId(msg.id); }}
-                      style={{
-                        padding: "10px 16px",
-                        backgroundColor: "#2563EB",
-                        color: "#FFFFFF",
-                        borderRadius: 8,
-                        fontWeight: 600,
-                      }}
-                    >
-                      Reply
-                    </button>
-                    <button
-                      onClick={() => { setDetailId(null); deleteMessage(msg.id); }}
-                      className="flex items-center gap-2"
-                      style={{
-                        padding: "10px 16px",
-                        backgroundColor: "#FEF2F2",
-                        color: "#DC2626",
-                        borderRadius: 8,
-                        fontWeight: 600,
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4" /> Delete
-                    </button>
+                    {/* Composer (sticky bottom) */}
+                    <div style={{ borderTop: "3px solid #2A8C2F20", padding: 16 }}>
+                      <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+                        <textarea
+                          value={replyText}
+                          onChange={e => setReplyText(e.target.value)}
+                          placeholder="Write a message..."
+                          className="w-full resize-none"
+                          style={{
+                            minHeight: 80,
+                            padding: 12,
+                            border: "1px solid #E0E0E0",
+                            borderRadius: 12,
+                            outline: "none",
+                            fontSize: 14,
+                            fontFamily: "inherit",
+                            backgroundColor: "#FAFAFA",
+                          }}
+                        />
+                        <button
+                          onClick={sendReply}
+                          disabled={!replyText.trim()}
+                          style={{
+                            padding: "10px 16px",
+                            backgroundColor: !replyText.trim() ? "#B0B0B0" : "#0A66C2",
+                            color: "#FFFFFF",
+                            borderRadius: 20,
+                            fontWeight: 600,
+                            fontSize: 14,
+                            border: "none",
+                            cursor: !replyText.trim() ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          Send
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
@@ -675,69 +698,20 @@ export default function MessagesPage() {
           </div>
         </div>
       )}
-
-      {/* Reply Modal */}
-      {replyId && messages.find(m => m.id === replyId) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setReplyId(null)}>
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              backgroundColor: "#FFFFFF",
-              borderRadius: 12,
-              boxShadow: "0 8px 24px rgba(16,24,40,0.18)",
-              width: "100%",
-              maxWidth: 640,
-            }}
-          >
-            {(() => {
-              const msg = messages.find(m => m.id === replyId)!;
-              return (
-                <div style={{ padding: 24 }}>
-                  <div className="flex justify-between items-center" style={{ marginBottom: 16 }}>
-                    <h3 style={{ fontSize: 18, fontWeight: 600 }}>Reply to {msg.name}</h3>
-                    <button onClick={() => setReplyId(null)} style={{ color: "#94A3B8" }}>
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <p style={{ fontSize: 14, color: "#475569", marginBottom: 16 }}>{msg.email}</p>
-                  <textarea
-                    value={replyText}
-                    onChange={e => setReplyText(e.target.value)}
-                    placeholder="Type your reply..."
-                    className="w-full resize-none"
-                    style={{
-                      height: 128,
-                      padding: 12,
-                      border: "1px solid #CBD5E1",
-                      borderRadius: 8,
-                      outline: "none",
-                    }}
-                  />
-                  <div className="flex justify-end gap-2" style={{ marginTop: 16 }}>
-                    <button onClick={() => setReplyId(null)} style={{ padding: "10px 16px", color: "#334155", backgroundColor: "#F1F5F9", borderRadius: 8 }}>
-                      Cancel
-                    </button>
-                    <button
-                      onClick={sendReply}
-                      disabled={!replyText.trim()}
-                      style={{
-                        padding: "10px 16px",
-                        backgroundColor: "#2563EB",
-                        color: "#FFFFFF",
-                        borderRadius: 8,
-                        opacity: !replyText.trim() ? 0.5 : 1,
-                        cursor: !replyText.trim() ? "not-allowed" : "pointer",
-                      }}
-                    >
-                      Send Reply
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        </div>
-      )}
+      <style jsx>{`
+        .no-scrollbar {
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none; /* Chrome, Safari, Opera */
+        }
+        .message-text-left {
+          text-align: left !important;
+          direction: ltr !important;
+          unicode-bidi: embed !important;
+        }
+      `}</style>
     </div>
   );
 }

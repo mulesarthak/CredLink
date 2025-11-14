@@ -1,0 +1,409 @@
+/* PublicCard.module.css */
+
+:root {
+  /* Primary Theme Color (Blue from the existing design) */
+  --color-primary: #1e62f5;
+  --color-primary-light: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-fade: rgba(37, 99, 235, 0.1);
+  --color-primary-soft: #eff6ff;
+  --color-primary-border: #bfdbfe;
+
+  /* General Colors */
+  --color-text-dark: #1f2937;
+  --color-text-medium: #4b5563;
+  --color-text-light: #6b7280;
+  --color-background: #f9fafb;
+  --color-white: #ffffff;
+  --color-border: #e5e7eb;
+
+  /* Success Colors */
+  --color-success: #10b981;
+  --color-success-bg: #ecfdf5;
+  --color-success-border: #a7f3d0;
+}
+
+/* --- Layout and Structure --- */
+.pageContainer {
+  background-color: var(--color-background);
+  min-height: 100vh;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .contentWrapper {
+    max-width: 500px;
+    gap: 2.5rem;
+  }
+}
+
+.cardPreviewArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* --- Connect Button --- */
+.connectButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: var(--color-white);
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+  min-width: 200px;
+}
+
+.connectButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+.connectButton:active {
+  transform: translateY(0);
+}
+
+@media (min-width: 640px) {
+  .connectButton {
+    padding: 1.25rem 2.5rem;
+    font-size: 1.25rem;
+    min-width: 240px;
+  }
+}
+
+/* --- Modal Styles --- */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+/* Mobile: Bottom sheet style */
+@media (max-width: 639px) {
+  .modalOverlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  
+  .modalContent {
+    background-color: var(--color-white);
+    border-radius: 1rem 1rem 0 0;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: none;
+    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15);
+    position: relative;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+}
+
+/* Desktop: Centered modal */
+@media (min-width: 640px) {
+  .modalContent {
+    background-color: var(--color-white);
+    border-radius: 1rem;
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    position: relative;
+  }
+}
+
+@media (min-width: 768px) {
+  .modalContent {
+    padding: 2.5rem;
+    max-width: 450px;
+  }
+}
+
+.modalHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.modalTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin-bottom: 0.5rem;
+}
+
+.modalSubtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: var(--color-text-light);
+  transition: all 150ms ease-in-out;
+}
+
+.closeButton:hover {
+  background-color: var(--color-background);
+  color: var(--color-text-dark);
+}
+
+/* --- Form Styles --- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+}
+
+.formInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 150ms ease-in-out;
+  background-color: var(--color-white);
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.formInput::placeholder {
+  color: var(--color-text-light);
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.submitButton {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: var(--color-white);
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease-in-out;
+}
+
+.submitButton:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cancelButton {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  background-color: var(--color-white);
+  color: var(--color-text-medium);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease-in-out;
+}
+
+.cancelButton:hover {
+  background-color: var(--color-background);
+  border-color: var(--color-text-medium);
+}
+
+/* --- Loading States --- */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid var(--color-border);
+  border-top: 3px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loadingText {
+  color: var(--color-text-medium);
+  font-size: 1rem;
+}
+
+/* --- Error States --- */
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  text-align: center;
+}
+
+.errorTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+}
+
+.errorMessage {
+  color: var(--color-text-medium);
+  font-size: 1rem;
+}
+
+.errorButton {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease-in-out;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.errorButton:hover {
+  background-color: var(--color-primary-dark);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 640px) {
+  .pageContainer {
+    padding: 1rem 0.75rem;
+  }
+  
+  .modalContent {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .modalTitle {
+    font-size: 1.25rem;
+  }
+  
+  .connectButton {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    min-width: 180px;
+  }
+  
+  .formActions {
+    flex-direction: column;
+  }
+  
+  .submitButton,
+  .cancelButton {
+    width: 100%;
+  }
+}
+
+/* --- Animation Classes for Framer Motion --- */
+.fadeIn {
+  opacity: 0;
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+.slideUp {
+  transform: translateY(20px);
+  opacity: 0;
+  animation: slideUp 0.4s ease-out forwards;
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* --- Hide number input spinners --- */
+.formInput[type="number"]::-webkit-outer-spin-button,
+.formInput[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.formInput[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

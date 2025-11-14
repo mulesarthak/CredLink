@@ -92,7 +92,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
-      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      const items = skillsList;
       return (
         <div style={{ padding: isMobile ? 12 : 16 }}>
           {items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}
@@ -101,20 +101,20 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
     }
     if (section === 'Services') {
       // Changed to use prop
-      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
+      const items = servicesList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Portfolio') {
-      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
+      const items = portfolioList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Experience') {
-      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
+      const items = experienceList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Review') {
       // Changed to use prop
-      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
+      const items = reviewList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     return null;
@@ -220,12 +220,14 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
         {/* Pills */}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
           {[
-            { text: "Services" },
-            { text: "Portfolio" },
-            { text: "Skills" },
-            { text: "Experience" },
-            { text: "Review" },
-          ].map((b) => (
+            { text: "Services", value: services },
+            { text: "Portfolio", value: portfolio },
+            { text: "Skills", value: skills },
+            { text: "Experience", value: experience },
+            { text: "Review", value: review },
+          ]
+          .filter(b => b.value && b.value.trim() !== '')
+          .map((b) => (
             <button
               key={b.text}
               onClick={() => setActivePanel(b.text as Section)}
@@ -311,7 +313,7 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
-      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      const items = skillsList;
       return (
         <div style={{ padding: isMobile ? 12 : 16 }}>
           {items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}
@@ -319,19 +321,19 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
       );
     }
     if (section === 'Services') {
-      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
+      const items = servicesList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Portfolio') {
-      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
+      const items = portfolioList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Experience') {
-      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
+      const items = experienceList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Review') {
-      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
+      const items = reviewList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     return null;
@@ -390,7 +392,7 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
             border: "1px solid rgba(255, 255, 255, 0.4)"
           }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.63A2 2 0 01 3.08 2h3a2 2 0 01 2 1.72 12.84 12.84 0 00 .7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 00 6 6l1.27-1.27a2 2 0 01 2.11-.45 12.84 12.84 0 00 2.81.7A2 2 0 01 22 16.92z"/>
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.63A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
             </svg>
           </a>
           <a href={linkedin} style={{
@@ -418,12 +420,14 @@ const FlatCardPreview: React.FC<DigitalCardProps> = ({
         {/* Pills Section */}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
           {[
-            { text: "Services" },
-            { text: "Portfolio" },
-            { text: "Skills" },
-            { text: "Experience" },
-            { text: "Review" },
-          ].map((b) => (
+            { text: "Services", value: services },
+            { text: "Portfolio", value: portfolio },
+            { text: "Skills", value: skills },
+            { text: "Experience", value: experience },
+            { text: "Review", value: review },
+          ]
+          .filter(b => b.value && b.value.trim() !== '')
+          .map((b) => (
             <button
               key={b.text}
               onClick={() => setActivePanel(b.text as Section)}
@@ -513,7 +517,7 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
-      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      const items = skillsList;
       return (
         <div style={{ padding: isMobile ? 12 : 16 }}>
           {items.map((it, idx) => renderItem(it))}
@@ -521,19 +525,19 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
       );
     }
     if (section === 'Services') {
-      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
+      const items = servicesList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Portfolio') {
-      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
+      const items = portfolioList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Experience') {
-      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
+      const items = experienceList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Review') {
-      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
+      const items = reviewList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     return null;
@@ -638,12 +642,14 @@ const ModernCardPreview: React.FC<DigitalCardProps> = ({
         {/* Pills Section */}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "16px" }}>
           {[
-            { text: "Services" },
-            { text: "Portfolio" },
-            { text: "Skills" },
-            { text: "Experience" },
-            { text: "Review" },
-          ].map((b) => (
+            { text: "Services", value: services },
+            { text: "Portfolio", value: portfolio },
+            { text: "Skills", value: skills },
+            { text: "Experience", value: experience },
+            { text: "Review", value: review },
+          ]
+          .filter(b => b.value && b.value.trim() !== '')
+          .map((b) => (
             <button
               key={b.text}
               onClick={() => setActivePanel(b.text as Section)}
@@ -733,7 +739,7 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
 
   const renderPanelContent = (section: Section) => {
     if (section === 'Skills') {
-      const items = skillsList.length ? skillsList : ['SEO Optimization (Advanced)', 'Content Strategy (Expert)', 'Analytics & Reporting'];
+      const items = skillsList;
       return (
         <div style={{ padding: isMobile ? 12 : 16 }}>
           {items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}
@@ -741,19 +747,19 @@ const SleekCardPreview: React.FC<DigitalCardProps> = ({
       );
     }
     if (section === 'Services') {
-      const items = servicesList.length ? servicesList : ['SEO Audits', 'Slogan Content Campaigns'];
+      const items = servicesList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Portfolio') {
-      const items = portfolioList.length ? portfolioList : ['Case Study 1', 'Project X', 'Client Y'];
+      const items = portfolioList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Experience') {
-      const items = experienceList.length ? experienceList : ['Senior Marketer (Present)', 'Marketing Executive'];
+      const items = experienceList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     if (section === 'Review') {
-      const items = reviewList.length ? reviewList : ['John transformed our online presence!', 'Happy Client'];
+      const items = reviewList;
       return <div style={{ padding: isMobile ? 12 : 16 }}>{items.map((it, idx) => <div key={idx}>{renderItem(it)}</div>)}</div>;
     }
     return null;

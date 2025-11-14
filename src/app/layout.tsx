@@ -23,6 +23,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MyKard",
   description: "Create a credible professional profile that showcases your expertise and connects you with opportunities.",
+  icons: {
+    icon: '/icon.png',
+  },
 };
 
 export default function RootLayout({
