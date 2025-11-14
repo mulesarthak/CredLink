@@ -41,6 +41,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [admin, setAdmin] = useState<AdminData | null>(null);
   const [navigation, setNavigation] = useState<typeof allNavigation>(allNavigation);
+   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -52,6 +53,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     checkAuth(); 
   }, []);
+
+
+useEffect(() => {
+  setShowLogoutConfirm(false);
+}, [pathname]);
 
   const checkAuth = async () => {
     try {
@@ -75,7 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   };
 
-  const handleLogout = async () => {
+    const handleLogout = async () => {
     try {
       await fetch("/api/admin/auth/logout", { method: "POST" });
       router.push("/admin/login");
@@ -95,7 +101,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className={styles.logoIcon}>
               <Shield />
             </div>
-            <span className={styles.logoText}>CredLink Admin</span>
+            <span className={styles.logoText}>MyKard Admin</span>
           </Link>
           
           {/* Mobile close button */}
@@ -129,7 +135,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Home /> Back to Site
             </Link> */}
 
-            <button onClick={handleLogout} className={styles.footerLogout}>
+             <button
+              onClick={() => setShowLogoutConfirm(true)}
+              className={styles.footerLogout}
+            >
               <LogOut /> Sign Out
             </button>
 
@@ -179,6 +188,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
 
       {sidebarOpen && <div className={styles.overlay} onClick={() => setSidebarOpen(false)} />}
+ {showLogoutConfirm && (
+        <div className={styles.logoutModalOverlay}>
+          <div className={styles.logoutModal}>
+            <h3>Are you sure you want to log out?</h3>
+
+            <div className={styles.logoutActions}>
+              <button onClick={handleLogout} className={styles.logoutYes}>
+                Yes, Log Out
+              </button>
+
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className={styles.logoutNo}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
     </div>
+    
   );
 }

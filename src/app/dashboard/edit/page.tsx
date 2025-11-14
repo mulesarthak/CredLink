@@ -184,7 +184,13 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
           {/* Social Row */}
           <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}> 
             {/* Mail */}
-            <a href={`mailto:${email || 'example@mykard.com'}`} style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <div
+              onClick={() => {
+                if (email) window.location.href = `mailto:${email}`;
+                else window.location.href = 'mailto:example@MyKard.com';
+              }}
+              style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer" }}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 4h16v16H4z" opacity="0"/>
                 <path d="M4 8l8 5 8-5"/>
@@ -202,7 +208,10 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4zM8.5 8.5h3.8v1.98h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V23h-4v-6.3c0-1.5-.03-3.44-2.1-3.44-2.1 0-2.42 1.64-2.42 3.34V23h-4z"/></svg>
             </a>
             {/* Globe */}
-            <a href={website || 'https://mykard.com'} target="_blank" rel="noopener noreferrer" style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            <div
+              onClick={() => window.open(website || 'https://MyKard.com', '_blank', 'noopener noreferrer')}
+              style={{ width: "40px", height: "40px", borderRadius: "9999px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer" }}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="2" y1="12" x2="22" y2="12"/>
@@ -943,6 +952,7 @@ const EditPage = () => {
   const [title, setTitle] = useState('');
   const [department, setDepartment] = useState('');
   const [company, setCompany] = useState('MyKard'); // Added default
+  const [company, setCompany] = useState('MyKard'); // Added default
   const [headline, setHeadline] = useState('');
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
@@ -957,6 +967,7 @@ const EditPage = () => {
 
   const [skills, setSkills] = useState('SEO, Content Creation, Analytics');
   const [portfolio, setPortfolio] = useState('Case Study 1, Project X');
+  const [experience, setExperience] = useState('Lead Marketer @ MyKard (2023-Present)');
   const [experience, setExperience] = useState('Lead Marketer @ MyKard (2023-Present)');
   const [linkedin, setLinkedin] = useState('https://linkedin.com/in/yaasnick');
   const [website, setWebsite] = useState('https://yaasnick.com');
@@ -2316,6 +2327,7 @@ const EditPage = () => {
                 <textarea
                   value={experience}
                   onChange={(e) => setExperience(e.target.value)}
+                  placeholder="e.g. Lead Marketer @ MyKard (2023-Present)"
                   placeholder="e.g. Lead Marketer @ MyKard (2023-Present)"
                   rows={3}
                   style={{

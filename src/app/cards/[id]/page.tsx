@@ -531,7 +531,7 @@ const handleDelete = async () => {
                     <div className={styles.settingsControl}>
                       <input
                         type="text"
-                        defaultValue={mockUserData.cardUrl}
+                        defaultValue="https://MyKard.com/hi/XXXX"
                         className={styles.settingsInput}
                         readOnly
                       />

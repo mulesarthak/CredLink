@@ -261,3 +261,33 @@ enum MessageTag {
   PRICING
   FEEDBACK
 }
+model Contact {
+  id        String   @id @default(cuid())
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name      String
+  title     String
+  company   String
+  tags      Json     @default("[]")
+  dateAdded DateTime @default(now())
+  email     String?
+  phone     String?
+  location  String?
+  status    String   @default("active")
+  
+  @@index([ownerId])
+  @@map("contacts")
+}
+
+model ConnectionRequest {
+  id          String   @id @default(cuid())
+  toUserId    String
+  fromUserId  String      // <-- ADD THIS
+  fromName    String
+  fromTitle   String?
+  fromCompany String?
+  tags        Json     @default("[]")
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+}
+

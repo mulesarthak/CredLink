@@ -9,12 +9,12 @@ export async function GET() {
     let csv = 'Type,Metric,Value\n';
     
     // Add traffic data
-    data.trafficData.forEach(item => {
+    data.trafficData.forEach((item: any) => {
       csv += `Traffic,${item.name},${item.visits}\n`;
     });
     
     // Add engagement data
-    data.engagementData.forEach(item => {
+    data.engagementData.forEach((item: any) => {
       csv += `Engagement,${item.name},${item.value}\n`;
     });
     

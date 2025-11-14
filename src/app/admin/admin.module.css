@@ -304,3 +304,84 @@
     margin-left: auto;
   }
 }
+/* ==============================
+   LOGOUT CONFIRMATION MODAL
+   ============================== */
+
+.logoutModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.logoutModal {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+  animation: scaleIn 0.22s ease-out;
+}
+
+.logoutModal h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.logoutActions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.logoutYes {
+  background:#3e5ad4;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+.logoutYes:hover {
+  background: #3e5ad4;
+}
+
+.logoutNo {
+  background: #e5e7eb;
+  color: #1f2937;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+.logoutNo:hover {
+  background: #d1d5db;
+}
+
+/* Modal Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
