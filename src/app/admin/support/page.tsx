@@ -27,6 +27,27 @@ interface SupportTicket {
   status: "Pending" | "Resolved";
 }
 
+const dummyTickets: SupportTicket[] = [
+  {
+    id: "demo-1",
+    userName: "Jane Doe",
+    userEmail: "jane@example.com",
+    subject: "Unable to share card",
+    message: "I cannot share my card link.",
+    date: new Date().toISOString(),
+    status: "Pending",
+  },
+  {
+    id: "demo-2",
+    userName: "John Smith",
+    userEmail: "john@example.com",
+    subject: "Billing & invoicing",
+    message: "Question about my last invoice.",
+    date: new Date().toISOString(),
+    status: "Resolved",
+  },
+];
+
 export default function SupportPage() {
   const router = useRouter();
   const [tickets, setTickets] = useState<SupportTicket[]>([]);

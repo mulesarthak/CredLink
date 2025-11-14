@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
             }, { status: 401 });
         }
 
-        // Fetch messages for the user
+        // Fetch messages sent *to* the user (incoming)
         const messages = await (prisma as any).message.findMany({
             where: {
                 receiverId: userId,
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
             },
         });
 
-        // Get unique sender IDs
+        // Get unique sender IDs (people who contacted this user)
         const senderIds = Array.from(new Set(messages.map((msg: any) => msg.senderId)));
 
         // Fetch sender details
@@ -37,9 +37,21 @@ export async function GET(req: NextRequest) {
             },
         });
 
+        // Fetch messages sent *by* this user to those same senders
+        const sentMessages = await (prisma as any).message.findMany({
+            where: {
+                senderId: userId,
+                receiverId: { in: senderIds },
+            },
+            orderBy: {
+                createdAt: "asc",
+            },
+        });
+
         return NextResponse.json({ 
             ok: true, 
-            messages, 
+            messages,       // incoming messages (others -> user)
+            sentMessages,   // outgoing messages (user -> others)
             senders 
         });
     } catch (error) {
