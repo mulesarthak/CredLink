@@ -74,69 +74,25 @@ export function Header() {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "10px",
-                      padding: "4px 12px 4px 6px",
-                      borderRadius: "9999px",
-                      background: "rgba(255,255,255,0.85)",
-                      border: "1px solid rgba(229,231,235,0.6)",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
-                      cursor: "pointer",
-                      backdropFilter: "blur(6px)",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      overflow: "hidden",
                     }}
                   >
-                    {/* Avatar */}
-                    <div
-                      style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "50%",
-                        background: user?.profileImage
-                          ? "transparent"
-                          : "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-                        border: "2px solid white",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                        overflow: "hidden",
-                      }}
-                    >
-                      {user?.profileImage ? (
-                        <img
-                          src={user.profileImage}
-                          alt="Profile"
-                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                        />
-                      ) : (
-                        <User style={{ width: "16px", height: "16px", color: "white" }} />
-                      )}
-                    </div>
-                    {/* Name + Email */}
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                      <span
+                    {user?.profileImage ? (
+                      <img
+                        src={user.profileImage}
+                        alt="Profile"
                         style={{
-                          fontSize: "14px",
-                          fontWeight: 600,
-                          color: "#374151",
-                          lineHeight: 1.2,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
                         }}
-                      >
-                        {user?.fullName || "User"}
-                      </span>
-                      <span style={{ fontSize: "12px", color: "#6b7280", lineHeight: 1.2 }}>
-                        {user?.email || "No email"}
-                      </span>
-                    </div>
-                    {/* Chevron */}
-                    <motion.div
-                      animate={{ rotate: isDropdownOpen ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                      style={{ display: "flex", alignItems: "center" }}
-                    >
-                      <ChevronDown style={{ width: "16px", height: "16px", color: "#6b7280" }} />
-                    </motion.div>
-                  </motion.div>
+                      />
+                    ) : (
+                      <User style={{ width: "16px", height: "16px", color: "white" }} />
+                    )}
+                  </motion.button>
                 ) : (
                   <motion.button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}

@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { ChevronDown, User, LogOut, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import '../app/globals.css';
 
 
 // Smooth scroll function without changing URL
@@ -41,52 +40,6 @@ export default function Header() {
 
   return (
     <>
-      <style jsx global>{`
-        .mobile-fixed-header {
-          position: fixed !important;
-          top: 0 !important;
-          left: 0 !important;
-          right: 0 !important;
-          width: 100vw !important;
-          min-height: 80px !important;
-          height: auto !important;
-          z-index: 999999 !important;
-          transform: translate3d(0, 0, 0) !important;
-          -webkit-transform: translate3d(0, 0, 0) !important;
-          will-change: transform !important;
-          backface-visibility: hidden !important;
-          -webkit-backface-visibility: hidden !important;
-          overflow: visible !important;
-        }
-        
-        @supports (-webkit-touch-callout: none) {
-          .mobile-fixed-header {
-            position: absolute !important;
-            top: 0 !important;
-          }
-        }
-        
-        @media screen and (max-width: 768px) {
-          html {
-            position: relative !important;
-            overflow-x: hidden !important;
-          }
-          
-          body {
-            position: relative !important;
-            -webkit-overflow-scrolling: touch !important;
-            overflow-scrolling: touch !important;
-            min-height: 100vh !important;
-          }
-          
-          .mobile-fixed-header {
-            position: fixed !important;
-            top: env(safe-area-inset-top, 0) !important;
-            transform: translateZ(0) !important;
-            -webkit-transform: translateZ(0) !important;
-          }
-        }
-      `}</style>
       <header 
         className="bg-white/95 backdrop-blur-xl border-b border-blue-100/50 shadow-sm mobile-fixed-header" 
         style={{ 
