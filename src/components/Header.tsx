@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { ChevronDown, User, LogOut, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import '../app/globals.css';
 
 
 // Smooth scroll function without changing URL
@@ -25,15 +24,26 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLgUp, setIsLgUp] = useState(false);
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
+  // Detect large screen
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => setIsLgUp(mql.matches);
+    onChange();
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+
   const handleLogout = async () => {
     try {
       await logout();
       window.location.href = '/';
+      setIsDropdownOpen(false);
     } catch (error) {
       console.error('Logout failed', error);
     }
@@ -42,49 +52,13 @@ export default function Header() {
   return (
     <>
       <style jsx global>{`
-        .mobile-fixed-header {
-          position: fixed !important;
-          top: 0 !important;
-          left: 0 !important;
-          right: 0 !important;
-          width: 100vw !important;
-          min-height: 80px !important;
-          height: auto !important;
+        .profile-dropdown-desktop {
           z-index: 999999 !important;
-          transform: translate3d(0, 0, 0) !important;
-          -webkit-transform: translate3d(0, 0, 0) !important;
-          will-change: transform !important;
-          backface-visibility: hidden !important;
-          -webkit-backface-visibility: hidden !important;
-          overflow: visible !important;
+          position: absolute !important;
         }
-        
-        @supports (-webkit-touch-callout: none) {
-          .mobile-fixed-header {
-            position: absolute !important;
-            top: 0 !important;
-          }
-        }
-        
-        @media screen and (max-width: 768px) {
-          html {
-            position: relative !important;
-            overflow-x: hidden !important;
-          }
-          
-          body {
-            position: relative !important;
-            -webkit-overflow-scrolling: touch !important;
-            overflow-scrolling: touch !important;
-            min-height: 100vh !important;
-          }
-          
-          .mobile-fixed-header {
-            position: fixed !important;
-            top: env(safe-area-inset-top, 0) !important;
-            transform: translateZ(0) !important;
-            -webkit-transform: translateZ(0) !important;
-          }
+        .profile-dropdown-mobile {
+          z-index: 999999 !important;
+          position: fixed !important;
         }
       `}</style>
       <header 
@@ -103,9 +77,7 @@ export default function Header() {
           WebkitTransform: 'translate3d(0px, 0px, 0px)',
           backfaceVisibility: 'hidden',
           WebkitBackfaceVisibility: 'hidden',
-          overflow: 'visible',
-          contain: 'layout style paint',
-          isolation: 'isolate'
+          overflow: 'visible'
         }}
       >
       <nav className="max-w-7xl mx-auto px-8" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}>
@@ -173,40 +145,262 @@ export default function Header() {
             <div className="flex items-center gap-4">
               {isAuthenticated ? (
                 <div className="relative">
-                  <motion.button
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center gap-3 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-500 flex items-center justify-center text-white font-bold">
+                  {isLgUp ? (
+                    <motion.button
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "50%",
+                        background: user?.profileImage
+                          ? "transparent"
+                          : "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                        border: "2px solid white",
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                        overflow: "hidden",
+                      }}
+                    >
                       {user?.profileImage ? (
-                        <img src={user.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                        <img
+                          src={user.profileImage}
+                          alt="Profile"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
                       ) : (
-                        user?.fullName?.charAt(0).toUpperCase() || 'U'
+                        <User style={{ width: "16px", height: "16px", color: "white" }} />
                       )}
-                    </div>
-                    <ChevronDown className={`w-5 h-5 text-gray-600 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                  </motion.button>
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      style={{
+                        width: "44px",
+                        height: "44px",
+                        borderRadius: "9999px",
+                        background:
+                          "radial-gradient(120% 120% at 30% 20%, #60a5fa 0%, #2563eb 40%, #1e40af 100%)",
+                        border: "1px solid rgba(147, 197, 253, 0.5)",
+                        boxShadow:
+                          "0 6px 18px rgba(37, 99, 235, 0.35), inset 0 0 12px rgba(147, 197, 253, 0.35)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: 0,
+                        cursor: "pointer",
+                      }}
+                      aria-label="Open profile menu"
+                    >
+                      <User style={{ width: "18px", height: "18px", color: "#ffffff" }} />
+                    </motion.button>
+                  )}
                   <AnimatePresence>
                     {isDropdownOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50"
-                      >
-                        <Link
-                          href="/dashboard"
-                          className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left"
+                      isLgUp ? (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                          transition={{ duration: 0.25, ease: "easeOut" }}
+                          style={{
+                            position: "absolute",
+                            right: "0",
+                            marginTop: "8px",
+                            width: "220px",
+                            maxWidth: "calc(100vw - 32px)",
+                            background: "rgba(255, 255, 255, 0.95)",
+                            backdropFilter: "blur(8px)",
+                            border: "1px solid rgba(229, 231, 235, 0.5)",
+                            borderRadius: "12px",
+                            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(147, 197, 253, 0.25) inset",
+                            paddingTop: "10px",
+                            paddingBottom: "10px",
+                            zIndex: "999999 !important",
+                            transform: "translateX(-16px)",
+                          }}
+                          className="profile-dropdown-desktop"
                         >
-                          Dashboard
-                        </Link>
-                        <button
-                          onClick={handleLogout}
-                          className="block w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 text-left"
+                          <Link
+                            href="/dashboard"
+                            onClick={() => setIsDropdownOpen(false)}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "12px",
+                              padding: "12px 16px",
+                              margin: "6px 0",
+                              fontSize: "14px",
+                              color: "#374151",
+                              textDecoration: "none",
+                              transition: "all 0.2s ease",
+                              borderRadius: "8px",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#eff6ff";
+                              e.currentTarget.style.color = "#1d4ed8";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "transparent";
+                              e.currentTarget.style.color = "#374151";
+                            }}
+                          >
+                            <User style={{ width: "16px", height: "16px" }} />
+                            <span>Dashboard</span>
+                          </Link>
+                          <button
+                            onClick={handleLogout}
+                            style={{
+                              width: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "12px",
+                              padding: "12px 16px",
+                              margin: "6px 0",
+                              fontSize: "14px",
+                              color: "#dc2626",
+                              backgroundColor: "transparent",
+                              border: "none",
+                              textAlign: "left",
+                              cursor: "pointer",
+                              transition: "all 0.2s ease",
+                              borderRadius: "8px",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#fef2f2";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "transparent";
+                            }}
+                          >
+                            <LogOut style={{ width: "16px", height: "16px" }} />
+                            <span>Logout</span>
+                          </button>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          style={{
+                            position: "fixed",
+                            inset: 0,
+                            zIndex: 999999,
+                            background: "rgba(2, 6, 23, 0.45)",
+                            backdropFilter: "blur(4px)",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "flex-start",
+                            padding: "12px",
+                          }}
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="profile-dropdown-mobile"
                         >
-                          Logout
-                        </button>
-                      </motion.div>
+                          <motion.div
+                            initial={{ x: 24, y: -8, opacity: 0, scale: 0.98 }}
+                            animate={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                            exit={{ x: 24, y: -8, opacity: 0, scale: 0.98 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                            style={{
+                              width: "min(88vw, 300px)",
+                              background: "rgba(255, 255, 255, 0.96)",
+                              border: "1px solid rgba(229, 231, 235, 0.6)",
+                              borderRadius: "16px",
+                              boxShadow:
+                                "0 20px 40px rgba(0,0,0,0.25), 0 0 0 1px rgba(147,197,253,0.35) inset",
+                              overflow: "hidden",
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "12px",
+                                padding: "12px",
+                                background:
+                                  "linear-gradient(135deg, rgba(219,234,254,0.9), rgba(191,219,254,0.9))",
+                                borderBottom: "1px solid rgba(229, 231, 235, 0.6)",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: "40px",
+                                  height: "40px",
+                                  borderRadius: "9999px",
+                                  background:
+                                    "radial-gradient(120% 120% at 30% 20%, #60a5fa 0%, #2563eb 40%, #1e40af 100%)",
+                                  border: "2px solid white",
+                                  boxShadow:
+                                    "0 6px 18px rgba(37, 99, 235, 0.35), inset 0 0 12px rgba(147, 197, 253, 0.35)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <User style={{ width: "18px", height: "18px", color: "#ffffff" }} />
+                              </div>
+                              <div style={{ display: "flex", flexDirection: "column" }}>
+                                <span style={{ fontSize: 15, fontWeight: 700, color: "#0f172a" }}>
+                                  {user?.fullName || "User"}
+                                </span>
+                                <span style={{ fontSize: 12, color: "#475569" }}>
+                                  {user?.email || "No email"}
+                                </span>
+                              </div>
+                            </div>
+                            <div style={{ padding: "6px" }}>
+                              <Link
+                                href="/dashboard"
+                                onClick={() => setIsDropdownOpen(false)}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "10px",
+                                  padding: "10px 12px",
+                                  borderRadius: "10px",
+                                  color: "#0f172a",
+                                  textDecoration: "none",
+                                }}
+                              >
+                                <User style={{ width: "18px", height: "18px" }} />
+                                <span>Dashboard</span>
+                              </Link>
+                              <button
+                                onClick={handleLogout}
+                                style={{
+                                  width: "100%",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "10px",
+                                  padding: "10px 12px",
+                                  borderRadius: "10px",
+                                  color: "#dc2626",
+                                  background: "transparent",
+                                  border: "none",
+                                  textAlign: "left",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <LogOut style={{ width: "18px", height: "18px" }} />
+                                <span>Logout</span>
+                              </button>
+                            </div>
+                          </motion.div>
+                        </motion.div>
+                      )
                     )}
                   </AnimatePresence>
                 </div>
@@ -368,6 +562,15 @@ export default function Header() {
         )}
       </nav>
     </header>
+
+    {/* Outside Click Handler for Desktop Dropdown */}
+    {isDropdownOpen && isLgUp && (
+      <div 
+        className="fixed inset-0 z-40" 
+        onClick={() => setIsDropdownOpen(false)}
+        style={{ zIndex: 999998 }}
+      />
+    )}
     </>
   );
 }

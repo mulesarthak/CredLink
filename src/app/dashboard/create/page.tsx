@@ -964,6 +964,11 @@ const EditPage = () => {
   const [reviews, setReviews] = useState('');
   // --- END NEW STATE ---
   
+  // Card Type functionality
+  const [customTypes, setCustomTypes] = useState<string[]>([]);
+  const [showCustomTypeInput, setShowCustomTypeInput] = useState(false);
+  const [customTypeInput, setCustomTypeInput] = useState('');
+  
   // Loading state for user data
   const [isLoadingUser, setIsLoadingUser] = useState(true);
 
@@ -1213,6 +1218,23 @@ const EditPage = () => {
       field.id === id ? { ...field, link: value } : field
     ));
   };
+
+  // Card Type helper functions
+  const builtInTypes = ['Personal', 'Professional', 'Business', 'Company', 'Creator', 'Influencer'];
+  
+  const handleAddCustomType = () => {
+    if (customTypeInput.trim() && !builtInTypes.includes(customTypeInput.trim()) && !customTypes.includes(customTypeInput.trim())) {
+      setCustomTypes([...customTypes, customTypeInput.trim()]);
+      setCardType(customTypeInput.trim());
+      setCustomTypeInput('');
+      setShowCustomTypeInput(false);
+    }
+  };
+
+  const getAllCardTypes = () => {
+    return [...builtInTypes, ...customTypes];
+  };
+
   // --- END NEW HANDLER FUNCTIONS ---
 
   // Save card function
@@ -1332,6 +1354,7 @@ const EditPage = () => {
       themeColor1: selectedColor1,
       themeColor2: selectedColor2,
       fontFamily: selectedFont,
+      cardType,
     };
 
     switch (selectedDesign) {
@@ -1901,6 +1924,105 @@ const EditPage = () => {
                 />
               </div>
             ))}
+
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Card Type</label>
+              <select
+                value={cardType}
+                onChange={(e) => setCardType(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  fontSize: '14px',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  boxSizing: 'border-box',
+                  backgroundColor: 'white',
+                  color: '#555',
+                  outline: 'none'
+                }}
+              >
+                <option value="">Select card type...</option>
+                {getAllCardTypes().map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+              
+              {/* Custom Type Input */}
+              {!showCustomTypeInput ? (
+                <button
+                  type="button"
+                  onClick={() => setShowCustomTypeInput(true)}
+                  style={{
+                    marginTop: '8px',
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    color: selectedColor1 || '#2563eb',
+                    background: 'transparent',
+                    border: `1px solid ${selectedColor1 || '#2563eb'}`,
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  + Add custom type
+                </button>
+              ) : (
+                <div style={{ marginTop: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    value={customTypeInput}
+                    onChange={(e) => setCustomTypeInput(e.target.value)}
+                    placeholder="Enter custom type..."
+                    style={{
+                      flex: 1,
+                      padding: '6px 8px',
+                      fontSize: '12px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      outline: 'none'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomType}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      color: 'white',
+                      background: selectedColor1 || '#2563eb',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      outline: 'none'
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCustomTypeInput(false);
+                      setCustomTypeInput('');
+                    }}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      color: '#666',
+                      background: 'transparent',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      outline: 'none'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
 
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>About / Description</label>

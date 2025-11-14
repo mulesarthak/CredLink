@@ -1,0 +1,30 @@
+.cardTypePill {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 12px;
+  color: white;
+  background: var(--pill-bg, #2563eb);
+  z-index: 10;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.cardTypePill.hidden {
+  display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .cardTypePill {
+    font-size: 9px;
+    padding: 3px 6px;
+    top: 6px;
+    right: 6px;
+  }
+}

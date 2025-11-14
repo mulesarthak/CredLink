@@ -27,15 +27,10 @@ export async function GET(
       return NextResponse.json({ error: 'Card not found' }, { status: 404 });
     }
 
-    // Increment views count (use raw query as views field might not be in types yet)
-    await prisma.$executeRaw`UPDATE cards SET views = views + 1 WHERE id = ${cardId}`;
-
+    // Only return the card; do NOT increment views here.
     return NextResponse.json({ 
       success: true,
-      card: {
-        ...card,
-        views: ((card as any).views || 0) + 1
-      }
+      card
     });
 
   } catch (error: any) {

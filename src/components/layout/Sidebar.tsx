@@ -130,7 +130,7 @@ const Sidebar = () => {
       {isMounted && isMobile && (
         <motion.button
           onClick={() => setIsOpen(!isOpen)}
-          className="mobileToggle"
+          className={`mobileToggle ${isOpen ? 'mobileToggleOpen' : 'mobileToggleClosed'}`}
           whileTap={{ scale: 0.9 }}
           suppressHydrationWarning
         >

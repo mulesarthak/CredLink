@@ -2,6 +2,7 @@
 
 import React from "react";
 import { DigitalCardProps } from "./DigitalCardPreview";
+import styles from './cardType.module.css';
 
 const SleekCardPreview: React.FC<DigitalCardProps & { themeColor1?: string; themeColor2?: string }> = ({
   name = "",
@@ -17,6 +18,7 @@ const SleekCardPreview: React.FC<DigitalCardProps & { themeColor1?: string; them
   website = "",
   themeColor1 = "#3b82f6",
   themeColor2 = "#60a5fa",
+  cardType = "",
 }) => {
   const firstLetter = name ? name.charAt(0).toUpperCase() : "J";
 
@@ -32,6 +34,17 @@ const SleekCardPreview: React.FC<DigitalCardProps & { themeColor1?: string; them
         border: `1px solid #e5e5e5`, 
         position: 'relative'
       }}>
+        {/* Card Type Pill */}
+        {cardType && cardType.trim() !== "" && (
+          <div 
+            className={styles.cardTypePill}
+            style={{ 
+              '--pill-bg': themeColor1 || '#2563eb'
+            } as React.CSSProperties}
+          >
+            {cardType}
+          </div>
+        )}
         {/* Header Section with Cover and Profile - Exact copy from edit page */}
         <div style={{
           height: "120px", 

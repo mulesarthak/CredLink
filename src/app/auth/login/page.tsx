@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import "../../globals.css"
+import { auth, GoogleAuthProvider, signInWithPopup } from "@/lib/firebase"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -35,7 +36,7 @@ export default function LoginPage() {
       console.log('email', email)
       console.log('password', password)
       // Send login payload to backend JSON API (email + password)
-      const res = await fetch('/api/login', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -62,6 +63,37 @@ export default function LoginPage() {
       }
     } catch {
       setError('Login failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      const provider = new GoogleAuthProvider()
+      const result = await signInWithPopup(auth, provider)
+      const idToken = await result.user.getIdToken(true)
+
+      const res = await fetch('/api/auth/firebase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ idToken }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(data?.error || 'Authentication failed')
+      }
+      if (data?.needsOnboarding) {
+        window.location.href = '/onboarding'
+      } else {
+        window.location.href = '/dashboard'
+      }
+    } catch (e: any) {
+      console.error('Google login failed', e)
+      setError(e?.message || 'Google sign-in failed')
     } finally {
       setLoading(false)
     }
@@ -155,7 +187,11 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Google Sign-in can be added later when OAuth is configured */}
+        <div className="mt-6">
+          <button type="button" onClick={handleGoogleLogin} className="auth-submit-button w-full" disabled={loading}>
+            Continue with Google
+          </button>
+        </div>
       </div>
     </div>
   )

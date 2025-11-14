@@ -98,82 +98,6 @@ export function Header() {
                     ) : (
                       <User style={{ width: "16px", height: "16px", color: "white" }} />
                     )}
-                  </div>
-
-                  {/* USER INFO */}
-                  <div
-                    className="hidden sm:block"
-                    style={{
-                      textAlign: "left",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {/* USER AVATAR */}
-                    <div
-                      style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "50%",
-                        background:
-                          "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-                        border: "2px solid white",
-                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <User style={{ width: "16px", height: "16px", color: "white" }} />
-                    </div>
-
-                    {/* USER INFO */}
-                    <div
-                      style={{
-                        textAlign: "left",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: "600",
-                          color: "#374151",
-                          lineHeight: "1.2",
-                          marginBottom: "2px",
-                        }}
-                      >
-                        {user?.fullName || "User"}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: "12px",
-                          color: "#6b7280",
-                          lineHeight: "1.2",
-                        }}
-                      >
-                        {user?.email || "No email"}
-                      </div>
-                    </div>
-
-                    {/* DROPDOWN ICON */}
-                    <motion.div
-                      animate={{ rotate: isDropdownOpen ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                      style={{ flexShrink: 0 }}
-                    >
-                      <ChevronDown
-                        style={{
-                          width: "16px",
-                          height: "16px",
-                          color: "#6b7280",
-                        }}
-                      />
-                    </motion.div>
                   </motion.button>
                 ) : (
                   <motion.button
@@ -214,6 +138,7 @@ export function Header() {
                           right: "0",
                           marginTop: "8px",
                           width: "220px",
+                          maxWidth: "calc(100vw - 32px)",
                           background: "rgba(255, 255, 255, 0.95)",
                           backdropFilter: "blur(8px)",
                           border: "1px solid rgba(229, 231, 235, 0.5)",
@@ -222,6 +147,7 @@ export function Header() {
                           paddingTop: "10px",
                           paddingBottom: "10px",
                           zIndex: 50,
+                          transform: "translateX(-16px)",
                         }}
                       >
                         <Link
@@ -320,7 +246,7 @@ export function Header() {
                           background: "rgba(2, 6, 23, 0.45)",
                           backdropFilter: "blur(4px)",
                           display: "flex",
-                          justifyContent: "flex-end",
+                          justifyContent: "center",
                           alignItems: "flex-start",
                           padding: "12px",
                         }}

@@ -75,6 +75,7 @@ export default function DashboardContactPage() {
   const [previewContact, setPreviewContact] = useState<Contact | null>(null);
   const [loading, setLoading] = useState(false);
   const [requestsLoading, setRequestsLoading] = useState(false);
+  const [approveModal, setApproveModal] = useState<{isOpen: boolean, request: Contact | null}>({isOpen: false, request: null});
   const filterRef = useRef<HTMLDivElement>(null);
 
   // Handle direct message - open message modal
@@ -231,9 +232,28 @@ export default function DashboardContactPage() {
   };
 
   // Handle delete connection
-  const handleDeleteConnection = (contactId: string) => {
-    setContactsList(prev => prev.filter(contact => contact.id !== contactId));
-    setOpenDropdown(null);
+  const handleDeleteConnection = async (contactId: string) => {
+    try {
+      const res = await fetch(`/api/users/connections/${contactId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || 'Failed to remove connection');
+      }
+
+      setContactsList(prev => prev.filter(contact => contact.id !== contactId));
+      setOpenDropdown(null);
+      toast.success('Connection removed successfully');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('connections-updated'));
+      }
+    } catch (e: any) {
+      console.error('Delete connection error:', e);
+      toast.error(e?.message || 'Failed to remove connection');
+    }
   };
 
   // Handle contact click to open sidebar
@@ -337,6 +357,14 @@ export default function DashboardContactPage() {
       console.error('Error approving connection request:', error);
       toast.error(error.message || 'Failed to approve connection request');
     }
+  };
+
+  const openApproveModal = (request: Contact) => {
+    setApproveModal({ isOpen: true, request });
+  };
+
+  const closeApproveModal = () => {
+    setApproveModal({ isOpen: false, request: null });
   };
 
   const handleRejectRequest = async (contactId: string) => {
@@ -1015,7 +1043,7 @@ export default function DashboardContactPage() {
                       </div>
                       <div className={styles.requestActions}>
                         <button 
-                          onClick={() => handleApproveRequest(request.id)}
+                          onClick={() => openApproveModal(request)}
                           style={{
                             background: 'linear-gradient(to bottom right, #1e3a8a, #2563eb)',
                             color: 'white',
@@ -1073,6 +1101,30 @@ export default function DashboardContactPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Approve Confirmation Modal */}
+        {approveModal.isOpen && approveModal.request && (
+          <Modal
+            isOpen={approveModal.isOpen}
+            onClose={closeApproveModal}
+            title={`Approve connection with ${approveModal.request.name}?`}
+            showActions={false}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <p className={styles.modalBody}>
+                Approving will allow this person to connect with you and see your shared profile information.
+              </p>
+              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                <button onClick={closeApproveModal} className={styles.modalCancelButton} style={{ flex: 1 }}>
+                  Cancel
+                </button>
+                <button onClick={() => { const id = approveModal.request!.id; closeApproveModal(); handleApproveRequest(id); }} className={styles.modalSendButton} style={{ flex: 1 }}>
+                  Approve
+                </button>
+              </div>
+            </div>
+          </Modal>
         )}
       </div>
     </div>
