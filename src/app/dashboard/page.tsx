@@ -54,9 +54,9 @@ const renderCardPreview = (card: Card) => {
     company: card.company || '',
     location: card.location || '',
     about: card.bio || card.about || card.description || '',
-    skills: card.skills || 'SEO, Content Creation, Analytics, Social Media',
-    portfolio: card.portfolio || '[Link] Latest Campaigns',
-    experience: card.experience || `${card.title || 'Lead SEO Specialist'} @ ${card.company || 'TechCorp'} (2021-Present)`,
+    skills: card.skills || '',
+    portfolio: card.portfolio || '',
+    experience: card.experience || '',
     services: card.services || '',
     review: card.review || '',
     photo: card.profileImage || card.photo || '',
@@ -273,25 +273,7 @@ const Dashboard = () => {
                 style={{ marginBottom: '1.5rem' }}
                 onClick={() => router.push(`/cards/${card.id}`)}
               >
-                <DigitalCardPreview
-                  name={card.name || ''}
-                  title={card.title || ''}
-                  company={card.company || ''}
-                  location={card.location || ''}
-                  about={card.about || ''}
-                  skills={card.skills || ''}
-                  portfolio={card.portfolio || ''}
-                  experience={card.experience || ''}
-                  photo={card.photo || ''}
-                  cover={card.cover || ''}
-                  email={card.email || ''}
-                  phone={card.phone || ''}
-                  linkedin={card.linkedin || ''}
-                  website={card.website || ''}
-                  design="Classic"
-                  themeColor1="#3b82f6"
-                  themeColor2="#2563eb"
-                />
+                {renderCardPreview(card)}
               </motion.div>
             ))}
           </>
