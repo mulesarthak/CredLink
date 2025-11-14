@@ -1,9 +1,8 @@
-import { getApps, initializeApp, applicationDefault, cert } from 'firebase-admin/app'
-import { getAuth } from 'firebase-admin/auth'
+import * as admin from 'firebase-admin'
 
 // Initialize Firebase Admin SDK once per runtime
 function initFirebaseAdmin() {
-  if (!getApps().length) {
+  if (!admin.apps.length) {
     const projectId = process.env.FIREBASE_PROJECT_ID
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
     let privateKey = process.env.FIREBASE_PRIVATE_KEY
@@ -14,8 +13,8 @@ function initFirebaseAdmin() {
     }
 
     if (projectId && clientEmail && privateKey) {
-      initializeApp({
-        credential: cert({
+      admin.initializeApp({
+        credential: admin.credential.cert({
           projectId,
           clientEmail,
           privateKey,
@@ -23,12 +22,12 @@ function initFirebaseAdmin() {
       })
     } else {
       // Fallback to applicationDefault if service account not explicitly set
-      initializeApp({
-        credential: applicationDefault(),
+      admin.initializeApp({
+        credential: admin.credential.applicationDefault(),
       })
     }
   }
-  return getAuth()
+  return admin.auth()
 }
 
 export const adminAuth = initFirebaseAdmin()
