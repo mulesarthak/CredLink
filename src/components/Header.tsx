@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { ChevronDown, User, LogOut, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import '../app/globals.css';
 
 // Smooth scroll function without changing URL
 const scrollToSection = (sectionId: string) => {
@@ -545,7 +545,7 @@ export default function Header() {
                       console.log('Mobile Create Card clicked');
                       window.location.href = '/auth/signup';
                     }}
-                    className="relative block w-full text-center px-6 py-3 text-[15px] font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg shadow-blue-500/30 overflow-hidden group border-none cursor-pointer"
+                    className="relative block w-full text-center px-6 py-3 text-[15px] font-semibold text-white bg-linear-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg shadow-blue-500/30 overflow-hidden group border-none cursor-pointer"
                   >
                     <span className="relative z-10" style={{ pointerEvents: 'none' }}>Create Card</span>
                     <div className="absolute inset-0 bg-linear-to-r from-blue-400/0 via-white/20 to-blue-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>

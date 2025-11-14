@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Search, X, Trash2 } from "lucide-react";
 
 type MessageStatus = "New" | "Read" | "Replied" | "Pending" | "Archived" | "Deleted";
@@ -57,6 +57,9 @@ export default function MessagesPage() {
       if (response.ok) {
         const data = await response.json();
 
+        const inboxMessages = data.messages || [];
+        const sentMessages = data.sentMessages || [];
+
         const sendersMap: Record<string, { id: string; fullName?: string; email?: string }> = {};
         (data.senders || []).forEach((s: any) => {
           sendersMap[s.id] = s;
@@ -77,7 +80,7 @@ export default function MessagesPage() {
           FEEDBACK: 'Feedback',
         };
 
-        const mapped: MessageItem[] = (data.messages || []).map((msg: any) => {
+        const mapped: MessageItem[] = inboxMessages.map((msg: any) => {
           const sender = sendersMap[msg.senderId] || {};
           return {
             id: msg.id,
@@ -94,7 +97,33 @@ export default function MessagesPage() {
           } as MessageItem;
         });
 
-        setMessages(mapped);
+        // Build replies from messages the current user has sent
+        const repliesByReceiver = new Map<string, { text: string; date: string }[]>();
+        (sentMessages as any[]).forEach((msg: any) => {
+          if (!msg.receiverId) return;
+          const existing = repliesByReceiver.get(msg.receiverId) || [];
+          existing.push({
+            text: msg.text || msg.message || "",
+            date: msg.createdAt || msg.date || new Date().toISOString(),
+          });
+          repliesByReceiver.set(msg.receiverId, existing);
+        });
+
+        // Group by senderId so the outer list shows one conversation per user
+        const groupedBySender = new Map<string, MessageItem>();
+        for (const msg of mapped) {
+          if (!msg.senderId) continue;
+          if (!groupedBySender.has(msg.senderId)) {
+            // messages are ordered from newest to oldest, so first one per sender is the latest
+            const replies = repliesByReceiver.get(msg.senderId) || [];
+            groupedBySender.set(msg.senderId, {
+              ...msg,
+              replies,
+            });
+          }
+        }
+
+        setMessages(Array.from(groupedBySender.values()));
       }
       console.log(response);
     }catch(err){
@@ -120,6 +149,15 @@ export default function MessagesPage() {
   const [replyId, setReplyId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  const conversationRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!detailId) return;
+    const container = conversationRef.current;
+    if (!container) return;
+    container.scrollTop = container.scrollHeight;
+  }, [detailId, messages]);
 
   const filteredMessages = useMemo(() => {
     let filtered = messages;
@@ -254,7 +292,7 @@ export default function MessagesPage() {
       className="no-scrollbar"
       style={{
         minHeight: "100vh",
-        backgroundColor: "#F3F2EF",
+        backgroundColor: "transparent",
         overflowX: "hidden",
       }}
     >
@@ -264,7 +302,7 @@ export default function MessagesPage() {
           maxWidth: "100%",
           margin: 0,
           boxSizing: "border-box",
-          padding: isMobile ? "0px" : "24px", 
+          padding: "0px",
         }}
       >
         {/* Full-page Message Box */}
@@ -275,8 +313,8 @@ export default function MessagesPage() {
         }}>
           <div style={{
             backgroundColor: "#FFFFFF",
-            borderRadius: isMobile ? 0 : 8,
-            boxShadow: isMobile ? "none" : "0 0 0 1px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.08)",
+            borderRadius: 8,
+            boxShadow: "0 0 0 1px rgba(0,0,0,0.06)",
             minHeight: isMobile ? "100vh" : "auto", 
           }}>
             {/* Search Bar */}
@@ -379,7 +417,7 @@ export default function MessagesPage() {
                       /* --- MOBILE LAYOUT --- */
                       <div>
                         {/* Top Row: Avatar, Info, Actions */}
-                        <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                           {/* Avatar */}
                           <div style={{
                             width: 48, height: 48, borderRadius: "50%", backgroundColor: "#0A66C2",
@@ -388,18 +426,15 @@ export default function MessagesPage() {
                           }}>
                             {getInitials(m.name)}
                           </div>
-                          {/* Content Header (Name, Email, Date, Trash) */}
+                          {/* Content Header (Name, Date, Trash) */}
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                                   <span style={{ fontSize: 14, fontWeight: m.read ? 400 : 600, color: "#000000" }}>
                                     {m.name}
                                   </span>
                                 </div>
-                                <p style={{ fontSize: 13, color: "#666666", marginTop: 2 }}>
-                                  {m.email}
-                                </p>
                               </div>
                               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                 <span style={{ fontSize: 12, color: "#666666", whiteSpace: "nowrap" }}>
@@ -464,7 +499,7 @@ export default function MessagesPage() {
                       </div>
                     ) : (
                       /* --- DESKTOP LAYOUT (Original) --- */
-                      <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                         {/* Avatar */}
                         <div style={{
                           width: 48, height: 48, borderRadius: "50%", backgroundColor: "#0A66C2",
@@ -477,16 +512,13 @@ export default function MessagesPage() {
                         {/* Content (all in one block) */}
                         <div style={{ flex: 1, minWidth: 0 }}>
                           {/* Content Header */}
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                                 <span style={{ fontSize: 14, fontWeight: m.read ? 400 : 600, color: "#000000" }}>
                                   {m.name}
                                 </span>
                               </div>
-                              <p style={{ fontSize: 13, color: "#666666", marginTop: 2 }}>
-                                {m.email}
-                              </p>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                               <span style={{ fontSize: 12, color: "#666666", whiteSpace: "nowrap" }}>
@@ -544,25 +576,39 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      {/* Detail Modal */}
+      {/* Detail Full-Page View */}
       {detailId && messages.find(m => m.id === detailId) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setDetailId(null)}>
+        <div
+          className="fixed right-0 bottom-0 left-0 lg:left-72 z-50 bg-white"
+          style={{
+            top: 64,
+            padding: isMobile ? 0 : 12,
+            display: "flex",
+            flexDirection: "column",
+            height: "calc(100vh - 64px)",
+            maxHeight: "calc(100vh - 64px)",
+            boxSizing: "border-box",
+            overflow: "hidden",
+          }}
+        >
           <div
-            onClick={e => e.stopPropagation()}
             style={{
               backgroundColor: "#FFFFFF",
               borderRadius: 8,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              boxShadow: "0 0 0 1px rgba(0,0,0,0.06)",
               width: "100%",
-              maxWidth: 640,
-              maxHeight: "90vh",
-              overflowY: "auto",
+              height: "auto",
+              maxWidth: "100%",
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+              flex: 1,
             }}
           >
             {(() => {
               const msg = messages.find(m => m.id === detailId)!;
               return (
-                <div>
+                <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
                   {/* Header */}
                   <div style={{ 
                     padding: "16px 20px", 
@@ -597,11 +643,21 @@ export default function MessagesPage() {
                   </div>
 
                   {/* Content */}
-                  <div style={{ padding: 0, display: "flex", flexDirection: "column", height: "100%" }}>
+                  <div style={{ padding: 0, display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
                     {/* Meta strip removed: tag/status badges hidden per request */}
 
-                    {/* Scrollable conversation area */}
-                    <div className="no-scrollbar" style={{ padding: 20, overflowY: "auto", maxHeight: "60vh" }}>
+                    {/* Scrollable conversation area + sticky composer */}
+                    <div
+                      ref={conversationRef}
+                      style={{
+                        padding: isMobile ? 12 : 20,
+                        paddingBottom: isMobile ? 80 : 96,
+                        overflowY: "auto",
+                        flex: 1,
+                        minHeight: 0,
+                        maxHeight: "100%",
+                      }}
+                    >
                       {/* Date separator */}
                       <div style={{ display: "flex", alignItems: "center", gap: 12, color: "#666", fontSize: 12, margin: "8px 0 16px" }}>
                         <div style={{ flex: 1, height: 1, background: "#E0E0E0" }} />
@@ -652,43 +708,54 @@ export default function MessagesPage() {
                           }}>You</div>
                         </div>
                       ))}
-                    </div>
 
-                    {/* Composer (sticky bottom) */}
-                    <div style={{ borderTop: "3px solid #2A8C2F20", padding: 16 }}>
-                      <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
-                        <textarea
-                          value={replyText}
-                          onChange={e => setReplyText(e.target.value)}
-                          placeholder="Write a message..."
-                          className="w-full resize-none"
-                          style={{
-                            minHeight: 80,
-                            padding: 12,
-                            border: "1px solid #E0E0E0",
-                            borderRadius: 12,
-                            outline: "none",
-                            fontSize: 14,
-                            fontFamily: "inherit",
-                            backgroundColor: "#FAFAFA",
-                          }}
-                        />
-                        <button
-                          onClick={sendReply}
-                          disabled={!replyText.trim()}
-                          style={{
-                            padding: "10px 16px",
-                            backgroundColor: !replyText.trim() ? "#B0B0B0" : "#0A66C2",
-                            color: "#FFFFFF",
-                            borderRadius: 20,
-                            fontWeight: 600,
-                            fontSize: 14,
-                            border: "none",
-                            cursor: !replyText.trim() ? "not-allowed" : "pointer",
-                          }}
-                        >
-                          Send
-                        </button>
+                      {/* Composer (sticky at bottom) */}
+                      <div
+                        style={{
+                          position: "sticky",
+                          bottom: 0,
+                          borderTop: "3px solid #2A8C2F20",
+                          paddingTop: 16,
+                          paddingBottom: 4,
+                          backgroundColor: "#FFFFFF",
+                        }}
+                      >
+                        <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+                          <textarea
+                            value={replyText}
+                            onChange={e => setReplyText(e.target.value)}
+                            placeholder="Write a message..."
+                            className="w-full resize-none"
+                            style={{
+                              minHeight: 60,
+                              maxHeight: 120,
+                              padding: 12,
+                              border: "1px solid #E0E0E0",
+                              borderRadius: 12,
+                              outline: "none",
+                              fontSize: 14,
+                              fontFamily: "inherit",
+                              backgroundColor: "#FAFAFA",
+                              overflowY: "auto",
+                            }}
+                          />
+                          <button
+                            onClick={sendReply}
+                            disabled={!replyText.trim()}
+                            style={{
+                              padding: "10px 16px",
+                              backgroundColor: !replyText.trim() ? "#B0B0B0" : "#0A66C2",
+                              color: "#FFFFFF",
+                              borderRadius: 20,
+                              fontWeight: 600,
+                              fontSize: 14,
+                              border: "none",
+                              cursor: !replyText.trim() ? "not-allowed" : "pointer",
+                            }}
+                          >
+                            Send
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
