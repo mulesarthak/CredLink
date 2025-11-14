@@ -953,40 +953,31 @@ const EditPage = () => {
   const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
   const [cardLocation, setCardLocation] = useState('California, USA');
   
-  // Renamed cardDescription to about
   const [about, setAbout] = useState('A modern digital visiting card for software designer showcasing professional details, social links, and portfolio');
 
-  // --- NEW STATE for DigitalCardPreview ---
   const [skills, setSkills] = useState('SEO, Content Creation, Analytics');
   const [portfolio, setPortfolio] = useState('Case Study 1, Project X');
   const [experience, setExperience] = useState('Lead Marketer @ MyKard (2023-Present)');
   const [linkedin, setLinkedin] = useState('https://linkedin.com/in/yaasnick');
   const [website, setWebsite] = useState('https://yaasnick.com');
-  // --- ADDED NEW STATE ---
   const [services, setServices] = useState('SEO Audits, Slogan Content Campaigns');
   const [reviews, setReviews] = useState('John transformed our online presence!, Happy Client');
-  // --- END NEW STATE ---
 
-  // --- NEW STATE for "Add Field" Modal ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newFieldName, setNewFieldName] = useState('');
   const [newFieldLink, setNewFieldLink] = useState('');
   const [extraFields, setExtraFields] = useState<ExtraField[]>([]);
-  // --- END NEW STATE ---
-
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [cardDescription, setCardDescription] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [displayTypes, setDisplayTypes] = useState<string[]>(['Classic']);
   const [existingCardId, setExistingCardId] = useState<string | null>(null);
 
   const hexToRgb = (hex: string) => {
-    // Ensure hex is valid
     if (!hex || hex.length < 4) hex = '#145DFD';
     const bigint = parseInt(hex.slice(1), 16);
     const r = (bigint >> 16) & 255;
@@ -1005,7 +996,7 @@ const EditPage = () => {
   const [bValue1, setBValue1] = useState(initialRgb1.b);
   const [hexValue1, setHexValue1] = useState(selectedColor1);
 
-  const initialRgb2 = hexToRgb(selectedColor2); // New state for second color
+  const initialRgb2 = hexToRgb(selectedColor2); 
   const [rValue2, setRValue2] = useState(initialRgb2.r);
   const [gValue2, setGValue2] = useState(initialRgb2.g);
   const [bValue2, setBValue2] = useState(initialRgb2.b);
@@ -1021,7 +1012,7 @@ const EditPage = () => {
     }
   }, [selectedColor1]);
 
-  React.useEffect(() => { // New useEffect for second color
+  React.useEffect(() => { 
     const newRgb2 = hexToRgb(selectedColor2);
     if (newRgb2) {
       setRValue2(newRgb2.r);
@@ -1031,7 +1022,6 @@ const EditPage = () => {
     }
   }, [selectedColor2]);
 
-  // Fetch card data if editing existing card
   useEffect(() => {
     const fetchCardData = async () => {
       if (!cardId) return;
@@ -1054,7 +1044,6 @@ const EditPage = () => {
           console.log('✅ Loaded card for editing:', data.card);
           const card = data.card;
           
-          // Populate all form fields with card data
           setFirstName(card.fullName || card.firstName || '');
           setMiddleName(card.middleName || '');
           setLastName(card.lastName || '');
@@ -1075,7 +1064,6 @@ const EditPage = () => {
           setAccreditations(card.accreditations || '');
           setCardLocation(card.location || '');
           setAbout(card.bio || card.about || card.description || '');
-          setCardDescription(card.description || '');
           setSkills(card.skills || '');
           setPortfolio(card.portfolio || '');
           setExperience(card.experience || '');
@@ -1166,7 +1154,6 @@ const EditPage = () => {
     setSelectedColor1(hex);
   };
 
-  // Second color handlers
   const handleRChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const r = Number(e.target.value);
     if (!isNaN(r) && r >= 0 && r <= 255) {
@@ -1225,7 +1212,6 @@ const EditPage = () => {
     setSelectedColor2(hex);
   };
 
-  // Helper function to convert file to base64
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -1235,9 +1221,6 @@ const EditPage = () => {
     });
   };
 
-
-
-  // --- NEW HANDLER FUNCTIONS for "Add Field" ---
   const handleAddField = () => {
     if (newFieldName.trim()) {
       const newField: ExtraField = {
@@ -1261,14 +1244,11 @@ const EditPage = () => {
       field.id === id ? { ...field, link: value } : field
     ));
   };
-  // --- END NEW HANDLER FUNCTIONS ---
 
-  // Save card function
   const handleSaveCard = async () => {
     try {
       setIsSaving(true);
 
-      // Validate required fields
       const fullName = `${prefix} ${firstName} ${middleName} ${lastName} ${suffix}`.trim();
       const finalName = cardName || fullName;
       
@@ -1279,10 +1259,8 @@ const EditPage = () => {
         return;
       }
 
-      // Create FormData
       const formData = new FormData();
       
-      // Add all the card fields
       formData.append('fullName', finalName);
       if (firstName) formData.append('firstName', firstName);
       if (middleName) formData.append('middleName', middleName);
@@ -1312,7 +1290,6 @@ const EditPage = () => {
       if (selectedColor2) formData.append('selectedColor2', selectedColor2);
       if (selectedFont) formData.append('selectedFont', selectedFont);
       if (about) formData.append('bio', about);
-      if (cardDescription) formData.append('description', cardDescription);
       if (skills) formData.append('skills', skills);
       if (portfolio) formData.append('portfolio', portfolio);
       if (experience) formData.append('experience', experience);
@@ -1985,15 +1962,15 @@ const EditPage = () => {
               { label: 'Middle Name', value: middleName, setter: setMiddleName },
               { label: 'Last Name', value: lastName, setter: setLastName },
               { label: 'Suffix', value: suffix, setter: setSuffix },
-              { label: 'Accreditations', value: accreditations, setter: setAccreditations },
-              { label: 'Preferred Name', value: preferredName, setter: setPreferredName },
-              { label: 'Maiden Name', value: maidenName, setter: setMaidenName },
-              { label: 'Pronouns', value: pronouns, setter: setPronouns },
-              { label: 'Affiliation', value: affiliation, setter: setAffiliation },
+              // { label: 'Accreditations', value: accreditations, setter: setAccreditations },
+              // { label: 'Preferred Name', value: preferredName, setter: setPreferredName },
+              // { label: 'Maiden Name', value: maidenName, setter: setMaidenName },
+              // { label: 'Pronouns', value: pronouns, setter: setPronouns },
+              // { label: 'Affiliation', value: affiliation, setter: setAffiliation },
               { label: 'Title', value: title, setter: setTitle },
-              { label: 'Department', value: department, setter: setDepartment },
+              // { label: 'Department', value: department, setter: setDepartment },
               { label: 'Company', value: company, setter: setCompany },
-              { label: 'Headline', value: headline, setter: setHeadline },
+              // { label: 'Headline', value: headline, setter: setHeadline },
               { label: 'Location', value: cardLocation, setter: setCardLocation }
             ].map(field => (
               <div key={field.label} style={{ marginBottom: '15px' }}>
@@ -2020,18 +1997,20 @@ const EditPage = () => {
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: '#555', marginBottom: '5px' }}>Description</label>
               <textarea
-                value={cardDescription}
-                onChange={(e) => setCardDescription(e.target.value)}
-                rows={4}
+                value={about}
+                onChange={(e) => setAbout(e.target.value)}
+                placeholder="Enter a brief description for your card"
                 style={{
                   width: '100%',
+                  minHeight: '100px',
                   padding: '10px',
                   fontSize: '14px',
                   border: '1px solid #ddd',
                   borderRadius: '8px',
                   boxSizing: 'border-box',
-                  outline: 'none',
-                  resize: 'vertical'
+                  backgroundColor: 'white',
+                  color: '#555',
+                  outline: 'none'
                 }}
               />
             </div>
@@ -2087,9 +2066,9 @@ const EditPage = () => {
 
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', marginBottom: '15px', backgroundColor: 'white' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Email
                   </span>
@@ -2131,9 +2110,9 @@ const EditPage = () => {
 
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Phone
                   </span>
@@ -2198,9 +2177,9 @@ const EditPage = () => {
               {/* Services */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Services
                   </span>
@@ -2232,9 +2211,9 @@ const EditPage = () => {
               {/* Portfolio */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                    {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Portfolio
                   </span>
@@ -2266,9 +2245,9 @@ const EditPage = () => {
               {/* Skills */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Skills
                   </span>
@@ -2300,9 +2279,9 @@ const EditPage = () => {
               {/* Experience */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Experience
                   </span>
@@ -2334,9 +2313,9 @@ const EditPage = () => {
               {/* Review */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Review
                   </span>
@@ -2368,9 +2347,9 @@ const EditPage = () => {
               {/* LinkedIn */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     LinkedIn
                   </span>
@@ -2396,9 +2375,9 @@ const EditPage = () => {
               {/* Website */}
               <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ cursor: 'grab', color: '#aaa' }}>
+                  {/* <span style={{ cursor: 'grab', color: '#aaa' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </span>
+                  </span> */}
                   <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Website
                   </span>
