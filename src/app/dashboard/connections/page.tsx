@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './connections.module.css'; // Import CSS Module
+import { Modal } from '@/components/ui/modal';
+import DigitalCardPreview from '@/components/cards/DigitalCardPreview';
 
 // Remove the inline style injection logic
 /*
@@ -55,6 +57,7 @@ export default function DashboardContactPage() {
   const [messageText, setMessageText] = useState('');
   const [connectionRequests, setConnectionRequests] = useState<Contact[]>([]);
   const [activeTab, setActiveTab] = useState<'connections' | 'requests'>('connections');
+  const [previewContact, setPreviewContact] = useState<Contact | null>(null);
   const [loading, setLoading] = useState(false);
   const [requestsLoading, setRequestsLoading] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
@@ -355,6 +358,28 @@ export default function DashboardContactPage() {
   return (
     <div className={styles.minHScreen}>
       <div className={styles.wFull}>
+        {previewContact && (
+          <Modal
+            isOpen={!!previewContact}
+            onClose={() => setPreviewContact(null)}
+            title=""
+            message={null}
+            showActions={false}
+          >
+            <div style={{ padding: 20 }}>
+              <DigitalCardPreview
+                name={previewContact.name}
+                title={previewContact.title}
+                company={previewContact.company}
+                location={previewContact.location || ''}
+                about={`${previewContact.title || ''}${previewContact.company ? ' at ' + previewContact.company : ''}`}
+                skills=""
+                portfolio=""
+                experience=""
+              />
+            </div>
+          </Modal>
+        )}
         {/* Hero Section */}
         <div className={styles.heroSection}>
           {/* Background Pattern */}
@@ -664,7 +689,7 @@ export default function DashboardContactPage() {
                                 </span>
                               </div>
                               <button
-                                onClick={() => handleContactClick(contact)}
+                                onClick={() => setPreviewContact(contact)}
                                 className={styles.contactNameButton}
                               >
                                 {contact.name}
@@ -728,7 +753,7 @@ export default function DashboardContactPage() {
                           <div className={styles.mobileCardContent}>
                             <div className={styles.mobileCardHeader}>
                               <div>
-                                <h3 className={styles.mobileCardTitle}>{contact.name}</h3>
+                                <h3 className={styles.mobileCardTitle} onClick={() => setPreviewContact(contact)} style={{ cursor: 'pointer' }}>{contact.name}</h3>
                                 <p className={styles.mobileCardSubtitle}>{contact.title}</p>
                               </div>
                               <div className={styles.mobileCardActions}>
