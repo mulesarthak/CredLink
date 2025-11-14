@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "react-hot-toast"
+import { auth, GoogleAuthProvider, signInWithPopup } from "@/lib/firebase"
+import { createUserWithEmailAndPassword } from "firebase/auth"
 import "../../globals.css"
 import styles from "./signup.module.css"
 
@@ -77,12 +79,50 @@ export default function SignupPage() {
     }
   }
 
-  // Handle OAuth providers (placeholder)
-  const handleOAuthLogin = (provider: string) => {
-    toast(`${provider} authentication coming soon!`, {
-      icon: 'ℹ️',
-    })
-    // TODO: Implement OAuth
+  // Google via Firebase
+  const handleGoogleOAuth = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      
+      console.log('🔐 Starting Google sign-in...')
+      const provider = new GoogleAuthProvider()
+      const result = await signInWithPopup(auth, provider)
+      
+      console.log('✅ Google popup success, getting token...')
+      const idToken = await result.user.getIdToken(true)
+      
+      console.log('📤 Sending token to backend...')
+      const res = await fetch('/api/auth/firebase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ idToken }),
+      })
+
+      const data = await res.json().catch(() => ({}))
+      console.log('📥 Backend response:', data)
+      
+      if (!res.ok) {
+        throw new Error(data?.error || 'Authentication failed')
+      }
+
+      toast.success('Signed in with Google')
+      if (data?.needsPassword) {
+        window.location.href = '/auth/set-password'
+      } else if (data?.needsOnboarding) {
+        window.location.href = '/onboarding'
+      } else {
+        window.location.href = '/dashboard'
+      }
+    } catch (e: any) {
+      console.error('❌ Google auth error:', e)
+      const errorMsg = e?.message || 'Google sign-in failed'
+      toast.error(errorMsg)
+      setError(errorMsg)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Handle password option click
@@ -93,90 +133,51 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    
+
     if (!fullName || !email || !phone || !password || !confirmPassword) {
       setError('Please fill in all required fields')
       return
     }
-    
+
     if (password !== confirmPassword) {
       setError('Passwords do not match')
       return
     }
 
-    // if (captchaCode !== generatedCaptcha) {
-    //   setError('Invalid captcha code. Please try again.')
-    //   generateCaptcha()
-    //   return
-    // }
-
     if (!acceptPrivacyPolicy) {
       setError('Please accept the privacy policy to continue')
       return
     }
-    
+
     if (password.length < 6) {
       setError('Password must be at least 6 characters long')
       return
     }
-    
+
     setLoading(true)
-    
+
     try {
-      // Call signup API directly (OTP verification disabled)
-      const response = await fetch('/api/auth/signup', {
+      // Create user in Firebase Auth
+      const cred = await createUserWithEmailAndPassword(auth, email, password)
+      const idToken = await cred.user.getIdToken(true)
+
+      // Call backend to create user in DB and set session
+      const response = await fetch('/api/auth/firebase', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName,
-          email,
-          phone,
-          password
-        })
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ idToken, fullName, phone }),
       })
 
       const data = await response.json()
 
       if (response.ok) {
         toast.success('Account created successfully!')
-        // Redirect to onboarding page
         router.push('/onboarding')
       } else {
         setError(data.error || 'Failed to create account')
         toast.error(data.error || 'Failed to create account')
       }
-      
-      // // OTP FLOW (COMMENTED OUT)
-      // // Store signup data in sessionStorage for after OTP verification
-      // if (typeof window !== 'undefined') {
-      //   sessionStorage.setItem('signupData', JSON.stringify({
-      //     fullName,
-      //     email,
-      //     phone,
-      //     password
-      //   }))
-      // }
-      // 
-      // // Setup reCAPTCHA and send OTP via Firebase
-      // const appVerifier = setupRecaptcha()
-      // const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`
-      // 
-      // console.log('📱 Sending OTP to:', formattedPhone)
-      // const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier)
-      // 
-      // // Store confirmation result in sessionStorage
-      // if (typeof window !== 'undefined') {
-      //   sessionStorage.setItem('verificationId', confirmation.verificationId)
-      //   sessionStorage.setItem('otpPhone', formattedPhone)
-      // }
-      // 
-      // toast.success('OTP sent successfully!')
-      // 
-      // // Redirect to OTP verification page
-      // router.push(`/auth/verify-otp?phone=${encodeURIComponent(formattedPhone)}`)
-      
     } catch (error: any) {
       console.error('Signup error:', error)
       setError(error.message || 'Failed to create account. Please try again.')
@@ -185,6 +186,7 @@ export default function SignupPage() {
       setLoading(false)
     }
   }
+      // ...existing code...
 
 
   return (
@@ -251,7 +253,7 @@ export default function SignupPage() {
             <div className={styles.optionsList}>
               {/* Google */}
               <button
-                onClick={() => handleOAuthLogin('Google')}
+                onClick={handleGoogleOAuth}
                 className={styles.oauthBtn}
               >
                 <svg className="icon" viewBox="0 0 24 24">
@@ -265,7 +267,7 @@ export default function SignupPage() {
 
               {/* Microsoft */}
               <button
-                onClick={() => handleOAuthLogin('Microsoft')}
+                onClick={() => toast('Microsoft auth coming soon', { icon: 'ℹ️' })}
                 className={styles.oauthBtn}
               >
                 <svg className="icon" viewBox="0 0 23 23">
@@ -280,7 +282,7 @@ export default function SignupPage() {
 
               {/* Apple */}
               <button
-                onClick={() => handleOAuthLogin('Apple')}
+                onClick={() => toast('Apple auth coming soon', { icon: 'ℹ️' })}
                 className={styles.oauthBtn}
               >
                 <svg className="icon" viewBox="0 0 24 24" fill="currentColor">

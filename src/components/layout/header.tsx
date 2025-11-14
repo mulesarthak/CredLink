@@ -65,116 +65,78 @@ export function Header() {
             >
               <div className="relative">
                 {isLgUp ? (
-                  <motion.button
+                  <motion.div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "50%",
-                      background: user?.profileImage
-                        ? "transparent"
-                        : "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-                      border: "2px solid white",
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                      overflow: "hidden",
+                      gap: "10px",
+                      padding: "4px 12px 4px 6px",
+                      borderRadius: "9999px",
+                      background: "rgba(255,255,255,0.85)",
+                      border: "1px solid rgba(229,231,235,0.6)",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+                      cursor: "pointer",
+                      backdropFilter: "blur(6px)",
                     }}
                   >
-                    {user?.profileImage ? (
-                      <img
-                        src={user.profileImage}
-                        alt="Profile"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      <User style={{ width: "16px", height: "16px", color: "white" }} />
-                    )}
-                  </div>
-
-                  {/* USER INFO */}
-                  <div
-                    className="hidden sm:block"
-                    style={{
-                      textAlign: "left",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {/* USER AVATAR */}
+                    {/* Avatar */}
                     <div
                       style={{
                         width: "36px",
                         height: "36px",
                         borderRadius: "50%",
-                        background:
-                          "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                        background: user?.profileImage
+                          ? "transparent"
+                          : "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
                         border: "2px solid white",
-                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         flexShrink: 0,
+                        overflow: "hidden",
                       }}
                     >
-                      <User style={{ width: "16px", height: "16px", color: "white" }} />
+                      {user?.profileImage ? (
+                        <img
+                          src={user.profileImage}
+                          alt="Profile"
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      ) : (
+                        <User style={{ width: "16px", height: "16px", color: "white" }} />
+                      )}
                     </div>
-
-                    {/* USER INFO */}
-                    <div
-                      style={{
-                        textAlign: "left",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <div
+                    {/* Name + Email */}
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span
                         style={{
                           fontSize: "14px",
-                          fontWeight: "600",
+                          fontWeight: 600,
                           color: "#374151",
-                          lineHeight: "1.2",
-                          marginBottom: "2px",
+                          lineHeight: 1.2,
                         }}
                       >
                         {user?.fullName || "User"}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: "12px",
-                          color: "#6b7280",
-                          lineHeight: "1.2",
-                        }}
-                      >
+                      </span>
+                      <span style={{ fontSize: "12px", color: "#6b7280", lineHeight: 1.2 }}>
                         {user?.email || "No email"}
-                      </div>
+                      </span>
                     </div>
-
-                    {/* DROPDOWN ICON */}
+                    {/* Chevron */}
                     <motion.div
                       animate={{ rotate: isDropdownOpen ? 180 : 0 }}
                       transition={{ duration: 0.2 }}
-                      style={{ flexShrink: 0 }}
+                      style={{ display: "flex", alignItems: "center" }}
                     >
-                      <ChevronDown
-                        style={{
-                          width: "16px",
-                          height: "16px",
-                          color: "#6b7280",
-                        }}
-                      />
+                      <ChevronDown style={{ width: "16px", height: "16px", color: "#6b7280" }} />
                     </motion.div>
-                  </motion.button>
+                  </motion.div>
                 ) : (
                   <motion.button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
