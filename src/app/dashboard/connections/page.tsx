@@ -1113,7 +1113,7 @@ export default function DashboardContactPage() {
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <p className={styles.modalBody}>
-                Approving will allow this person to connect with you and see your shared profile information.
+              Approving will allow this person to connect with you and see your card information, including your phone number, email, job title, and other shared details.
               </p>
               <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                 <button onClick={closeApproveModal} className={styles.modalCancelButton} style={{ flex: 1 }}>

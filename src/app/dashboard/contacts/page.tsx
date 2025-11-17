@@ -221,8 +221,11 @@ export default function ContactsPage() {
                         <div className={styles.contactDetails}>
                           <h3 className={styles.contactName}>{contact.name}</h3>
                           <p className={styles.contactCard}>
-                            Connected via <span className={styles.cardName}>
+                            Contacted via <span className={styles.cardName}>
                               {contact.card.cardName || contact.card.fullName}
+                              {contact.card.cardName && contact.card.fullName !== contact.card.cardName && (
+                                <span className={styles.cardType}> ({contact.card.fullName})</span>
+                              )}
                             </span>
                           </p>
                         </div>

@@ -44,7 +44,15 @@ export default function SupportPage() {
   ], []);
 
   const faqs = useMemo<Faq[]>(() => [
-      {
+    {
+      q: "What is MyKard?",
+      a: "MyKard is a digital business card platform that allows users to create and share their professional profiles online. It provides a modern, customizable, and shareable way to represent oneself in the digital age.",
+    },  
+   {
+      q: "How to create MyKard?",
+      a: "to create MyKard, you can follow these steps: 1) Go to dashboard and click on create card button. 2) Fill the form with your details. 3) Click on create card button .And you will get your MyKard.",
+    }, 
+    {
       q: "How does MyKard works",
       a: "1)Create Your Profile – Add your professional details.2) Customize Your Card – Personalize with themes and logos.3)Share Anywhere – Use your link or QR code instantly.4)Track Insights – Monitor views, leads, and engagement.",
     },
