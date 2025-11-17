@@ -513,32 +513,39 @@ const OnboardingPage: React.FC = () => {
           }}
         >
           <div style={{ maxWidth: '448px', textAlign: 'center', marginBottom: 0 }}>
-            <h1
-              style={{
-                fontSize: '36px',
-                fontWeight: '700',
-                color: '#1F2937',
-              }}
-            >
-              Welcome to{' '}
-              <span
-                style={{
-                  background: `linear-gradient(135deg, ${colors.primary}, ${colors.purple})`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                MyKard
-              </span>
-            </h1>
-            <p
-              style={{
-                color: colors.textLight,
-                margin: '16px 0 32px',
-              }}
-            >
-              Build connections in your own unique way.
-            </p>
+  <h1
+  style={{
+    fontSize: "40px",
+    fontWeight: "700",
+    color: "#1F2937",
+    display: "flex",
+    alignItems: "flex-end",   
+    justifyContent: "center",
+    gap: "5px",
+    whiteSpace: "nowrap",
+    lineHeight: "1",
+    marginBottom: "20px",      
+  }}
+>
+  Welcome to
+  <img
+    src="/assets/myKard.png"
+    alt="MyKard Logo"
+    style={{
+      height: "150px",        
+      objectFit: "contain",
+      marginBottom: "-50px", 
+    }}
+  />
+</h1>
+           <p
+    style={{
+      color: colors.textLight,
+      margin: "0 0 32px",            
+    }}
+  >
+    Build connections in your own unique way.
+  </p>
             <button
               onClick={() => setStep(1)}
               style={{

@@ -44,6 +44,7 @@ export default function SupportPage() {
   ], []);
 
   const faqs = useMemo<Faq[]>(() => [
+    
       {
       q: "How does MyKard works",
       a: "1)Create Your Profile – Add your professional details.2) Customize Your Card – Personalize with themes and logos.3)Share Anywhere – Use your link or QR code instantly.4)Track Insights – Monitor views, leads, and engagement.",
@@ -60,7 +61,7 @@ export default function SupportPage() {
 
     {
       q: "How much does it cost to get started?",
-      a: "You can get started for free with a basic MyKard.Just click “Create Your Free Card Now” on the homepage to begin designing your digital card.",
+      a: "You can get started for free with MyKard.Just click “Create Your Free Card Now” on the homepage to begin designing your digital card.",
     },
     {
       q: "How does MyKard help grow my professional network?",
