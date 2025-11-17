@@ -76,7 +76,7 @@ export default function SupportPage() {
 
     {
       q: "How much does it cost to get started?",
-      a: "You can get started for free with a basic MyKard.Just click “Create Your Free Card Now” on the homepage to begin designing your digital card.",
+      a: "You can get started for free with MyKard.Just click “Create Your Free Card Now” on the homepage to begin designing your digital card.",
     },
     {
       q: "How does MyKard help grow my professional network?",
