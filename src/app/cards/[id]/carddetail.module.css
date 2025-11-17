@@ -460,13 +460,28 @@
 }
 
 .shareToggleButton:hover {
-  color: var(--color-primary-light);
+  color: inherit;
 }
 
 .shareToggleButtonActive {
   background-color: var(--color-primary-light);
   color: var(--color-white);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06); /* shadow-md */
+}
+
+/* Ensure icon adopts white when active */
+.shareToggleButtonActive svg {
+  color: var(--color-white);
+}
+
+/* Mobile: force white text/icon when selected */
+@media (max-width: 639px) {
+  .shareToggleButtonActive {
+    color: var(--color-white) !important;
+  }
+  .shareToggleButtonActive svg {
+    color: var(--color-white) !important;
+  }
 }
 
 .qrWrapper {
