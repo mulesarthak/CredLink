@@ -635,13 +635,13 @@ const handleDelete = async () => {
                 className={`${styles.tabContent} ${styles.settingsContent}`}
               >
                 {/* Card Configuration */}
-                <div className={styles.settingsCard}>
+                {/* <div className={styles.settingsCard}>
                   <h3 className={styles.settingsCardTitle}>
                     <div className={`${styles.dot}`} style={{ backgroundColor: 'var(--color-primary-light)' }}></div> Card Configuration
-                  </h3>
+                  </h3> */}
                   
                   {/* Card Name */}
-                  <div className={styles.settingsItem}>
+                  {/* <div className={styles.settingsItem}>
                     <div className={styles.settingsInfo}>
                       <h4 className={styles.settingsLabel}>Card Name</h4>
                       <p className={styles.settingsDescription}>Change the name of this card.</p>
@@ -653,10 +653,10 @@ const handleDelete = async () => {
                         className={styles.settingsInput}
                       />
                     </div>
-                  </div>
+                  </div> */}
                   
                   {/* QR Code Logo */}
-                  <div className={styles.settingsItem}>
+                  {/* <div className={styles.settingsItem}>
                     <div className={styles.settingsInfo}>
                       <h4 className={styles.settingsLabel}>QR Code Logo</h4>
                       <p className={styles.settingsDescription}>Change the logo inside the QR code.</p>
@@ -685,10 +685,10 @@ const handleDelete = async () => {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </div> */}
                   
                   {/* Personalized Link */}
-                  <div className={styles.settingsItem}>
+                  {/* <div className={styles.settingsItem}>
                     <div className={styles.settingsInfo}>
                       <h4 className={styles.settingsLabel}>Personalized Link</h4>
                       <p className={styles.settingsDescription}>Create your own link to further your brand.</p>
@@ -702,7 +702,7 @@ const handleDelete = async () => {
                       />
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Privacy & Visibility */}
                 <div className={`${styles.settingsCard} ${styles.privacyCard}`}>
@@ -732,13 +732,13 @@ const handleDelete = async () => {
                 </div>
 
                 {/* Advanced Settings */}
-                <div className={styles.settingsCard}>
-                  <h3 className={styles.settingsCardTitle}>
-                    <div className={`${styles.dot}`} style={{ backgroundColor: 'var(--color-purple-600)' }}></div> Advanced Settings
-                  </h3>
+                {/* <div className={styles.settingsCard}> */}
+                  {/* <h3 className={styles.settingsCardTitle}> */}
+                    {/* <div className={`${styles.dot}`} style={{ backgroundColor: 'var(--color-purple-600)' }}></div> Advanced Settings */}
+                  {/* </h3> */}
 
                   {/* Renew Link only */}
-                  <div className={styles.settingsItem}>
+                  {/* <div className={styles.settingsItem}>
                     <div className={styles.settingsInfo}>
                       <h4 className={styles.settingsLabel}>Renew Link</h4>
                       <p className={styles.settingsDescription}>Renew the link to your card.</p>
@@ -749,7 +749,7 @@ const handleDelete = async () => {
                       </button>
                     </div>
                   </div>
-                </div>
+                </div> */}
 
 
                 {/* Danger Zone */}

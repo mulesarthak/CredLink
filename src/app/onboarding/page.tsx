@@ -76,7 +76,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       {/* Header - Warm Orange/Red Gradient with cover */}
       <div
         style={{
-          background: "linear-gradient(180deg, #f59e0b 0%, #f97316 45%, #ef4444 100%)",
+          background: "linear-gradient(180deg, rgba(45, 111, 255, 1) 0%, #517cd7ff 45%, #00c0fd 100%)",
           padding: "22px",
           color: colors.white,
           position: "relative",
@@ -164,7 +164,7 @@ const DigitalCardPreview: React.FC<DigitalCardProps> = ({
       </div>
 
       {/* Body */}
-      <div style={{ padding: "8px 20px 16px", background: "linear-gradient(180deg, #ef4444 0%, #dc2626 100%)", color: "#FFFFFF", textAlign: "center" }}>
+      <div style={{ padding: "8px 20px 16px", background: "linear-gradient(180deg, #00c0fd 0%, #00c0fd 100%)", color: "#FFFFFF", textAlign: "center" }}>
         <p style={{ fontSize: "13px", lineHeight: 1.6, margin: 0, color: "#FFFFFF", opacity: 1 }}>
           {about}
         </p>
@@ -680,9 +680,9 @@ const OnboardingPage: React.FC = () => {
                 color: colors.primary,
               }}
             >
-              {step === 1 && 'Your Full Name *'}
-              {step === 2 && 'Phone Number *'}
-              {step === 3 && 'Email Address *'}
+              {step === 1 && 'Full Name '}
+              {step === 2 && 'Phone Number '}
+              {step === 3 && 'Email Address '}
               {step === 4 && 'Professional Title'}
               {step === 5 && 'Company Name'}
               {step === 6 && 'Location'}
