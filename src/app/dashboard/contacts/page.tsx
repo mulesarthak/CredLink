@@ -65,7 +65,7 @@ export default function ContactsPage() {
             name: "John Smith",
             email: "john.smith@example.com",
             phone: "+1 (555) 123-4567",
-            sourceUrl: "https://credlink.com/cards/public/abc123",
+            sourceUrl: "https://mykard.in/cards/public/abc123",
             createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
             card: { id: "abc123", fullName: "Professional Card", cardName: "Business" }
           },
@@ -82,7 +82,7 @@ export default function ContactsPage() {
             name: "Mike Chen",
             email: "mike.chen@tech.io",
             phone: "+1 (555) 456-7890",
-            sourceUrl: "https://credlink.com/cards/public/ghi789",
+            sourceUrl: "https://mykard.in/cards/public/ghi789",
             createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
             card: { id: "ghi789", fullName: "Tech Lead Card", cardName: "Professional" }
           }
